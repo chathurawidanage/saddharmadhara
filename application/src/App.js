@@ -2,12 +2,12 @@ import "./App.css";
 import "survey-core/defaultV2.min.css";
 import { Survey } from "survey-react-ui";
 import { Model, surveyLocalization } from "survey-core";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 
 // todo validate NIC, Passport
 // todo add emojis to the heading
 
-const customLocaleStrings = {
+const sinhalaLocaleStrings = {
   pagePrevText: "පෙ​ර පිටුවට",
   pageNextText: "ඊළඟ පිටුවට",
   completeText: "අයදුම් කරන්න",
@@ -15,18 +15,24 @@ const customLocaleStrings = {
   exceedMaxSize: "ගොනු​වේ විශාලත්වය {0} නොඉක්මවිය යුතුය.",
   booleanCheckedLabel: "​ඔව්",
   booleanUncheckedLabel: "නැත",
-  previewText: "පෙරදසුන",
+  previewText: "අවසාන පිටුවට(පෙරදසුන)",
   editText: "වෙනස්කරන්න",
   placeholder: "තෝරන්න...",
   filePlaceholder:
-    "ෆයිල් එ​ක මෙතැනට ඇද දමන්න, නැතහොත් අප්ලෝඩ් කිරීමට ෆයිල් එ​කක් තේරීමට පහත බොත්තම ක්ලික් කරන්න.",
+    "ෆයිල් එ​ක මෙතැනට ඇද දමන්න, නැතහොත් අප්ලෝඩ් කිරීමට ෆයිල් එ​කක් තේරීමට පහත බට්න් එ​ක ක්ලික් කරන්න.",
   chooseFileCaption: "ෆයිල් එ​කක් තෝරන්න",
   savingDataError: "දෝෂයක් සිදු වූ අතර අපට දත්​ත සුරැකීමට නොහැකි විය.",
   saveAgainButton: "නැවත උත්සාහ කරන්න",
   savingData: "දත්​ත සුරකිමින් පවතී...",
+  invalidEmail: "කරණාකර වලංගු විද්‍යුත් තැපැල් ලිපිනයක් ඇතුළු කරන්න.",
 };
 
-surveyLocalization.locales["si"] = customLocaleStrings;
+const englishLocaleStrings = {
+  previewText: "Last Page(Preview)",
+};
+
+surveyLocalization.locales["si"] = sinhalaLocaleStrings;
+surveyLocalization.locales["default"] = englishLocaleStrings;
 
 const isRequired = false; // set required fields on or off for testing purposes
 
@@ -61,6 +67,7 @@ const yesNoQuestionWithComment = (
       isRequired: isRequired,
       elements: [
         {
+          name: name + "Comment",
           type: "comment",
           title: {
             default: englishMorePrompt,
@@ -81,8 +88,9 @@ const yesNoQuestionWithComment = (
   ];
 };
 
-const agreeDisagreeQuestion = (english, sinhala) => {
+const agreeDisagreeQuestion = (name, english, sinhala, validators) => {
   return {
+    name,
     type: "boolean",
     title: {
       default: english,
@@ -97,21 +105,30 @@ const agreeDisagreeQuestion = (english, sinhala) => {
       default: "I Disagree",
       si: "එකඟ නොවෙමි",
     },
+    validators,
   };
 };
 
+// Copy the response from /api/trackedEntityAttributes.json?fields=id,code&paging=false
+const d2IdsMap = {};
+JSON.parse(
+  `{"trackedEntityAttributes":[{"code":"NoBadHabbits","id":"ThRvZed4wxU"},{"code":"ReadFourNobleTruths","id":"wbllYsatR5l"},{"code":"DoAshubaBhavana","id":"DZgJUDEYKvH"},{"code":"UnderstandTrividaRathna","id":"q6N0kD78IS9"},{"code":"DoMaithreeBhavana","id":"ZnRv3kNDmun"},{"code":"NoPhones","id":"EJaujr9wSTz"},{"code":"HasDeformities","id":"nwItPNW72se"},{"code":"HasDiseases","id":"iaW1GDx6k3P"},{"code":"HasDeformitiesComment","id":"aHZ7BJDzntQ"},{"code":"UnattendedDeformitiesComment","id":"HtW0OMmthFQ"},{"code":"HaveKidsComment","id":"i3RptmIeSwR"},{"code":"HasLitigationsComment","id":"GL9bAKX2wl3"},{"code":"HasDiseasesComment","id":"nOm8SVX2VbC"},{"code":"StressComment","id":"Mp6LLGv4WOT"},{"code":"HaveTakenDrugsComment","id":"la4960WBUC3"},{"code":"HasPermissionComment","id":"QOGamVcvLPz"},{"code":"MedicalTreatmentsComment","id":"nTi2kp2C0v8"},{"code":"DateOfBirth","id":"oZkvTN1dcPw"},{"code":"Email","id":"lByRbJqnG5q"},{"code":"EmergencyContactName","id":"NgHvHow9RZs"},{"code":"EmergencyContactPhone","id":"uYHVvgUT65S"},{"code":"EmergencyContactRelationship","id":"duD6vVqtSCq"},{"code":"UnattendedDeformities","id":"RpNKpAufHbn"},{"code":"FullName","id":"fvk2p04ylAA"},{"code":"Gender","id":"tuKFO1uF5x5"},{"code":"HasPermission","id":"QGXYhZMXfnc"},{"code":"HaveKids","id":"Bpce3m4do80"},{"code":"OrdinationIntended","id":"kT2ExGjYbPS"},{"code":"HasLitigations","id":"g1QmlpA14bX"},{"code":"HomePhone","id":"ZRXiTWo2Vbq"},{"id":"aTV4MgCAFAX"},{"code":"PastInvolvementComment","id":"rrXapwmqJ3D"},{"code":"MaritalStatus","id":"B08mfPKrUiM"},{"code":"MedicalConditionsComment","id":"F2b0gJpgjLp"},{"code":"MobilePhone","id":"lLXB9cYYgEP"},{"code":"NameWithInitials","id":"MMb2cXBOrSY"},{"code":"NIC","id":"W1fmUMMnQdu"},{"code":"Objective","id":"KxFKodUg1kx"},{"code":"OtherIssuesComment","id":"iGNQ7t4qvcM"},{"code":"Passport","id":"hv3aLM80Mrn"},{"code":"Address","id":"ywoMYb2bCz5"},{"code":"Photo","id":"zMtxZwR7Kw5"},{"code":"PriamaryId","id":"EDhjneO1ofm"},{"code":"Profession","id":"EDMGB8x9lc3"},{"code":"Stress","id":"dgky5acnvG3"},{"code":"HaveTakenDrugs","id":"fyV0EfY0dnR"},{"code":"Whatsapp","id":"CpF36JSasMJ"}]}`
+).trackedEntityAttributes.forEach((att) => {
+  d2IdsMap[att.code] = att.id;
+});
+
 const surveyJson = {
   title: {
-    default: "🪷 Saddharma Dhara Application",
+    default: "🪷 Saddharmadhara Application",
     si: "🪷 සද්ධර්මධාරා අයදුම්පත්‍රය",
   },
   showProgressBar: "top",
-  showPreviewBeforeComplete: "showAllQuestions",
+  showPreviewBeforeComplete: "showAnsweredQuestions",
   checkErrorsMode: "onValueChanged",
   showTOC: true,
   completedHtml: {
     default: "<h4>Thank you for applying to Saddharmadhara!</h4>",
-    si: "<h4>සද්ධර්මධාරා සඳහා අයදුම් කළ ඔඹ​ට ස්තුතියි!</h4>",
+    si: "<h4>සද්ධර්මධාරා සඳහා අයදුම් කළ ඔ​බ​ට ස්තුතියි!</h4>",
   },
   pages: [
     {
@@ -131,6 +148,7 @@ const surveyJson = {
           choices: ["සිංහල", "English"],
           defaultValue: "සිංහල",
           isRequired: isRequired,
+          d2Id: "bla",
         },
       ],
     },
@@ -186,7 +204,7 @@ const surveyJson = {
             si: "ජාතික හැදුනුම්පත් අංකය",
           },
           type: "text",
-          // requiredIf: "{Passport} empty",
+          requiredIf: "{Passport} empty",
         },
         {
           name: "Passport",
@@ -195,7 +213,7 @@ const surveyJson = {
             si: "ගමන් බලපත්‍ර අංක​ය",
           },
           type: "text",
-          // requiredIf: "{NIC} empty",
+          requiredIf: "{NIC} empty",
         },
       ],
     },
@@ -230,14 +248,14 @@ const surveyJson = {
           type: "radiogroup",
           choices: [
             {
-              value: "Male",
+              value: "male",
               text: {
                 default: "Male",
                 si: "පුරුෂ",
               },
             },
             {
-              value: "Female",
+              value: "female",
               text: {
                 default: "Female",
                 si: "ස්ත්‍රී",
@@ -245,6 +263,8 @@ const surveyJson = {
             },
           ],
           isRequired: isRequired,
+          showCommentArea: true,
+          comment: "BlaCOmment",
         },
         {
           name: "MaritalStatus",
@@ -252,28 +272,28 @@ const surveyJson = {
           type: "dropdown",
           choices: [
             {
-              value: "Single",
+              value: "single",
               text: {
                 default: "Single",
                 si: "අවිවාහක",
               },
             },
             {
-              value: "Married",
+              value: "married",
               text: {
                 default: "Married",
                 si: "විවාහක",
               },
             },
             {
-              value: "Widowed",
+              value: "widowed",
               text: {
                 default: "Widowed",
                 si: "වැන්දඹු",
               },
             },
             {
-              value: "Divorced",
+              value: "divorced",
               text: {
                 default: "Divorced",
                 si: "දික්කසා​ද",
@@ -296,13 +316,79 @@ const surveyJson = {
           isRequired: isRequired,
         },
         {
+          name: "HomePhone",
+          title: { default: "Home Phone", si: "ස්ථාවර දුරකථන අංකය" },
+          type: "text",
+          inputType: "tel",
+          isRequired: isRequired,
+        },
+        {
+          name: "Whatsapp",
+          title: { default: "Whatsapp", si: "වට්ස්ඇප් අංකය" },
+          type: "text",
+          inputType: "tel",
+          isRequired: isRequired,
+        },
+        {
+          name: "Email",
+          title: { default: "Email", si: "විද්‍යුත් තැපැල් ලිපිනය" },
+          type: "text",
+          inputType: "email",
+        },
+        {
+          name: "Profession",
+          title: { default: "Profession", si: "රැකියාව" },
+          type: "text",
+        },
+        {
           name: "Photo",
           title: {
             default: "Photo",
             si: "ඡායා රූප​ය",
           },
           type: "file",
-          maxSize: 102400,
+          maxSize: 1024000 * 5, // 5MB
+          acceptedTypes: "image/*",
+          storeDataAsText: false,
+          waitForUpload: true,
+          allowMultiple: false,
+          allowImagesPreview: false,
+        },
+      ],
+    },
+    {
+      title: {
+        default: "🚑 Emergency Contact",
+        si: "🚑 හදිසි අවස්ථාවකදී දැනුම් දිය යුතු අයගේ විස්තර",
+      },
+      elements: [
+        {
+          name: "EmergencyContactName",
+          type: "text",
+          title: {
+            default:
+              "Name with initials of the person to be contacted in an emergency.",
+            si: "හදිසි අවස්ථාවකදී සම්බන්ධ කර ගත යුතු අයකුගේ නම (මුලකුරු සමග).",
+          },
+          isRequired: isRequired,
+        },
+        {
+          name: "EmergencyContactRelationship",
+          type: "text",
+          title: {
+            default: "Applicant's relationship to emergency contact person.",
+            si: "හදිසි අවස්ථාවකදී සම්බන්ධ කර ගත යුතු අය හා අයදුම්කරුගේ සම්බන්ධතාවය.",
+          },
+          isRequired: isRequired,
+        },
+        {
+          name: "EmergencyContactPhone",
+          type: "text",
+          title: {
+            default: "Phone number of the emergency contact.",
+            si: "හදිසි අවස්ථාවකදී සම්බන්ධ කර ගත යුතු අයගේ දුරකථන අංකය.",
+          },
+          isRequired: isRequired,
         },
       ],
     },
@@ -313,6 +399,7 @@ const surveyJson = {
       },
       elements: [
         {
+          name: "OrdinationIntended",
           type: "boolean",
           title: {
             default:
@@ -322,6 +409,7 @@ const surveyJson = {
           isRequired: isRequired,
         },
         {
+          name: "Objective",
           type: "comment",
           title: {
             default:
@@ -331,6 +419,7 @@ const surveyJson = {
           isRequired: isRequired,
         },
         {
+          name: "PastInvolvementComment",
           type: "comment",
           title: {
             default:
@@ -339,6 +428,7 @@ const surveyJson = {
           },
         },
         {
+          name: "MedicalConditionsComment",
           type: "comment",
           title: {
             default:
@@ -347,6 +437,7 @@ const surveyJson = {
           },
         },
         {
+          name: "MedicalTreatmentsComment",
           type: "comment",
           title: {
             default:
@@ -355,6 +446,7 @@ const surveyJson = {
           },
         },
         {
+          name: "OtherIssuesComment",
           type: "comment",
           title: {
             default:
@@ -381,12 +473,12 @@ const surveyJson = {
       elements: [
         ...yesNoQuestionWithComment(
           "HasPermission",
-          "Do you have full permission from your spouse/parents/guardian /employer or any such duty-bound relationships (for venerables, this could be the Monastery Head, Upajjhāya, or Ācariya) to attend the residential meditation program?",
+          "Do you have full permission from your spouse/parents/guardian/employer or any such duty-bound relationships (for venerables, this could be the Monastery Head, Upajjhāya, or Ācariya) to attend the residential meditation program?",
           "ඔබට මෙම නේවාසික භාවනා වැඩසටහන හා සම්බන්ධ වීමට දෙමව්පියන්ගෙන්/භාරකරුගෙන්/රැකියා කරන ස්ථානයෙන් සහ වෙනත් එවැනි විශේෂ වගකිවයුතු සම්බන්ධතාවලින් සම්පූර්ණ අවසරය ලැබී තිබේ ද?",
           false
         ),
         ...yesNoQuestionWithComment(
-          "Kids",
+          "HaveKids",
           "Do you have children under the age of 12?",
           "වයස අවුරුදු 12ට අඩු දරුවන් සිටී ද?",
           true,
@@ -394,13 +486,13 @@ const surveyJson = {
           "ඔවුන්ගේ වයස් කාණ්ඩ පිළිබඳව විස්තර සදහන් කරන්න. භාවනා වැඩසටහන් කාලය තුළ ඔවුන්ගේ රැකවරණය සදහා විධිමත් ක්‍රියාමාර්ග ගෙන තිබේද?"
         ),
         ...yesNoQuestionWithComment(
-          "BirthDefects",
+          "UnattendedDeformities",
           "Are you free from illnesses or deformities from birth, or which have arisen in a later period in life, which have not been cured up till now or there has been no medication found so far?",
           "ඔබ උපතේ සිටම පවතින රෝගාබාධවලින් හෝ විකෘතිතාවලින් පෙළෙන්නේද, එසේත් නැතිනම් ජීවිතයේ පසු කාලයක ඇති වූ මෙතෙක් සුව නොවූ හෝ මෙතෙක් ඖෂධ සොයාගෙන නොමැති සංකූලතාවයන් ඇති වී තිබේද?",
           true
         ),
         ...yesNoQuestionWithComment(
-          "Drugs",
+          "HaveTakenDrugs",
           "Are you now taking, or have you taken within the past two years, any alcohol or drugs (such as cigarettes, marijuana, amphetamines, barbiturates, cocaine, heroin, or other intoxicants) or mind-altering plants and substances (such as ayahuasca, peyote, LSD, etc.)?",
           "පසුගිය වසර දෙක තුළ ඔබ මත්පැන් හෝ මත්ද්‍රව්‍ය (සිගරට්, මරිජුවානා, ඇම්ෆෙටමින්, බාබිටියුරේට්, කොකේන්, හෙරොයින් හෝ වෙනත් මත් ද්‍රව්‍ය වැනි) හෝ මනස වෙනස් කරන ශාක සහ ද්‍රව්‍ය (අයුවස්කා, පෙයෝට්, LSD, ආදිය) භාවිත කර ඇත්ද?",
           true
@@ -414,19 +506,19 @@ const surveyJson = {
           "ඔබ එවැනි ආබාධ සඳහා ප්‍රතිකාර කරන්නේ නම්, කරුණාකර ඔබගේ රෝග ඉතිහාසය සහ ඔබගේ තත්වය පිළිබඳ අදාල වෙනත් තොරතුරු ලබා දෙන්න."
         ),
         ...yesNoQuestionWithComment(
-          "Legal",
+          "HasLitigations",
           "Do you have serious legal litigations that are bothering you, or similar unsettled duties to family, government, or society.?",
           "නීතිමය වශයෙන් පැහැර නොහැරිය හැකි යම් දඬුවමකින්, වගකීමකින්, රාජකාරී කටයුත්තකින් ඔබගේ පවුලට, රජයට හෝ සමාජයීය වශයෙන් බැඳී සිටිනවා ද?",
           true
         ),
         ...yesNoQuestionWithComment(
-          "Diseases",
+          "HasDiseases",
           "Do you have any signs of diseases like Asthma, Kushta, Vana, cists (Visha gedi), boils, or epilepsy?",
           "ඔබ ඇස්ම, කුෂ්ඨ, වණ, විෂ ගෙඩි, සුදු කබර, ඇස්ම , අපස්මාරය (epilepsy) ආදී රෝගාබාධ තත්වයන්ගෙන් යුතු ද?",
           true
         ),
         ...yesNoQuestionWithComment(
-          "Deformities",
+          "HasDeformities",
           "Are there any deformities in the body (for example amputated hands, legs, ears, etc.)?",
           "ශරීරයේ කිසියම් විකෘතිතාවයක් තිබේද (උදාහරණ ලෙස යම්කිසි හේතුවක් නිසා අත්, කකුල්, කන් ආදි අවයව හෝ කොටස් ඉවත් කර ඇති ද?",
           true
@@ -438,31 +530,38 @@ const surveyJson = {
         default: "☑️ Heading needed",
       },
       description: {
-        default: "",
+        default:
+          "If you intend to join the meditation program, indicate whether you are able to follow the following instructions prepared according to the instructions given by Most Reverend Bambalapitiya Gnanaloka Thero.",
         si: "භාවනා වැඩසටහන සඳහා සම්බන්වීමට අදහස් කරන ඔබ, අපගේ අතිපූජනීය බම්බලපිටියේ ඤාණාලෝක ස්වාමීන් වහන්සේගේ අනුශාසනා අනුව සකස් කරන ලද පහත සදහන් උපදෙස් සහ ඒවා පිළිපැදීමට ඔබට හැකියාවක් තිබේද යන්න සඳහන් කරන්න.",
       },
       elements: [
         agreeDisagreeQuestion(
+          "NoPhones",
           "You should try to reduce the use of cell phones, the internet, and other sense-stimulating activities for some time (preferably two weeks, otherwise at least five days) prior to the retreat date.",
           "ඔබ භාවනා වැඩසටහන සහභාගී වීමට නියමිත දිනට පෙර යම් කාලයක් (වඩාත් සුදුසු සති දෙකක්, එසේ නොමැති නම් අවම වශයෙන් දින පහක්) ජංගම දුරකථන, අන්තර්ජාලය සහ අනෙකුත් සංවේදී ක්‍රියාකාරකම් භාවිතය අවම කිරීමට උත්සාහ කළ යුතුය."
         ),
         agreeDisagreeQuestion(
+          "NoBadHabbits",
           "You should try to avoid bad habits like masturbation or any kind of sexual activity at a physical level for at least two weeks prior to the retreat.",
           "භාවනා වැඩසටහන පෙර අවම වශයෙන් සති දෙකකටවත් පෙර ශාරීරික මට්ටමේ ලිංගික ක්‍රියාකාරකම් වලින් වැළකී සිටීමට මෙන්ම ස්වයංවින්දනය වැනි නරක පුරුදුවලින් වැළකී සිටීමට හෝ ඔබ උත්සාහ කිරීම."
         ),
         agreeDisagreeQuestion(
+          "DoAshubaBhavana",
           "Practice 'Ashuba Bhavana' (reflection on unattractiveness) at least two weeks prior to the retreat.",
           "භාවනා වැඩසටහන පෙර අවම වශයෙන් සති දෙකකට පෙර සිටම අසුබ භාවනාව පුහුණු කිරීම."
         ),
         agreeDisagreeQuestion(
+          "DoMaithreeBhavana",
           "Practice compassion (Maithree Bhavana) at least two weeks prior to the retreat.",
           "භාවනා වැඩසටහන පෙර අවම වශයෙන් සති දෙකකට පෙර සිටම මෛත්‍රීය භාවනාව පුහුණු කිරීම."
         ),
         agreeDisagreeQuestion(
+          "UnderstandTrividaRathna",
           "With the understanding of the virtues of 'Trivida Rathna', cultivate pure and honest faith and practice Buddhanussathi, Dhammanussathi, Sanghanussathi at least two weeks prior to the retreat in advance.",
           "'ත්‍රිවිධ රත්නයේ' ගුණ අවබෝධ කරගෙන පිරිසුදු අවංක ශ්‍රද්ධාව වඩවාගෙන බුද්ධානුස්සති, ධම්මානුස්සති, සංඝානුස්සති යන පිළිවෙත් පුරුදු පුහුණු වීම."
         ),
         agreeDisagreeQuestion(
+          "ReadFourNobleTruths",
           "Have some Dhamma knowledge about the basic facts (four noble truths) of Buddhism - (Peruse the book 'The Word of the Buddha' written by the German monk Most Venerable Gnayanathiloka Thero)",
           "බුදුදහමේ මූලික කරුණු (උතුම් චතුරාර්ය සත්‍යය) පිළිබඳව යම් දහම් දැනුමක් ලබා ගැනීම - (ඒ සඳහා ඔබට ගෞරවනීය ස්වාමීන්වහන්සේ විසින් අනුදැන වදාළ පරිදි ජර්මානු ජාතික අතිපූජනීය ඤාණතිලෝක ස්වාමීන් වහන්සේ විසින් ලියන ලද ‘බුද්ධ වචනය’ ග්‍රන්ථය පරිශීලනය කළ හැකිය)"
         ),
@@ -491,8 +590,20 @@ const surveyJson = {
       },
       elements: [
         agreeDisagreeQuestion(
+          "FinalAgreement",
           "I hereby affirm the accuracy of the information provided above, to the best of my knowledge. I know that providing false information would reject my application. I willingly confirm my readiness to participate in the residential meditation program without any interruptions and with full commitment for the specified duration.",
-          "ඉහතින් සපයා ඇති තොරතුරුවල නිරවද්‍යතාවය මම මෙයින් තහවුරු කරමි. අසත්‍ය තොරතුරු ඉදිරිපත් කිරීම භාවනා වැඩසටහන් සදහා තෝරා ගැනීමට නුසුදුසුකමක් වන අතර, නැවත භාවනා වැඩසටහනකට අයදුම් කිර්‍රමට ඇති අවස්ථාවද මග හැරෙන බව දනිමි. කිසිදු බාධාවකින් තොරව සහ නියමිත කාලසීමාව සඳහා පූර්ණ කැපවීමෙන් නේවාසික භාවනා වැඩසටහනට සහභාගී වීමට මගේ සූදානම මම කැමැත්තෙන් තහවුරු කරමි."
+          "ඉහතින් සපයා ඇති තොරතුරුවල නිරවද්‍යතාවය මම මෙයින් තහවුරු කරමි. අසත්‍ය තොරතුරු ඉදිරිපත් කිරීම භාවනා වැඩසටහන් සදහා තෝරා ගැනීමට නුසුදුසුකමක් වන අතර, නැවත භාවනා වැඩසටහනකට අයදුම් කිර්‍රමට ඇති අවස්ථාවද මග හැරෙන බව දනිමි. කිසිදු බාධාවකින් තොරව සහ නියමිත කාලසීමාව සඳහා පූර්ණ කැපවීමෙන් නේවාසික භාවනා වැඩසටහනට සහභාගී වීමට මගේ සූදානම මම කැමැත්තෙන් තහවුරු කරමි.",
+          [
+            {
+              type: "expression",
+              expression: "{FinalAgreement}",
+              text: {
+                default:
+                  "Sorry. You can't submit the application without agreeing to these terms.",
+                si: "සමාවන්න. මෙම නියමයන්ට එකඟ නොවී ඔබට අයදුම්පත ඉදිරිපත් කළ නොහැක.",
+              },
+            },
+          ]
         ),
       ],
     },
@@ -500,13 +611,12 @@ const surveyJson = {
 };
 
 function App() {
-  const survey = new Model(surveyJson);
+  const survey = useMemo(() => new Model(surveyJson));
 
   useEffect(() => {
     survey.locale = "si";
     survey.onValueChanged.add((sender, options) => {
       if (sender.data && sender.data.Language) {
-        console.log(options.question.jsonObj);
         if (sender.data.Language === "English") {
           survey.locale = "default";
         } else {
@@ -516,8 +626,60 @@ function App() {
     });
   }, []);
 
+  survey.onUploadFiles.add((_, options) => {
+    console.log(_, options);
+    const formData = new FormData();
+    for (let file of options.files) {
+      formData.append("file", file);
+      if (file?.type?.indexOf("image/") < 0) {
+        options.callback(
+          [],
+          ["Unsupported file type. Only images are supported."]
+        );
+        return;
+      }
+    }
+
+    fetch("http://localhost:8080/api/fileResources", {
+      method: "POST",
+      body: formData,
+      headers: {
+        Authorization: "Basic YWRtaW46ZGlzdHJpY3Q=",
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("File data", data);
+        options.callback(
+          options.files.map((file) => {
+            return {
+              file: file,
+              content: data?.response?.fileResource?.id,
+            };
+          })
+        );
+      })
+      .catch((error) => {
+        console.error("File upload Error: ", error);
+        options.callback([], ["An error occurred during file upload."]);
+      });
+  });
+
   survey.onComplete.add((sender, options) => {
     options.showSaveInProgress();
+
+    let Photo = sender.data.Photo?.find((el) => el !== undefined)?.content;
+
+    let attributes = {
+      ...sender.data,
+      PriamaryId: [sender.data.NIC, sender.data.Passport].find(
+        (el) => el !== undefined
+      ),
+      Photo,
+    };
+
+    console.log(attributes);
+
     fetch("http://localhost/api/submitForm/", {
       method: "POST",
       headers: {
@@ -529,6 +691,14 @@ function App() {
           {
             trackedEntityType: "j5l8gwYkmvg",
             orgUnit: "GRcUwrSIcZv",
+            attributes: Object.entries(attributes)
+              .filter((entry) => d2IdsMap[entry[0]])
+              .map((entry) => {
+                return {
+                  attribute: d2IdsMap[entry[0]],
+                  value: entry[1],
+                };
+              }),
             enrollments: [
               {
                 orgUnit: "GRcUwrSIcZv",
@@ -548,8 +718,6 @@ function App() {
       }
       console.log(response);
     });
-    console.log(options);
-    console.log(JSON.stringify(sender.data, null, 3));
   });
   return (
     <div className="App">
