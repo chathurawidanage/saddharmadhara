@@ -1,7 +1,7 @@
 const config = {
     type: 'app',
-    name: 'sdhara',
-    title: 'Saddharma Dhara',
+    name: 'Saddharmadhara',
+    title: 'Saddharmadhara',
 
     entryPoints: {
         app: './src/App.js',
