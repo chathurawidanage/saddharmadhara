@@ -1,7 +1,7 @@
 import {
-  DHIS2_API_URL,
   DHIS2_PROGRAM,
   DHIS2_ROOT_ORG_UNIT,
+  DHIS2_SUBMIT_FORM_URL,
   DHIS2_TRACKED_ENTITY_TYPE,
   SURVEY_JS_NAME_TO_D2_TRACKED_ENTITY_ATTRIBUTES_MAP,
 } from "../dhis2";
@@ -38,7 +38,7 @@ const onComplete = (survey, options) => {
     delete attributes.SpecialComment;
   }
 
-  fetch(new URL("submitForm", DHIS2_API_URL), {
+  fetch(DHIS2_SUBMIT_FORM_URL, {
     method: "POST",
     body: JSON.stringify({
       trackedEntities: [

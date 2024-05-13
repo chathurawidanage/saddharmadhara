@@ -10,6 +10,7 @@ const defaultCommentTitle = {
 export const yesNoQuestionWithComment = (
   name,
   title,
+  isRequired,
   showMoreOnYes = true, // show more on `No` if false
   commentTitle = defaultCommentTitle
 ) => {
@@ -19,7 +20,7 @@ export const yesNoQuestionWithComment = (
       name: name,
       type: "boolean",
       title,
-      isRequired: true,
+      isRequired,
     },
     {
       name: name + "Comment",
@@ -30,12 +31,12 @@ export const yesNoQuestionWithComment = (
   ];
 };
 
-export const agreeDisagreeQuestion = (name, title, validators) => {
+export const agreeDisagreeQuestion = (name, title, isRequired, validators) => {
   return {
     name,
     type: "boolean",
     title,
-    isRequired: true,
+    isRequired,
     labelTrue: {
       [ENGLISH_LOCALE]: "I Agree",
       [SINHALA_LOCALE]: "එකඟ වෙමි",

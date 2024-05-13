@@ -1,5 +1,7 @@
 export const DHIS2_API_URL = new URL(process.env.REACT_APP_DHIS2_API_ENDPOINT);
 export const DHIS2_FILE_UPLOAD_URL = new URL("fileResources", DHIS2_API_URL);
+export const DHIS2_SUBMIT_FORM_URL = new URL("submitForm", DHIS2_API_URL);
+export const DHIS2_CHECK_EXISTS_URL = new URL("checkExists", DHIS2_API_URL);
 
 export const DHIS2_PROGRAM = "KdYt2OP9VjD";
 export const DHIS2_ROOT_ORG_UNIT = "GRcUwrSIcZv";
