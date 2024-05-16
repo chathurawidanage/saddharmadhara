@@ -21,6 +21,7 @@ const identificationPage = {
       },
       type: "text",
       requiredIf: "{Passport} empty",
+      validators: [{ type: "regex", regex: "^([0-9]{9}[x|X|v|V]|[0-9]{12})$" }],
     },
     {
       name: "Passport",
@@ -30,6 +31,7 @@ const identificationPage = {
       },
       type: "text",
       requiredIf: "{NIC} empty",
+      validators: [{ type: "text", minLength: 7, maxLength: 9 }],
     },
   ],
 };
