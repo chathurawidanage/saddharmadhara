@@ -70,10 +70,7 @@ const onCurrentPageChanging = (survey, options) => {
       .then((found) => {
         console.log("Found an existing yogi", found);
         options.oldCurrentPage.readOnly = true;
-        survey.setPropertyValue(
-          EXISTING_YOGI_ID_PROPERTY,
-          found.trackedEntityInstance
-        );
+        survey.setPropertyValue(EXISTING_YOGI_ID_PROPERTY, found.enrollment);
         // hide pages
         for (let page of survey.pages) {
           if (!visiblePageNamesForExistingYogis.has(page.name)) {

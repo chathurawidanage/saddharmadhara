@@ -1,11 +1,15 @@
 export const DHIS2_API_URL = new URL(process.env.REACT_APP_DHIS2_API_ENDPOINT);
 export const DHIS2_FILE_UPLOAD_URL = new URL("fileResources", DHIS2_API_URL);
-export const DHIS2_SUBMIT_FORM_URL = new URL("submitForm", DHIS2_API_URL);
 export const DHIS2_CHECK_EXISTS_URL = new URL("checkExists", DHIS2_API_URL);
+const DHIS2_SUBMIT_FORM_URL = new URL("tracker", DHIS2_API_URL);
+DHIS2_SUBMIT_FORM_URL.searchParams.set("async", "false");
+export { DHIS2_SUBMIT_FORM_URL };
 
 export const DHIS2_PROGRAM = "KdYt2OP9VjD";
 export const DHIS2_ROOT_ORG_UNIT = "GRcUwrSIcZv";
 export const DHIS2_TRACKED_ENTITY_TYPE = "j5l8gwYkmvg";
+export const DHIS2_SPECIAL_COMMENT_PROGRAM_STAGE = "owqAYpdS5dr";
+export const DHIS2_SPECIAL_COMMENT_DATA_ELEMENT = "PH2ygv78F19";
 export const SURVEY_JS_NAME_TO_D2_TRACKED_ENTITY_ATTRIBUTES_MAP = {
   NoBadHabbits: "ThRvZed4wxU",
   ReadFourNobleTruths: "wbllYsatR5l",

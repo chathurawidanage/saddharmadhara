@@ -1,0 +1,8 @@
+{
+  "dhis2": {
+    "token": "d2pat_VobpNZ7e0WlR2txjIHK0h8kutpzC6evH3967108166"
+  },
+  "cors": {
+    "origin": "*"
+  }
+}

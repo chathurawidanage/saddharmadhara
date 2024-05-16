@@ -20,6 +20,8 @@ import onUploadFiles from "./handlers/onUploadFiles";
 import onComplete from "./handlers/onComplete";
 import Loader from "./components/Loader";
 import onCurrentPageChanging from "./handlers/onCurrentPageChanging";
+import { ReactElementFactory, SurveyQuestionCheckboxItem } from "survey-react-ui";
+import React from "react";
 
 // todo validate NIC, Passport
 
@@ -42,18 +44,66 @@ const surveyJson = {
     [SINHALA_LOCALE]: "<h4>සද්ධර්මධාරා සඳහා අයදුම් කළ ඔ​බ​ට ස්තුතියි!</h4>",
   },
   pages: [
-    languagePage,
-    instructionsPage,
+    // languagePage,
+    // instructionsPage,
     identificationPage,
     personalPage(isRequired),
-    emergenecyContactPage(isRequired),
-    spiritualPursuitsPage(isRequired),
-    readynessCheckPage(isRequired),
-    preperationsPage(isRequired),
+    // emergenecyContactPage(isRequired),
+    // spiritualPursuitsPage(isRequired),
+    // readynessCheckPage(isRequired),
+    // preperationsPage(isRequired),
     specialCommentsPage,
-    agreementPage,
+    // agreementPage,
+    {
+      name: "Retreats",
+      elements: [
+        {
+          type: "checkbox",
+          name: "car",
+          title: "Which is the brand of your car?",
+          isRequired: true,
+          colCount: 1,
+          itemComponent: "retreat-item",
+          choices: [
+            {
+              value: "to",
+              text: `<b>Hmmm</b>`,
+              customProperty: "sd",
+            },
+          ],
+        },
+      ],
+    },
   ],
 };
+
+class CheckComponent extends SurveyQuestionCheckboxItem{
+  
+  renderElement() {
+    console.log( this);
+
+    return super.renderElement();
+  }
+};
+
+ReactElementFactory.Instance.registerElement(
+  "retreat-item",
+  (props) => {
+    return React.createElement(CheckComponent, props);
+  }
+);
+
+// const onTextMarkdown = (survey, options) => {
+//   if (options.element.constructor.name === "QuestionCheckboxModel") {
+//     // window.options = options;
+//     console.log(
+//       { ...options },
+//       survey,
+//       options.element.getPropertyValue("customProperty")
+//     );
+//     options.html = `<div class="test">Hello</div>`;
+//   }
+// };
 
 function App() {
   const survey = useMemo(() => new Model(surveyJson), []);

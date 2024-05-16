@@ -27,6 +27,7 @@ export const yesNoQuestionWithComment = (
       type: "comment",
       title: commentTitle,
       visibleIf: `{${name}} = ${showMoreOnYes}`,
+      isRequired,
     },
   ];
 };
