@@ -7,6 +7,7 @@ const readynessCheckPage = (isRequired) => {
     name: "ReadynessCheck",
     title: {
       [ENGLISH_LOCALE]: "❓ Heading needed",
+      [SINHALA_LOCALE]: "❓ Heading needed",
     },
     description: {
       [ENGLISH_LOCALE]:

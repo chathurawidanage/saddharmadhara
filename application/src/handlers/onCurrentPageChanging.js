@@ -1,5 +1,5 @@
 import {
-  DHIS2_CHECK_EXISTS_URL,
+  CHECK_EXISTS_URL,
   DHIS2_PROGRAM,
   SURVEY_JS_NAME_TO_D2_TRACKED_ENTITY_ATTRIBUTES_MAP,
 } from "../dhis2";
@@ -7,6 +7,7 @@ import agreementPage from "../pages/agreement";
 import identificationPage from "../pages/identification";
 import instructionsPage from "../pages/instructions";
 import languagePage from "../pages/language";
+import retreatsPage from "../pages/retreats";
 import specialCommentsPage from "../pages/specialComments";
 import {
   EXISTING_YOGI_CHECK_DONE,
@@ -18,11 +19,12 @@ const visiblePageNamesForExistingYogis = new Set([
   identificationPage.name,
   instructionsPage.name,
   specialCommentsPage.name,
+  retreatsPage.name,
   agreementPage.name,
 ]);
 
 const trySearch = async (attribute, value) => {
-  let url = new URL(DHIS2_CHECK_EXISTS_URL);
+  let url = new URL(CHECK_EXISTS_URL);
   url.searchParams.set("program", DHIS2_PROGRAM);
   url.searchParams.set("attribute", attribute);
   url.searchParams.set("value", value);
@@ -98,7 +100,6 @@ const onCurrentPageChanging = (survey, options) => {
     options.newCurrentPage?.name === identificationPage.name &&
     !options.newCurrentPage.readOnly
   ) {
-    console.log("reset");
     // set to false, so the it will recheck since applicant can edit the values
     survey.setPropertyValue(EXISTING_YOGI_CHECK_DONE, false);
   }

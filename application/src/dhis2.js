@@ -1,15 +1,29 @@
-export const DHIS2_API_URL = new URL(process.env.REACT_APP_DHIS2_API_ENDPOINT);
-export const DHIS2_FILE_UPLOAD_URL = new URL("fileResources", DHIS2_API_URL);
-export const DHIS2_CHECK_EXISTS_URL = new URL("checkExists", DHIS2_API_URL);
-const DHIS2_SUBMIT_FORM_URL = new URL("tracker", DHIS2_API_URL);
-DHIS2_SUBMIT_FORM_URL.searchParams.set("async", "false");
-export { DHIS2_SUBMIT_FORM_URL };
+export const API_URL = new URL(process.env.REACT_APP_DHIS2_API_ENDPOINT);
+export const FILE_UPLOAD_URL = new URL("fileResources", API_URL);
+export const CHECK_EXISTS_URL = new URL("checkExists", API_URL);
+
+const SUBMIT_FORM_URL = new URL("tracker", API_URL);
+SUBMIT_FORM_URL.searchParams.set("async", "false");
+export { SUBMIT_FORM_URL as DHIS2_SUBMIT_FORM_URL };
+
+const DHIS2_RETREATS_OPTION_SET = "ys2Pv9hTS0O";
+const DHIS2_RETREAT_DATE_ATTRIBUTE = "sCzsZZ7m37E";
+
+const RETREATS_LIST_URL = new URL("retreats", API_URL);
+RETREATS_LIST_URL.searchParams.set("optionSet", DHIS2_RETREATS_OPTION_SET);
+RETREATS_LIST_URL.searchParams.set(
+  "dateAttribute",
+  DHIS2_RETREAT_DATE_ATTRIBUTE
+);
+export { RETREATS_LIST_URL };
 
 export const DHIS2_PROGRAM = "KdYt2OP9VjD";
 export const DHIS2_ROOT_ORG_UNIT = "GRcUwrSIcZv";
 export const DHIS2_TRACKED_ENTITY_TYPE = "j5l8gwYkmvg";
 export const DHIS2_SPECIAL_COMMENT_PROGRAM_STAGE = "owqAYpdS5dr";
 export const DHIS2_SPECIAL_COMMENT_DATA_ELEMENT = "PH2ygv78F19";
+export const DHIS2_EXPRESSION_OF_INTEREST_PROGRAM_STAGE = "BLn1j2VgLZf";
+export const DHIS2_RETREAT_DATA_ELEMENT = "rYqV3VQu7LS";
 export const SURVEY_JS_NAME_TO_D2_TRACKED_ENTITY_ATTRIBUTES_MAP = {
   NoBadHabbits: "ThRvZed4wxU",
   ReadFourNobleTruths: "wbllYsatR5l",

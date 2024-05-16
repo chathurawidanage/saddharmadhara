@@ -1,5 +1,7 @@
 import {
+  DHIS2_EXPRESSION_OF_INTEREST_PROGRAM_STAGE,
   DHIS2_PROGRAM,
+  DHIS2_RETREAT_DATA_ELEMENT,
   DHIS2_ROOT_ORG_UNIT,
   DHIS2_SPECIAL_COMMENT_DATA_ELEMENT,
   DHIS2_SPECIAL_COMMENT_PROGRAM_STAGE,
@@ -10,6 +12,7 @@ import {
 import { EXISTING_YOGI_ID_PROPERTY } from "../properties";
 
 const dataToAttributesAndEvents = (data) => {
+  console.log("data", data);
   let Photo = data.Photo?.find((el) => el !== undefined)?.content;
 
   let surveyJsAttributes = {
@@ -20,26 +23,44 @@ const dataToAttributesAndEvents = (data) => {
     Photo,
   };
 
-  let events = undefined;
+  let events = [];
 
   // special comment is saved as an event and applicants can send them multiple times
   if (surveyJsAttributes.SpecialComment) {
-    events = [
-      {
+    events.push({
+      occurredAt: Date.now(),
+      programStage: DHIS2_SPECIAL_COMMENT_PROGRAM_STAGE,
+      orgUnit: DHIS2_ROOT_ORG_UNIT,
+      status: "COMPLETED",
+      dataValues: [
+        {
+          occurredAt: Date.now(),
+          dataElement: DHIS2_SPECIAL_COMMENT_DATA_ELEMENT,
+          value: surveyJsAttributes.SpecialComment,
+        },
+      ],
+    });
+    delete surveyJsAttributes.SpecialComment;
+  }
+
+  // retreats are saved as events and applicants can send them multiple times
+  if (surveyJsAttributes.Retreats) {
+    for (let retreat of surveyJsAttributes.Retreats) {
+      events.push({
         occurredAt: Date.now(),
-        programStage: DHIS2_SPECIAL_COMMENT_PROGRAM_STAGE,
+        programStage: DHIS2_EXPRESSION_OF_INTEREST_PROGRAM_STAGE,
         orgUnit: DHIS2_ROOT_ORG_UNIT,
         status: "COMPLETED",
         dataValues: [
           {
             occurredAt: Date.now(),
-            dataElement: DHIS2_SPECIAL_COMMENT_DATA_ELEMENT,
-            value: surveyJsAttributes.SpecialComment,
+            dataElement: DHIS2_RETREAT_DATA_ELEMENT,
+            value: retreat,
           },
         ],
-      },
-    ];
-    delete surveyJsAttributes.SpecialComment;
+      });
+    }
+    delete surveyJsAttributes.Retreats;
   }
 
   let dhis2Attributes = Object.entries(surveyJsAttributes)
@@ -62,7 +83,7 @@ const dataToAttributesAndEvents = (data) => {
 const postNewYogi = (attributes, events) => {
   return fetch(DHIS2_SUBMIT_FORM_URL, {
     method: "POST",
-    headers: new Headers({'content-type': 'application/json'}),
+    headers: new Headers({ "content-type": "application/json" }),
     body: JSON.stringify({
       trackedEntities: [
         {
@@ -87,7 +108,7 @@ const postNewYogi = (attributes, events) => {
 const postEventsOnlyForExistingYogi = (enrollment, events) => {
   return fetch(DHIS2_SUBMIT_FORM_URL, {
     method: "POST",
-    headers: new Headers({'content-type': 'application/json'}),
+    headers: new Headers({ "content-type": "application/json" }),
     body: JSON.stringify({
       events: events.map((event) => {
         event.enrollment = enrollment;

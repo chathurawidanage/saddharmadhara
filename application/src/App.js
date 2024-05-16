@@ -20,8 +20,21 @@ import onUploadFiles from "./handlers/onUploadFiles";
 import onComplete from "./handlers/onComplete";
 import Loader from "./components/Loader";
 import onCurrentPageChanging from "./handlers/onCurrentPageChanging";
-import { ReactElementFactory, SurveyQuestionCheckboxItem } from "survey-react-ui";
+import { ReactElementFactory } from "survey-react-ui";
 import React from "react";
+import { API_URL, RETREATS_LIST_URL } from "./dhis2";
+import onPropertyChanged from "./handlers/onPropertyChanged";
+import retreatsPage from "./pages/retreats";
+import RetreatCheckboxItem, {
+  RETREAT_CHECKBOX_ITEM_NAME,
+} from "./components/RetreatCheckboxItem";
+
+ReactElementFactory.Instance.registerElement(
+  RETREAT_CHECKBOX_ITEM_NAME,
+  (props) => {
+    return React.createElement(RetreatCheckboxItem, props);
+  }
+);
 
 // todo validate NIC, Passport
 
@@ -47,51 +60,16 @@ const surveyJson = {
     // languagePage,
     // instructionsPage,
     identificationPage,
-    personalPage(isRequired),
+    // personalPage(isRequired),
     // emergenecyContactPage(isRequired),
     // spiritualPursuitsPage(isRequired),
     // readynessCheckPage(isRequired),
     // preperationsPage(isRequired),
     specialCommentsPage,
-    // agreementPage,
-    {
-      name: "Retreats",
-      elements: [
-        {
-          type: "checkbox",
-          name: "car",
-          title: "Which is the brand of your car?",
-          isRequired: true,
-          colCount: 1,
-          itemComponent: "retreat-item",
-          choices: [
-            {
-              value: "to",
-              text: `<b>Hmmm</b>`,
-              customProperty: "sd",
-            },
-          ],
-        },
-      ],
-    },
+    retreatsPage,
+    agreementPage,
   ],
 };
-
-class CheckComponent extends SurveyQuestionCheckboxItem{
-  
-  renderElement() {
-    console.log( this);
-
-    return super.renderElement();
-  }
-};
-
-ReactElementFactory.Instance.registerElement(
-  "retreat-item",
-  (props) => {
-    return React.createElement(CheckComponent, props);
-  }
-);
 
 // const onTextMarkdown = (survey, options) => {
 //   if (options.element.constructor.name === "QuestionCheckboxModel") {
@@ -124,6 +102,7 @@ function App() {
         onUploadFiles={onUploadFiles}
         onComplete={onComplete}
         onCurrentPageChanging={onCurrentPageChanging}
+        onPropertyChanged={onPropertyChanged}
       />
     </div>
   );

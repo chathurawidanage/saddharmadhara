@@ -48,7 +48,7 @@ app.get("/api/retreats", (req, res) => {
   }
 
   let optionSetUrl = new URL("optionSets/" + optionSet, dhis2Endpoint);
-  optionSetUrl.searchParams.set("fields", "options[name,attributeValues]");
+  optionSetUrl.searchParams.set("fields", "options[code,name,attributeValues]");
   fetch(optionSetUrl, {
     method: "GET",
     headers: {
@@ -60,7 +60,8 @@ app.get("/api/retreats", (req, res) => {
       let mappedOptions = jsonResponse?.options
         ?.map((option) => {
           return {
-            name: option?.name,
+            value: option?.code,
+            text: option?.name,
             attributes: option?.attributeValues?.reduce((map, elem) => {
               map[elem.attribute.id] = elem.value;
               return map;
@@ -113,7 +114,6 @@ app.get("/api/checkExists", (req, res) => {
             responseJson.trackedEntityInstances[0].enrollments[0].enrollment,
         });
       } else {
-        console.log(responseJson);
         res.status(404).send();
       }
     })

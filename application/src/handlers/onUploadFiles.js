@@ -1,4 +1,4 @@
-import { DHIS2_FILE_UPLOAD_URL } from "../dhis2";
+import { FILE_UPLOAD_URL } from "../dhis2";
 
 const onUploadFiles = (survey, options) => {
   const formData = new FormData();
@@ -13,7 +13,7 @@ const onUploadFiles = (survey, options) => {
     }
   }
 
-  fetch(DHIS2_FILE_UPLOAD_URL, {
+  fetch(FILE_UPLOAD_URL, {
     method: "POST",
     body: formData,
   })
