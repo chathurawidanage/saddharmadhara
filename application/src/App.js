@@ -36,8 +36,6 @@ ReactElementFactory.Instance.registerElement(
   }
 );
 
-// todo validate NIC, Passport
-
 surveyLocalization.locales[SINHALA_LOCALE] = sinhalaLocaleStrings;
 surveyLocalization.locales[ENGLISH_LOCALE] = englishLocaleStrings;
 
@@ -70,18 +68,6 @@ const surveyJson = {
     agreementPage,
   ],
 };
-
-// const onTextMarkdown = (survey, options) => {
-//   if (options.element.constructor.name === "QuestionCheckboxModel") {
-//     // window.options = options;
-//     console.log(
-//       { ...options },
-//       survey,
-//       options.element.getPropertyValue("customProperty")
-//     );
-//     options.html = `<div class="test">Hello</div>`;
-//   }
-// };
 
 function App() {
   const survey = useMemo(() => new Model(surveyJson), []);
