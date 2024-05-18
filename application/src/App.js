@@ -39,7 +39,7 @@ ReactElementFactory.Instance.registerElement(
 surveyLocalization.locales[SINHALA_LOCALE] = sinhalaLocaleStrings;
 surveyLocalization.locales[ENGLISH_LOCALE] = englishLocaleStrings;
 
-const isRequired = false; // set required fields on or off for testing purposes
+const isRequired = true; // set required fields on or off for testing purposes
 
 const surveyJson = {
   title: {
