@@ -123,6 +123,10 @@ app.get("/api/checkExists", (req, res) => {
     });
 });
 
+app.get("/api/health", (req, res) => {
+  res.send("OK");
+});
+
 app.listen(port, () => {
   console.log(`App listening on port ${port}`);
 });
