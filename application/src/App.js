@@ -22,7 +22,6 @@ import Loader from "./components/Loader";
 import onCurrentPageChanging from "./handlers/onCurrentPageChanging";
 import { ReactElementFactory } from "survey-react-ui";
 import React from "react";
-import { API_URL, RETREATS_LIST_URL } from "./dhis2";
 import onPropertyChanged from "./handlers/onPropertyChanged";
 import retreatsPage from "./pages/retreats";
 import RetreatCheckboxItem, {

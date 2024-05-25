@@ -24,40 +24,31 @@ const visiblePageNamesForExistingYogis = new Set([
 ]);
 
 const trySearch = async (attribute, value) => {
+  if (value === undefined || attribute === undefined) {
+    throw new Error("value and attribute can't be undefined");
+  }
+
   let url = new URL(CHECK_EXISTS_URL);
   url.searchParams.set("program", DHIS2_PROGRAM);
   url.searchParams.set("attribute", attribute);
   url.searchParams.set("value", value);
 
-  if (value === undefined) {
-    return;
+  let response = await fetch(url);
+  if (response.ok) {
+    return await response.json();
+  } else {
+    throw new Error("Couldn't find an existing entity");
   }
-
-  return fetch(url).then((res) => {
-    if (res.status == 200) {
-      return res.json();
-    }
-  });
 };
 
-const searchExisting = async (data) => {
-  let responses = await Promise.all([
-    trySearch(
-      SURVEY_JS_NAME_TO_D2_TRACKED_ENTITY_ATTRIBUTES_MAP["NIC"],
-      data?.NIC
-    ),
+const searchExisting = ({ NIC, Passport }) => {
+  return Promise.any([
+    trySearch(SURVEY_JS_NAME_TO_D2_TRACKED_ENTITY_ATTRIBUTES_MAP["NIC"], NIC),
     trySearch(
       SURVEY_JS_NAME_TO_D2_TRACKED_ENTITY_ATTRIBUTES_MAP["Passport"],
-      data?.Passport
+      Passport
     ),
   ]);
-
-  let foundAny = responses.find((x) => x !== undefined);
-  if (foundAny === undefined) {
-    return Promise.reject("Couldn't find an existing yogi");
-  } else {
-    return foundAny;
-  }
 };
 
 const onCurrentPageChanging = (survey, options) => {
@@ -70,7 +61,7 @@ const onCurrentPageChanging = (survey, options) => {
     survey.setLoading(true);
     searchExisting(survey.data)
       .then((found) => {
-        console.log("Found an existing yogi", found);
+        console.info("Found an existing yogi", found);
         options.oldCurrentPage.readOnly = true;
         survey.setPropertyValue(EXISTING_YOGI_ID_PROPERTY, found.enrollment);
         // hide pages
@@ -89,7 +80,7 @@ const onCurrentPageChanging = (survey, options) => {
       })
       .catch((err) => {
         // didn't find an existing one
-        console.log("Couldn't find an existing yogi");
+        console.error("Couldn't find an existing yogi", err);
         survey.currentPage = options.newCurrentPage;
       })
       .finally(() => {

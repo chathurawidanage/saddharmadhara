@@ -3,7 +3,6 @@ import { FILE_UPLOAD_URL } from "../dhis2";
 const onUploadFiles = (survey, options) => {
   const formData = new FormData();
   for (let file of options.files) {
-    formData.append("file", file);
     if (file?.type?.indexOf("image/") < 0) {
       options.callback(
         [],
@@ -11,11 +10,15 @@ const onUploadFiles = (survey, options) => {
       );
       return;
     }
+    formData.append("file", file);
   }
 
   fetch(FILE_UPLOAD_URL, {
     method: "POST",
     body: formData,
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
   })
     .then((response) => response.json())
     .then((data) => {
