@@ -12,14 +12,13 @@ import {
 import { EXISTING_YOGI_ID_PROPERTY } from "../properties";
 
 const dataToAttributesAndEvents = (data) => {
-  console.log("data", data);
   let Photo = data.Photo?.find((el) => el !== undefined)?.content;
 
   let surveyJsAttributes = {
     ...data,
     // Primary ID is used to enforce a mandatory Id in DHIS2 end since
     // it can't make either nic or passport mandatory out of box
-    PriamaryId: [data.NIC, data.Passport].find((el) => el !== undefined),
+    PrimaryId: [data.NIC, data.Passport].find((el) => el !== undefined),
     Photo,
   };
 
@@ -128,13 +127,18 @@ const onComplete = (survey, options) => {
   (existingYogiId
     ? postEventsOnlyForExistingYogi(existingYogiId, events)
     : postNewYogi(attributes, events)
-  ).then((response) => {
-    if (response.status !== 200) {
+  )
+    .then((response) => {
+      if (!response.ok) {
+        options.showSaveError();
+      } else {
+        options.showSaveSuccess();
+      }
+    })
+    .catch((err) => {
+      console.error("Error in saving", err);
       options.showSaveError();
-    } else {
-      options.showSaveSuccess();
-    }
-  });
+    });
 };
 
 export default onComplete;
