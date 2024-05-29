@@ -19,18 +19,18 @@ const yesNoQuestions = new Set([
   "22.a) Do you have full permission from your parents/guardian/employer",
   "22.b) Are you free from unmanageable loans",
   "22.c) Are you free from illnesses or deformities from birth",
-  "22.d) Is there any addiction to toxications (drugs)? ",
-  "22.e) Do you suffer from stress or other such mental problems? ",
+  "22.d) Is there any addiction to toxications (drugs)?",
+  "22.e) Do you suffer from stress or other such mental problems?",
   "22.f) Do you have serious legal litigations that are bothering you",
   "22.g) Do you have any signs of diseases like Asthma/Kushta/Vana/cists (Visha gedi)/boils or epilepsy?",
-  "22.h) Are there any deformities in the body ",
+  "22.h) Are there any deformities in the body",
 ]);
 
 const agreeDisagreeQuestions = new Set([
   "23.a) You should try to reduce the use of cell phones",
   "23.b) You should try to avoid bad habits like masturbation",
   "23.c) Practice ‘Ashuba Bhavana’ at least two weeks",
-  "23.d) Practice compassion (Maithree Bhavana) ",
+  "23.d) Practice compassion (Maithree Bhavana)",
   "23.e) With the understanding of the virtues of ‘Trivida Rathna’",
   "23.f) Have some Dhamma knowledge about the basic facts",
 ]);
@@ -57,10 +57,12 @@ const agreeDisagreeMap = new Map([
   ["D", false],
 ]);
 
-const specialCommentQuestion = "Special Comments";
+const specialCommentQuestion = "Special comments";
 const appliedDateField = "Applied Date";
 const maritalStatusQuestion = "5. Marital status";
 const genderQuestion = "4. Gender";
+const nicQuestion = "6. National identity card number";
+const passportQuestion = "7. Passport number";
 
 const idMap = {
   "Record ID": undefined,
@@ -76,7 +78,7 @@ const idMap = {
   WhatsApp: "CpF36JSasMJ",
   Home: "ZRXiTWo2Vbq",
   "10. Email address": "lByRbJqnG5q",
-  "11. Profession": "EDMGB8x9lc3 ",
+  "11. Profession": "EDMGB8x9lc3",
   "12. Name with initials of the person to be contacted in an emergency.":
     "NgHvHow9RZs",
   "13. Applicant’s relationship to emergency contact person.": "duD6vVqtSCq",
@@ -102,9 +104,9 @@ const idMap = {
   " 22.b) detail": undefined,
   "22.c) Are you free from illnesses or deformities from birth": "RpNKpAufHbn",
   " 22.c) detail": "HtW0OMmthFQ",
-  "22.d) Is there any addiction to toxications (drugs)? ": "fyV0EfY0dnR",
+  "22.d) Is there any addiction to toxications (drugs)?": "fyV0EfY0dnR",
   " 22.d) detail": "la4960WBUC3",
-  "22.e) Do you suffer from stress or other such mental problems? ":
+  "22.e) Do you suffer from stress or other such mental problems?":
     "dgky5acnvG3",
   " 22.e) detail": "Mp6LLGv4WOT",
   "22.f) Do you have serious legal litigations that are bothering you":
@@ -113,23 +115,23 @@ const idMap = {
   "22.g) Do you have any signs of diseases like Asthma/Kushta/Vana/cists (Visha gedi)/boils or epilepsy?":
     "iaW1GDx6k3P",
   " 22.g) detail": "nOm8SVX2VbC",
-  "22.h) Are there any deformities in the body ": "nwItPNW72se",
+  "22.h) Are there any deformities in the body": "nwItPNW72se",
   " 22.h) detail": "aHZ7BJDzntQ",
   "23.a) You should try to reduce the use of cell phones": "EJaujr9wSTz",
   "23.b) You should try to avoid bad habits like masturbation": "ThRvZed4wxU",
   "23.c) Practice ‘Ashuba Bhavana’ at least two weeks": "DZgJUDEYKvH",
-  "23.d) Practice compassion (Maithree Bhavana) ": "ZnRv3kNDmun",
+  "23.d) Practice compassion (Maithree Bhavana)": "ZnRv3kNDmun",
   "23.e) With the understanding of the virtues of ‘Trivida Rathna’":
     "q6N0kD78IS9",
   "23.f) Have some Dhamma knowledge about the basic facts": "wbllYsatR5l",
   "Guardian Name": undefined,
   "Relationship to the applicant": undefined,
-  Profession: "EDMGB8x9lc3",
   Age: undefined,
   "Telephone number": undefined,
   Address: undefined,
   "Special comments": "PH2ygv78F19",
-  "Applied Date": "25/12/2023",
+  "Applied Date": undefined,
+  [DHIS2_PRIMARY_ID_ATTRIBUTE]: DHIS2_PRIMARY_ID_ATTRIBUTE,
 };
 
 let records = [];
@@ -179,25 +181,22 @@ const tansformRecord = (record) => {
     console.log("Unknonw gender", newRecord[genderQuestion]);
   }
 
-  if (newRecord["6. National identity card number"].length > 3) {
-    newRecord[DHIS2_PRIMARY_ID_ATTRIBUTE] =
-      newRecord["6. National identity card number"];
-  } else if (newRecord["7. Passport number"].length > 3) {
-    newRecord[DHIS2_PRIMARY_ID_ATTRIBUTE] = newRecord["7. Passport number"];
+  if (newRecord[nicQuestion].length > 3) {
+    newRecord[DHIS2_PRIMARY_ID_ATTRIBUTE] = newRecord[nicQuestion];
+  } else if (newRecord[passportQuestion].length > 3) {
+    newRecord[DHIS2_PRIMARY_ID_ATTRIBUTE] = newRecord[passportQuestion];
   }
 
   let mappedAttributes = [];
 
   for (let key of Object.keys(newRecord)) {
-    if (idMap[key]) {
+    if (idMap[key] && idMap[key] !== DHIS2_SPECIAL_COMMENT_DATA_ELEMENT) {
       mappedAttributes.push({
         attribute: idMap[key],
         value: newRecord[key].toLocaleString(),
       });
     }
   }
-
-  // set primary id
 
   return mappedAttributes;
 };
@@ -223,7 +222,7 @@ const startImport = async () => {
           {
             occurredAt: date,
             dataElement: DHIS2_SPECIAL_COMMENT_DATA_ELEMENT,
-            value: surveyJsAttributes.SpecialComment,
+            value: specialComment,
           },
         ],
       });
@@ -248,8 +247,6 @@ const startImport = async () => {
       ],
     };
 
-    console.log(JSON.stringify(body));
-
     let response = await fetch(DHIS2_TRACKER_URL, {
       method: "POST",
       headers: new Headers({
@@ -258,11 +255,9 @@ const startImport = async () => {
       }),
       body: JSON.stringify(body),
     });
-    if (response.status !== 201) {
+    if (!response.ok) {
       console.log(await response.json());
-      break;
     }
-    break;
   }
 };
 
