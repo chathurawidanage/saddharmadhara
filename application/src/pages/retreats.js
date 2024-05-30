@@ -8,7 +8,7 @@ const retreatsPage = {
   name: "Retreats",
   title: {
     [ENGLISH_LOCALE]: "🗓 Retreats",
-    [SINHALA_LOCALE]: "🗓 වැඩසටහන්",
+    [SINHALA_LOCALE]: "🗓 භාවනා වැඩසටහන්",
   },
   elements: [
     {
