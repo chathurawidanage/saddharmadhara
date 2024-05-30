@@ -66,7 +66,7 @@ export const SURVEY_JS_NAME_TO_D2_TRACKED_ENTITY_ATTRIBUTES_MAP = {
   Passport: "hv3aLM80Mrn",
   Address: "ywoMYb2bCz5",
   Photo: "zMtxZwR7Kw5",
-  PriamaryId: "EDhjneO1ofm",
+  PrimaryId: "EDhjneO1ofm",
   Profession: "EDMGB8x9lc3",
   Stress: "dgky5acnvG3",
   HaveTakenDrugs: "fyV0EfY0dnR",
