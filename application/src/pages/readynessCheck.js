@@ -6,8 +6,8 @@ const readynessCheckPage = (isRequired) => {
   return {
     name: "ReadynessCheck",
     title: {
-      [ENGLISH_LOCALE]: "❓ Heading needed",
-      [SINHALA_LOCALE]: "❓ Heading needed",
+      [ENGLISH_LOCALE]: "❓ Physical and psychological attachments and health conditions",
+      [SINHALA_LOCALE]: "❓ කායික/මානසික බැදියාවන් සහ සෞඛ්‍ය තත්වයන්",
     },
     description: {
       [ENGLISH_LOCALE]:

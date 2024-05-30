@@ -6,7 +6,8 @@ const preperationsPage = (isRequired) => {
   return {
     name: "Preperations",
     title: {
-      [ENGLISH_LOCALE]: "☑️ Heading needed",
+      [ENGLISH_LOCALE]: "☑️ Preparation for the meditation program",
+      [SINHALA_LOCALE]: "☑️ භාවනා වැඩසටහන සදහා මුලික සුදානම් වීම",
     },
     description: {
       [ENGLISH_LOCALE]:
