@@ -126,7 +126,7 @@ const personalPage = (isRequired) => {
         name: "Photo",
         title: {
           [ENGLISH_LOCALE]: "Photo",
-          [SINHALA_LOCALE]: "ඡායා රූප​ය",
+          [SINHALA_LOCALE]: "ඡායාරූප​ය",
         },
         type: "file",
         maxSize: 1024000 * 5, // 5MB

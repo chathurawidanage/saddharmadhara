@@ -8,7 +8,7 @@ const identificationPage = {
     [SINHALA_LOCALE]: "🪪 හදුනාගැනීම",
   },
   description: {
-    [ENGLISH_LOCALE]: "<MISSING ENGLISH>",
+    [ENGLISH_LOCALE]: "If the ID number you provide during admission to the meditation program does not match this number, you may lose the opportunity to participate.",
     [SINHALA_LOCALE]:
       "භාවනා වැඩසටහනට සහභාගි වන අවස්ථාවේදී ඔබ ඉදිරිපත් කරන හැදුනුම්පතේ අංකය මෙම අංකය සමග නොගැලපේ නම් වැඩසටහනට සම්බන්ධ වීමට ඇති අවස්ථාව අහිමි වී යා හැකිය.",
   },

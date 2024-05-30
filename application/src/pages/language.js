@@ -14,7 +14,7 @@ const languagePage = {
       name: "Language",
       title: {
         [ENGLISH_LOCALE]: "Select a language for filling the application.",
-        [SINHALA_LOCALE]: "අයදුම්පත සමුපූර්ණ කිරීමට භාෂාවක් තෝරාගන්න.",
+        [SINHALA_LOCALE]: "අයදුම්පත සම්පූර්ණ කිරීමට භාෂාවක් තෝරාගන්න.",
       },
       colCount: 2,
       type: "radiogroup",

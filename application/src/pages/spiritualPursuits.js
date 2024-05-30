@@ -53,7 +53,7 @@ const spiritualPursuitsPage = (isRequired) => {
         title: {
           [ENGLISH_LOCALE]:
             "Please specify the treatments currently being administered for the mentioned ailments and disabilities.",
-          [SINHALA_LOCALE]: "ඔබ දැනට යම් රෝගාබාධ තත්වයකට බෙහෙත් ඖෂධ/විශේෂ ප්‍රතිකාර ආදිය ලබා ගනියි නම් ඒ පිළිබඳ තොරතුරු සඳහන් කරන්න.",
+          [SINHALA_LOCALE]: "ඔබ දැනට යම් රෝගාබාධ තත්වයකට බෙහෙත් ඖෂධ/විශේෂ ප්‍රතිකාර ආදිය ලබා ගනී නම් ඒ පිළිබඳ තොරතුරු සඳහන් කරන්න.",
         },
       },
       {

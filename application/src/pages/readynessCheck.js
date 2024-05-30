@@ -109,7 +109,7 @@ const readynessCheckPage = (isRequired) => {
           [ENGLISH_LOCALE]:
             "Are there any deformities in the body (for example amputated hands, legs, ears, etc.)?",
           [SINHALA_LOCALE]:
-            "ශරීරයේ කිසියම් විකෘතිතාවයක් තිබේද (උදාහරණ ලෙස යම්කිසි හේතුවක් නිසා අත්, කකුල්, කන් ආදි අවයව හෝ කොටස් ඉවත් කර ඇති ද?",
+            "ශරීරයේ කිසියම් විකෘතිතාවයක් තිබේද (උදාහරණ ලෙස යම්කිසි හේතුවක් නිසා අත්, කකුල්, කන් ආදි අවයව හෝ කොටස් ඉවත් කර ඇති ද?)",
         },
         isRequired,
         true

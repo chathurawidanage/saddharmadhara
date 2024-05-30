@@ -70,7 +70,7 @@ const preperationsPage = (isRequired) => {
         "ReadFourNobleTruths",
         {
           [ENGLISH_LOCALE]:
-            "Have some Dhamma knowledge about the basic facts (four noble truths) of Buddhism - (Peruse the book 'The Word of the Buddha' written by the German monk Most Venerable Gnayanathiloka Thero)",
+            "Have some Dhamma knowledge about the basic facts (four noble truths) of Buddhism - (Peruse the book 'The Word of the Buddha' written by the German monk Most Venerable Nyanatiloka Thero)",
           [SINHALA_LOCALE]:
             "බුදුදහමේ මූලික කරුණු (උතුම් චතුරාර්ය සත්‍යය) පිළිබඳව යම් දහම් දැනුමක් ලබා ගැනීම - (ඒ සඳහා ඔබට ගෞරවනීය ස්වාමීන්වහන්සේ විසින් අනුදැන වදාළ පරිදි ජර්මානු ජාතික අතිපූජනීය ඤාණතිලෝක ස්වාමීන් වහන්සේ විසින් ලියන ලද ‘බුද්ධ වචනය’ ග්‍රන්ථය පරිශීලනය කළ හැකිය)",
         },
