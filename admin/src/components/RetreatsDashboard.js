@@ -5,12 +5,16 @@ import { Button, CircularLoader, Tag } from "@dhis2/ui";
 import { Container, Card, Row, Col } from "react-bootstrap";
 import RetreatModel from "./RetreatModal";
 import { DHIS_RETREATS_OPTION_SET_ID, mapRetreatFromD2 } from "../dhis2";
+import { useNavigate } from "react-router-dom";
 
 const styles = {
   headerRow: {
     textAlign: "right",
     marginTop: 5,
     marginBottom: 5,
+  },
+  manageButton: {
+    textAlign: "right",
   },
 };
 
@@ -24,34 +28,42 @@ const query = {
 };
 
 const Retreat = (props) => {
-  let retreat = mapRetreatFromD2(props.retreat);
-
+  const retreat = mapRetreatFromD2(props.retreat);
+  const navigate = useNavigate();
   return (
     <Col md={3}>
       <Card>
         <Card.Body>
           <Card.Title>
-            {retreat.name}{" "}
+            {retreat.name}
             <Tag positive={!retreat.disabled} negative={retreat.disabled}>
               {retreat.disabled ? "Disabled" : "Active"}
             </Tag>
           </Card.Title>
-          <Card.Text>
-            <Row>
-              <Col xs={2}>📅</Col>
-              <Col>{retreat.date.toDateString()}</Col>
-            </Row>
-            <Row>
-              <Col xs={2}>📍</Col>
-              <Col>{retreat.location}</Col>
-            </Row>
-            <Row>
-              <Col xs={2}>🧘‍♂️</Col>
-              <Col>{retreat.totalYogis}</Col>
-            </Row>
-          </Card.Text>
-
-          <Button variant="primary">Manage</Button>
+          <Row>
+            <Col xs={2}>📅</Col>
+            <Col>{retreat.date.toDateString()}</Col>
+          </Row>
+          <Row>
+            <Col xs={2}>📍</Col>
+            <Col>{retreat.location}</Col>
+          </Row>
+          <Row>
+            <Col xs={2}>🧘‍♂️</Col>
+            <Col>{retreat.totalYogis}</Col>
+          </Row>
+          <Row>
+            <Col style={styles.manageButton}>
+              <Button
+                variant="primary"
+                onClick={() => {
+                  navigate(retreat.id);
+                }}
+              >
+                Manage
+              </Button>
+            </Col>
+          </Row>
         </Card.Body>
       </Card>
     </Col>

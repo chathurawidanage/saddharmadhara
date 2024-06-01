@@ -10,11 +10,17 @@ import {
   ButtonStrip,
   Label,
   hasValue,
-  InputFieldFF
+  InputFieldFF,
 } from "@dhis2/ui";
 import { Row, Col } from "react-bootstrap";
 
 const { Form, Field } = ReactFinalForm;
+
+const styles = {
+  fieldRow: {
+    marginBottom: 10,
+  },
+};
 
 const RetreatModel = (props) => {
   return (
@@ -23,15 +29,17 @@ const RetreatModel = (props) => {
         console.log(values);
       }}
     >
-      {({ handleSubmit, form, submitting, pristine, values }) => (
-        <form onSubmit={handleSubmit}>
+      {({ handleSubmit, form, submitting, values }) => (
+        <form>
           <Modal>
             <ModalTitle>New Retreat</ModalTitle>
             <ModalContent>
-              <h6>
-                {values.date} {values.location?.displayName}
-              </h6>
-              <Row>
+              <Row style={styles.fieldRow}>
+                <Col>
+                  <h6>{`${values.date} ${values.location?.displayName} ${values.noOfDays} Days`}</h6>
+                </Col>
+              </Row>
+              <Row style={styles.fieldRow}>
                 <Col>
                   <Field
                     required
@@ -43,8 +51,17 @@ const RetreatModel = (props) => {
                   />
                 </Col>
               </Row>
-
-              <Row>
+              <Row style={styles.fieldRow}>
+                <Field
+                  required
+                  name="noOfDays"
+                  label="No of Days"
+                  component={InputFieldFF}
+                  type="number"
+                  validate={hasValue}
+                />
+              </Row>
+              <Row style={styles.fieldRow}>
                 <Field
                   name="location"
                   label="Location"
@@ -68,7 +85,7 @@ const RetreatModel = (props) => {
                   )}
                 </Field>
               </Row>
-              <Row>
+              <Row style={styles.fieldRow}>
                 <Field
                   required
                   name="noOfYogis"
@@ -94,6 +111,7 @@ const RetreatModel = (props) => {
                 <Button
                   primary
                   type="submit"
+                  loading={submitting}
                   disabled={submitting}
                   onClick={handleSubmit}
                 >
