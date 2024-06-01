@@ -2,6 +2,7 @@ import {
   DHIS2_EXPRESSION_OF_INTEREST_PROGRAM_STAGE,
   DHIS2_PROGRAM,
   DHIS2_RETREAT_DATA_ELEMENT,
+  DHIS2_RETREAT_SELECTION_STATE_DATA_ELEMENT,
   DHIS2_ROOT_ORG_UNIT,
   DHIS2_SPECIAL_COMMENT_DATA_ELEMENT,
   DHIS2_SPECIAL_COMMENT_PROGRAM_STAGE,
@@ -55,6 +56,11 @@ const dataToAttributesAndEvents = (data) => {
             occurredAt: Date.now(),
             dataElement: DHIS2_RETREAT_DATA_ELEMENT,
             value: retreat,
+          },
+          {
+            occurredAt: Date.now(),
+            dataElement: DHIS2_RETREAT_SELECTION_STATE_DATA_ELEMENT,
+            value: "applied",
           },
         ],
       });
