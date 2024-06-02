@@ -1,11 +1,12 @@
 import React, { useState } from "react";
-import { DataQuery } from "@dhis2/app-runtime";
+import { useDataQuery } from "@dhis2/app-runtime";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Button, CircularLoader, Tag } from "@dhis2/ui";
 import { Container, Card, Row, Col } from "react-bootstrap";
 import RetreatModel from "./RetreatModal";
 import { DHIS_RETREATS_OPTION_SET_ID, mapRetreatFromD2 } from "../dhis2";
 import { useNavigate } from "react-router-dom";
+import RetreatLocation from "./RetreatLocation";
 
 const styles = {
   headerRow: {
@@ -16,9 +17,19 @@ const styles = {
   manageButton: {
     textAlign: "right",
   },
+  tags: {
+    display: "flex",
+    columnGap: 5,
+  },
+  retreatCard: {
+    marginBottom: 10,
+  },
+  retreatTitle: {
+    marginBottom: 5,
+  },
 };
 
-const query = {
+const retreatsQuery = {
   retreats: {
     resource: `optionSets/${DHIS_RETREATS_OPTION_SET_ID}.json`,
     params: {
@@ -32,21 +43,40 @@ const Retreat = (props) => {
   const navigate = useNavigate();
   return (
     <Col md={3}>
-      <Card>
+      <Card style={styles.retreatCard}>
         <Card.Body>
           <Card.Title>
-            {retreat.name}
-            <Tag positive={!retreat.disabled} negative={retreat.disabled}>
-              {retreat.disabled ? "Disabled" : "Active"}
-            </Tag>
+            <Row>
+              <Col style={styles.retreatTitle}>{retreat.name}</Col>
+            </Row>
+            <Row>
+              <Col style={styles.tags}>
+                <Tag positive={!retreat.disabled} negative={retreat.disabled}>
+                  {retreat.disabled ? "Disabled" : "Active"}
+                </Tag>
+                <Tag>{retreat.retreatType?.toUpperCase()}</Tag>
+              </Col>
+            </Row>
           </Card.Title>
           <Row>
             <Col xs={2}>📅</Col>
-            <Col>{retreat.date.toDateString()}</Col>
+            <Col>
+              {retreat.date.toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+              })}
+            </Col>
+          </Row>
+          <Row>
+            <Col xs={2}>⛺</Col>
+            <Col>{retreat.noOfDays} Days</Col>
           </Row>
           <Row>
             <Col xs={2}>📍</Col>
-            <Col>{retreat.location}</Col>
+            <Col>
+              <RetreatLocation locationId={retreat.location} />
+            </Col>
           </Row>
           <Row>
             <Col xs={2}>🧘‍♂️</Col>
@@ -72,6 +102,11 @@ const Retreat = (props) => {
 
 const RetreatsDashboard = () => {
   const [hideRetreatModel, setHideRetreatModel] = useState(true);
+  const { error, loading, data, refetch } = useDataQuery(retreatsQuery);
+
+  if (error) return <span>ERROR</span>;
+  if (loading) return <CircularLoader extrasmall />;
+
   return (
     <Container>
       <div style={styles.headerRow}>
@@ -89,26 +124,18 @@ const RetreatsDashboard = () => {
               <RetreatModel
                 onCancel={() => {
                   setHideRetreatModel(true);
+                  refetch();
                 }}
               />
             )}
           </Col>
         </Row>
       </div>
-      <DataQuery query={query}>
-        {({ error, loading, data }) => {
-          if (error) return <span>ERROR</span>;
-          if (loading) return <CircularLoader extrasmall />;
-
-          return (
-            <Row>
-              {data.retreats.options.map((retreat) => {
-                return <Retreat retreat={retreat} key={retreat.id} />;
-              })}
-            </Row>
-          );
-        }}
-      </DataQuery>
+      <Row>
+        {data?.retreats.options.map((retreat) => {
+          return <Retreat retreat={retreat} key={retreat.id} />;
+        })}
+      </Row>
     </Container>
   );
 };

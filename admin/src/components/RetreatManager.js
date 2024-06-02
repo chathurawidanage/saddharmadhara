@@ -12,6 +12,7 @@ import {
   DHIS_RETREAT_SELECTION_STATE_OPTION_SET_ID,
   mapRetreatFromD2,
 } from "../dhis2";
+import { useNavigate } from "react-router-dom";
 import {
   DataQuery,
   useAlert,
@@ -28,7 +29,9 @@ import {
   Tab,
   FlyoutMenu,
   MenuItem,
+  IconArrowLeft16,
 } from "@dhis2/ui";
+import RetreatLocation from "./RetreatLocation";
 
 const styles = {
   container: {
@@ -36,6 +39,9 @@ const styles = {
   },
   actionButton: {
     marginRight: 2,
+  },
+  backButton: {
+    marginBottom: 10,
   },
 };
 
@@ -292,6 +298,7 @@ const YogisList = ({ retreat, selectionStates }) => {
 
 const RetreatManager = () => {
   const params = useParams();
+  const navigate = useNavigate();
 
   const query = {
     retreat: {
@@ -320,13 +327,32 @@ const RetreatManager = () => {
             <div>
               <div>
                 <Row>
-                  <Col>
-                    <h3>{retreat.name}</h3>
+                  <Col style={styles.backButton}>
+                    <Button
+                      small
+                      icon={<IconArrowLeft16 />}
+                      onClick={() => {
+                        navigate("/");
+                      }}
+                    >
+                      Back to Retreats List
+                    </Button>
                   </Col>
                 </Row>
                 <Row>
+                  <Col>
+                    <h3>{retreat.name} </h3>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col>
+                    <Tag>{retreat.retreatType?.toUpperCase()}</Tag>
+                  </Col>
                   <Col>📅 {retreat.date.toDateString()}</Col>
-                  <Col>📍 {retreat.location}</Col>
+                  <Col>⛺ {retreat.noOfDays} Days</Col>
+                  <Col>
+                    📍 <RetreatLocation locationId={retreat.location} />
+                  </Col>
                   <Col>🧘‍♂️ {retreat.totalYogis}</Col>
                 </Row>
               </div>
