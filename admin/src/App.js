@@ -1,17 +1,17 @@
 import React from "react";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createHashRouter, RouterProvider } from "react-router-dom";
 import RetreatsDashboard from "./components/RetreatsDashboard";
 import RetreatManager from "./components/RetreatManager";
 
-const router = createBrowserRouter([
+const router = createHashRouter([
   {
     path: "/",
     element: <RetreatsDashboard />,
   },
   {
-    path:"/:retreatId",
-    element: <RetreatManager/>
-  }
+    path: "/:retreatId",
+    element: <RetreatManager />,
+  },
 ]);
 
 const App = () => {

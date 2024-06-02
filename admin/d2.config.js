@@ -1,11 +1,9 @@
 const config = {
-    type: 'app',
-    name: 'Saddharmadhara',
-    title: 'Saddharmadhara',
+  type: "app",
 
-    entryPoints: {
-        app: './src/App.js',
-    },
-}
+  entryPoints: {
+    app: "./src/App.js",
+  },
+};
 
-module.exports = config
+module.exports = config;
