@@ -82,10 +82,12 @@ const YogiRow = (props) => {
                 small
                 onClick={() => {
                   //TODO: change ou
+                  let tempElement = document.createElement("a");
+                  tempElement.href = baseUrl;
                   window.open(
                     new URL(
                       `dhis-web-tracker-capture/index.html#/dashboard?tei=${props.trackedEntity}&program=${DHIS_PROGRAM}&ou=GRcUwrSIcZv`,
-                      baseUrl
+                      tempElement.href
                     ),
                     "_blank"
                   );
