@@ -12,7 +12,8 @@ export const yesNoQuestionWithComment = (
   title,
   isRequired,
   showMoreOnYes = true, // show more on `No` if false
-  commentTitle = defaultCommentTitle
+  commentTitle = defaultCommentTitle,
+  visibleIf = true
 ) => {
   // Note: Not using SurveyJS showCommentArea since it can't be enabled conditionally.
   return [
@@ -21,18 +22,19 @@ export const yesNoQuestionWithComment = (
       type: "boolean",
       title,
       isRequired,
+      visibleIf
     },
     {
       name: name + "Comment",
       type: "comment",
       title: commentTitle,
-      visibleIf: `{${name}} = ${showMoreOnYes}`,
-      isRequired,
+      visibleIf: `{${name}} = ${showMoreOnYes} and ${visibleIf}`,
+      isRequired
     },
   ];
 };
 
-export const agreeDisagreeQuestion = (name, title, isRequired, validators) => {
+export const agreeDisagreeQuestion = (name, title, isRequired, validators, visibleIf = true) => {
   return {
     name,
     type: "boolean",
@@ -47,5 +49,6 @@ export const agreeDisagreeQuestion = (name, title, isRequired, validators) => {
       [SINHALA_LOCALE]: "එකඟ නොවෙමි",
     },
     validators,
+    visibleIf
   };
 };

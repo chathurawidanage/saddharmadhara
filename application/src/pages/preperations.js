@@ -34,7 +34,9 @@ const preperationsPage = (isRequired) => {
           [SINHALA_LOCALE]:
             "භාවනා වැඩසටහන පෙර අවම වශයෙන් සති දෙකකටවත් පෙර ශාරීරික මට්ටමේ ලිංගික ක්‍රියාකාරකම් වලින් වැළකී සිටීමට මෙන්ම ස්වයංවින්දනය වැනි නරක පුරුදුවලින් වැළකී සිටීමට හෝ ඔබ උත්සාහ කිරීම.",
         },
-        isRequired
+        isRequired,
+        null,
+        "!({MaritalStatus} = 'reverend')"
       ),
       agreeDisagreeQuestion(
         "DoAshubaBhavana",

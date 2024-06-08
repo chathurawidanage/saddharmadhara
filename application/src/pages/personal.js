@@ -11,26 +11,38 @@ const personalPage = (isRequired) => {
     elements: [
       {
         name: "FullName",
-        title: { [ENGLISH_LOCALE]: "Full Name", [SINHALA_LOCALE]: "සම්පූර්ණ නම" },
+        title: {
+          [ENGLISH_LOCALE]: "Full Name",
+          [SINHALA_LOCALE]: "සම්පූර්ණ නම",
+        },
         type: "text",
         isRequired,
       },
       {
         name: "NameWithInitials",
-        title: { [ENGLISH_LOCALE]: "Name with Initials", [SINHALA_LOCALE]: "මුලකුරු සමග නම" },
+        title: {
+          [ENGLISH_LOCALE]: "Name with Initials",
+          [SINHALA_LOCALE]: "මුලකුරු සමග නම",
+        },
         type: "text",
         isRequired,
       },
       {
         name: "DateOfBirth",
-        title: { [ENGLISH_LOCALE]: "Date of Birth", [SINHALA_LOCALE]: "උපන්දිනය" },
+        title: {
+          [ENGLISH_LOCALE]: "Date of Birth",
+          [SINHALA_LOCALE]: "උපන්දිනය",
+        },
         type: "text",
         inputType: "date",
         isRequired,
       },
       {
         name: "Gender",
-        title: { [ENGLISH_LOCALE]: "Gender", [SINHALA_LOCALE]: "ස්ත්‍රී/පුරුෂ භාවය" },
+        title: {
+          [ENGLISH_LOCALE]: "Gender",
+          [SINHALA_LOCALE]: "ස්ත්‍රී/පුරුෂ භාවය",
+        },
         type: "radiogroup",
         choices: [
           {
@@ -52,9 +64,19 @@ const personalPage = (isRequired) => {
       },
       {
         name: "MaritalStatus",
-        title: { [ENGLISH_LOCALE]: "Marital Status", [SINHALA_LOCALE]: "විවාහක/අවිවාහක බව" },
+        title: {
+          [ENGLISH_LOCALE]: "Marital Status",
+          [SINHALA_LOCALE]: "විවාහක/අවිවාහක බව",
+        },
         type: "dropdown",
         choices: [
+          {
+            value: "reverend",
+            text: {
+              [ENGLISH_LOCALE]: "Reverend",
+              [SINHALA_LOCALE]: "පූජ්‍ය",
+            },
+          },
           {
             value: "single",
             text: {
@@ -87,33 +109,71 @@ const personalPage = (isRequired) => {
         isRequired,
       },
       {
+        name: "YearOfFullOrdination",
+        type: "text",
+        title: {
+          [ENGLISH_LOCALE]: "Year of Full Ordination(Upasampadā)",
+          [SINHALA_LOCALE]: "උපසම්පදා වූ වර්ෂය",
+        },
+        inputType: "number",
+        isRequired,
+        visibleIf: "({MaritalStatus} = 'reverend')",
+      },
+      {
+        name: "NumberOfVassa",
+        type: "text",
+        title: {
+          [ENGLISH_LOCALE]: "Number of Vassa (rain retreats) observed",
+          [SINHALA_LOCALE]: "සම්පුර්ණ කල වස් ප්‍රමාණය",
+        },
+        inputType: "number",
+        isRequired,
+        visibleIf: "({MaritalStatus} = 'reverend')",
+      },
+      {
         name: "Address",
-        title: { [ENGLISH_LOCALE]: "Permenant Address", [SINHALA_LOCALE]: "ස්ථිර පදිංචි ලිපිනය" },
+        title: {
+          [ENGLISH_LOCALE]: "Permenant Address",
+          [SINHALA_LOCALE]: "ස්ථිර පදිංචි ලිපිනය",
+        },
         type: "comment",
         isRequired,
       },
       {
         name: "MobilePhone",
-        title: { [ENGLISH_LOCALE]: "Mobile Phone", [SINHALA_LOCALE]: "ජංගම දුරකථන අංකය" },
+        title: {
+          [ENGLISH_LOCALE]: "Mobile Phone",
+          [SINHALA_LOCALE]: "ජංගම දුරකථන අංකය",
+        },
         type: "text",
         inputType: "tel",
         isRequired,
       },
       {
         name: "HomePhone",
-        title: { [ENGLISH_LOCALE]: "Home Phone", [SINHALA_LOCALE]: "ස්ථාවර දුරකථන අංකය" },
+        title: {
+          [ENGLISH_LOCALE]: "Home Phone",
+          [SINHALA_LOCALE]: "ස්ථාවර දුරකථන අංකය",
+        },
         type: "text",
         inputType: "tel",
       },
       {
         name: "Whatsapp",
-        title: { [ENGLISH_LOCALE]: "Whatsapp", [SINHALA_LOCALE]: "වට්ස්ඇප් අංකය" },
+        title: {
+          [ENGLISH_LOCALE]: "Whatsapp",
+          [SINHALA_LOCALE]: "වට්ස්ඇප් අංකය",
+        },
         type: "text",
         inputType: "tel",
+        isRequired,
       },
       {
         name: "Email",
-        title: { [ENGLISH_LOCALE]: "Email", [SINHALA_LOCALE]: "විද්‍යුත් තැපැල් ලිපිනය" },
+        title: {
+          [ENGLISH_LOCALE]: "Email",
+          [SINHALA_LOCALE]: "විද්‍යුත් තැපැල් ලිපිනය",
+        },
         type: "text",
         inputType: "email",
       },

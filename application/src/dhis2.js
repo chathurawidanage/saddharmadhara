@@ -63,4 +63,6 @@ export const SURVEY_JS_NAME_TO_D2_TRACKED_ENTITY_ATTRIBUTES_MAP = {
   Stress: "dgky5acnvG3",
   HaveTakenDrugs: "fyV0EfY0dnR",
   Whatsapp: "CpF36JSasMJ",
+  YearOfFullOrdination: "MCCX4BAduLq",
+  NumberOfVassa: "pUPux4ovXEA",
 };
