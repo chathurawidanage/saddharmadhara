@@ -45,6 +45,8 @@ const surveyJson = {
     [ENGLISH_LOCALE]: "🪷 Saddharmadhara Application",
     [SINHALA_LOCALE]: "🪷 සද්ධර්මධාරා අයදුම්පත්‍රය",
   },
+  showTimerPanel: "top",
+  maxTimeToFinish: 60 * 60,
   showProgressBar: "top",
   showPreviewBeforeComplete: "showAnsweredQuestions",
   checkErrorsMode: "onValueChanged",
