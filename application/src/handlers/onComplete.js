@@ -10,7 +10,7 @@ import {
   DHIS2_TRACKED_ENTITY_TYPE,
   SURVEY_JS_NAME_TO_D2_TRACKED_ENTITY_ATTRIBUTES_MAP,
 } from "../dhis2";
-import { EXISTING_YOGI_ID_PROPERTY } from "../properties";
+import { EXISTING_YOGI_ENROLLMENT_ID_PROPERTY } from "../properties";
 
 const dataToAttributesAndEvents = (data) => {
   let Photo = data.Photo?.find((el) => el !== undefined)?.content;
@@ -128,7 +128,7 @@ const onComplete = (survey, options) => {
 
   let { attributes, events } = dataToAttributesAndEvents(survey.data);
 
-  let existingYogiId = survey.getPropertyValue(EXISTING_YOGI_ID_PROPERTY);
+  let existingYogiId = survey.getPropertyValue(EXISTING_YOGI_ENROLLMENT_ID_PROPERTY);
 
   (existingYogiId
     ? postEventsOnlyForExistingYogi(existingYogiId, events)

@@ -6,16 +6,7 @@ const SUBMIT_FORM_URL = new URL("tracker", API_URL);
 SUBMIT_FORM_URL.searchParams.set("async", "false");
 export { SUBMIT_FORM_URL as DHIS2_SUBMIT_FORM_URL };
 
-const DHIS2_RETREATS_OPTION_SET = "ys2Pv9hTS0O";
-const DHIS2_RETREAT_DATE_ATTRIBUTE = "sCzsZZ7m37E";
-
-const RETREATS_LIST_URL = new URL("retreats", API_URL);
-RETREATS_LIST_URL.searchParams.set("optionSet", DHIS2_RETREATS_OPTION_SET);
-RETREATS_LIST_URL.searchParams.set(
-  "dateAttribute",
-  DHIS2_RETREAT_DATE_ATTRIBUTE
-);
-export { RETREATS_LIST_URL };
+export const RETREATS_LIST_URL = new URL("retreats", API_URL);
 
 export const DHIS2_PROGRAM = "KdYt2OP9VjD";
 export const DHIS2_ROOT_ORG_UNIT = "GRcUwrSIcZv";

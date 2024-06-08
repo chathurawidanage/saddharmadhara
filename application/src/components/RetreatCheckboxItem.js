@@ -1,5 +1,4 @@
 import {
-  ReactElementFactory,
   SurveyQuestionCheckboxItem,
 } from "survey-react-ui";
 
@@ -9,6 +8,7 @@ export const RETREAT_CHECKBOX_ITEM_NAME = "retreat-checkbox-item";
 // if the checkbox item needs to be customized later.
 class RetreatCheckboxItem extends SurveyQuestionCheckboxItem {
   renderElement() {
+    console.log(this);
     return super.renderElement();
   }
 }

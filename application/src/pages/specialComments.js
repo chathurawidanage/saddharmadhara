@@ -1,6 +1,15 @@
 import { ENGLISH_LOCALE } from "../locale/english";
 import { SINHALA_LOCALE } from "../locale/sinhala";
 
+const SPECIAL_COMMENTS_QUESTION_NAME = "SpecialComments";
+
+const titleForExistingYogi = {
+  [ENGLISH_LOCALE]:
+    "Since you are a pre-registered applicant, there is no need to complete the questionnaire again. If there is any other information in addition to the previously provided information, it can be mentioned here.",
+  [SINHALA_LOCALE]:
+    "ඔබ පෙර ලියාපදිංචි වී ඇති අයදුම්කරුවකු වන බැවින් යලි ප්‍රශ්නාවලිය සම්පූර්ණ කිරීම අවශ්‍ය නොවේ. පෙර සපයා ඇති තොරතුරු වලට අමතරව වූ වෙනත් යම් තොරතුරක් වේ නම් මෙහි සදහන් කලහැකිය.",
+};
+
 const specialCommentsPage = {
   name: "SpecialComments",
   title: {
@@ -9,7 +18,7 @@ const specialCommentsPage = {
   },
   elements: [
     {
-      name: "SpecialComment",
+      name: SPECIAL_COMMENTS_QUESTION_NAME,
       type: "comment",
       title: {
         [ENGLISH_LOCALE]:
@@ -19,6 +28,11 @@ const specialCommentsPage = {
       },
     },
   ],
+};
+
+export const changeSpecialCommentPromptToExistingYogi = (survey) => {
+  survey.getQuestionByName(SPECIAL_COMMENTS_QUESTION_NAME).title =
+    titleForExistingYogi[survey.locale];
 };
 
 export default specialCommentsPage;

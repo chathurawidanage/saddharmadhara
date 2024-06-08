@@ -7,7 +7,7 @@ const Loader = (props) => {
       {props.visible && (
         <div className="loader">
           <div className="loader-bubble">
-            <img src={LOTUS_IMG} />
+            <img src={LOTUS_IMG} alt="loading" />
           </div>
         </div>
       )}

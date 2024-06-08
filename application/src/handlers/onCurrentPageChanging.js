@@ -1,6 +1,5 @@
 import {
   CHECK_EXISTS_URL,
-  DHIS2_PROGRAM,
   SURVEY_JS_NAME_TO_D2_TRACKED_ENTITY_ATTRIBUTES_MAP,
 } from "../dhis2";
 import agreementPage from "../pages/agreement";
@@ -8,10 +7,12 @@ import identificationPage from "../pages/identification";
 import instructionsPage from "../pages/instructions";
 import languagePage from "../pages/language";
 import retreatsPage from "../pages/retreats";
-import specialCommentsPage from "../pages/specialComments";
+import specialCommentsPage, {
+  changeSpecialCommentPromptToExistingYogi,
+} from "../pages/specialComments";
 import {
   EXISTING_YOGI_CHECK_DONE,
-  EXISTING_YOGI_ID_PROPERTY,
+  EXISTING_YOGI_ENROLLMENT_ID_PROPERTY,
 } from "../properties";
 
 const visiblePageNamesForExistingYogis = new Set([
@@ -29,7 +30,6 @@ const trySearch = async (attribute, value) => {
   }
 
   let url = new URL(CHECK_EXISTS_URL);
-  url.searchParams.set("program", DHIS2_PROGRAM);
   url.searchParams.set("attribute", attribute);
   url.searchParams.set("value", value);
 
@@ -63,7 +63,7 @@ const onCurrentPageChanging = (survey, options) => {
       .then((found) => {
         console.info("Found an existing yogi", found);
         options.oldCurrentPage.readOnly = true;
-        survey.setPropertyValue(EXISTING_YOGI_ID_PROPERTY, found.enrollment);
+        survey.setPropertyValue(EXISTING_YOGI_ENROLLMENT_ID_PROPERTY, found.enrollment);
         // hide pages
         for (let page of survey.pages) {
           if (!visiblePageNamesForExistingYogis.has(page.name)) {
@@ -77,6 +77,9 @@ const onCurrentPageChanging = (survey, options) => {
         } else {
           survey.currentPage = survey.getPageByName(specialCommentsPage.name);
         }
+
+        // change the title of the special comment
+        changeSpecialCommentPromptToExistingYogi(survey);
       })
       .catch((err) => {
         // didn't find an existing one
