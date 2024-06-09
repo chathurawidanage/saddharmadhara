@@ -38,9 +38,21 @@ const retreatsQuery = {
   },
 };
 
+const getEndDate = (startDate, noOfDays) => {
+  let endDate = new Date(startDate.getTime() + noOfDays * 24 * 60 * 60 * 1000);
+  return endDate;
+};
+
 const Retreat = (props) => {
   const retreat = mapRetreatFromD2(props.retreat);
   const navigate = useNavigate();
+  const endDate = getEndDate(retreat.date, retreat.noOfDays);
+
+  // hide after 7 days
+  if (Date.now() > endDate.getTime() + 7 * 24 * 60 * 60 * 1000) {
+    return null;
+  }
+
   return (
     <Col md={3}>
       <Card style={styles.retreatCard}>
@@ -62,6 +74,12 @@ const Retreat = (props) => {
             <Col xs={2}>📅</Col>
             <Col>
               {retreat.date.toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+              })}{" "}
+              -{" "}
+              {endDate.toLocaleDateString("en-US", {
                 year: "numeric",
                 month: "short",
                 day: "numeric",
