@@ -65,7 +65,7 @@ const identificationPage = {
       visibleIf: "{IdentificationTypes} contains 'Passport'",
       isRequired: true,
       validators: [{
-        type: "text", minLength: 7, maxLength: 9, text: {
+        type: "regex", regex: "^[a-zA-Z0-9]{7,9}$", text: {
           [ENGLISH_LOCALE]: "Invalid Passport Number.",
           [SINHALA_LOCALE]: "ගමන් බලපත්‍ර අංක​ය වලංගු නැත."
         }
