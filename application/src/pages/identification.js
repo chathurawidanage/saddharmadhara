@@ -14,14 +14,46 @@ const identificationPage = {
   },
   elements: [
     {
+      name: "IdentificationTypes",
+      title: {
+        [ENGLISH_LOCALE]: "Please select the documents you would like to use for identification purposes.",
+        [SINHALA_LOCALE]: "හදුනා ගැනීම සදහා භාවිතා කිරීමට බලාපොරොත්තු වන ලේඛන තෝරන්න."
+      },
+      description: {
+        [ENGLISH_LOCALE]: "Please select all that apply.",
+        [SINHALA_LOCALE]: "කරුණාකර අදාළ සියල්ල තෝරන්න."
+      },
+      type: "tagbox",
+      choices: [{
+        value: "NIC",
+        text: {
+          [ENGLISH_LOCALE]: "National Identity Card(NIC)",
+          [SINHALA_LOCALE]: "ජාතික හැදුනුම්පත"
+        }
+      }, {
+        value: "Passport",
+        text: {
+          [ENGLISH_LOCALE]: "Passport",
+          [SINHALA_LOCALE]: "ගමන් බලපත්‍රය"
+        }
+      }],
+      isRequired: true
+    },
+    {
       name: "NIC",
       title: {
         [ENGLISH_LOCALE]: "National Identity Card No. (NIC)",
         [SINHALA_LOCALE]: "ජාතික හැදුනුම්පත් අංකය",
       },
       type: "text",
-      requiredIf: "{Passport} empty",
-      validators: [{ type: "regex", regex: "^([0-9]{9}[x|X|v|V]|[0-9]{12})$" }],
+      isRequired: true,
+      visibleIf: "{IdentificationTypes} contains 'NIC'",
+      validators: [{
+        type: "regex", regex: "^([0-9]{9}[x|X|v|V]|[0-9]{12})$", text: {
+          [ENGLISH_LOCALE]: "Invalid Identity Card No.",
+          [SINHALA_LOCALE]: "හැඳුනුම්පත් අංකය වලංගු නැත."
+        }
+      }],
     },
     {
       name: "Passport",
@@ -30,8 +62,14 @@ const identificationPage = {
         [SINHALA_LOCALE]: "ගමන් බලපත්‍ර අංක​ය",
       },
       type: "text",
-      requiredIf: "{NIC} empty",
-      validators: [{ type: "text", minLength: 7, maxLength: 9 }],
+      visibleIf: "{IdentificationTypes} contains 'Passport'",
+      isRequired: true,
+      validators: [{
+        type: "text", minLength: 7, maxLength: 9, text: {
+          [ENGLISH_LOCALE]: "Invalid Passport Number.",
+          [SINHALA_LOCALE]: "ගමන් බලපත්‍ර අංක​ය වලංගු නැත."
+        }
+      }],
     },
   ],
 };
