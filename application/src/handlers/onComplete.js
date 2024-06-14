@@ -125,6 +125,7 @@ const postEventsOnlyForExistingYogi = (enrollment, events) => {
 
 const onComplete = (survey, options) => {
   if (survey.timeSpent >= SURVEY_TIME_LIMIT_SECONDS) {
+    options.showSaveError("You spent more time on the application than allocated.");
     return;
   }
 
