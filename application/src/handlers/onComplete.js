@@ -10,7 +10,7 @@ import {
   DHIS2_TRACKED_ENTITY_TYPE,
   SURVEY_JS_NAME_TO_D2_TRACKED_ENTITY_ATTRIBUTES_MAP,
 } from "../dhis2";
-import { EXISTING_YOGI_ENROLLMENT_ID_PROPERTY } from "../properties";
+import { EXISTING_YOGI_ENROLLMENT_ID_PROPERTY, SURVEY_TIME_LIMIT_SECONDS } from "../properties";
 
 const dataToAttributesAndEvents = (data) => {
   let Photo = data.Photo?.find((el) => el !== undefined)?.content;
@@ -124,6 +124,10 @@ const postEventsOnlyForExistingYogi = (enrollment, events) => {
 };
 
 const onComplete = (survey, options) => {
+  if (survey.timeSpent >= SURVEY_TIME_LIMIT_SECONDS) {
+    return;
+  }
+
   options.showSaveInProgress();
 
   let { attributes, events } = dataToAttributesAndEvents(survey.data);

@@ -27,6 +27,7 @@ import retreatsPage from "./pages/retreats";
 import RetreatCheckboxItem, {
   RETREAT_CHECKBOX_ITEM_NAME,
 } from "./components/RetreatCheckboxItem";
+import { SURVEY_TIME_LIMIT_SECONDS } from "./properties";
 
 ReactElementFactory.Instance.registerElement(
   RETREAT_CHECKBOX_ITEM_NAME,
@@ -46,7 +47,7 @@ const surveyJson = {
     [SINHALA_LOCALE]: "🪷 සද්ධර්මධාරා අයදුම්පත්‍රය",
   },
   showTimerPanel: "top",
-  maxTimeToFinish: 60 * 60,
+  maxTimeToFinish: SURVEY_TIME_LIMIT_SECONDS,
   showProgressBar: "top",
   showPreviewBeforeComplete: "showAnsweredQuestions",
   checkErrorsMode: "onValueChanged",
