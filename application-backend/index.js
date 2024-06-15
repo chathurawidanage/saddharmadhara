@@ -176,7 +176,7 @@ app.get("/api/checkExists", (req, res) => {
     });
 });
 
-app.get("/api/health", (req, res) => {
+app.get("/health", (req, res) => {
   res.send("OK");
 });
 
