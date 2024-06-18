@@ -7,7 +7,7 @@ const titleForExistingYogi = {
   [ENGLISH_LOCALE]:
     "Since you are a pre-registered applicant, there is no need to complete the questionnaire again. If there is any other information in addition to the previously provided information, it can be mentioned here.",
   [SINHALA_LOCALE]:
-    "ඔබ පෙර ලියාපදිංචි වී ඇති අයදුම්කරුවකු වන බැවින් යලි ප්‍රශ්නාවලිය සම්පූර්ණ කිරීම අවශ්‍ය නොවේ. පෙර සපයා ඇති තොරතුරු වලට අමතරව වූ වෙනත් යම් තොරතුරක් වේ නම් මෙහි සදහන් කලහැකිය.",
+    "ඔබ පෙර ලියාපදිංචි වී ඇති අයදුම්කරුවකු වන බැවින් යළි ප්‍රශ්නාවලිය සම්පූර්ණ කිරීම අවශ්‍ය නොවේ. පෙර සපයා ඇති තොරතුරු වලට අමතරව වූ වෙනත් යම් තොරතුරක් වේ නම් මෙහි සදහන් කළහැකිය.",
 };
 
 const specialCommentsPage = {

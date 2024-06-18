@@ -16,7 +16,7 @@ const emergenecyContactPage = (isRequired = true) => {
           [ENGLISH_LOCALE]:
             "Name with initials of the person to be contacted in an emergency.",
           [SINHALA_LOCALE]:
-            "හදිසි අවස්ථාවකදී සම්බන්ධ කර ගත යුතු අයකුගේ නම (මුලකුරු සමග).",
+            "හදිසි අවස්ථාවකදී සම්බන්ධ කර ගත යුතු අයකුගේ නම (මුලකුරු සමඟ).",
         },
         isRequired,
       },

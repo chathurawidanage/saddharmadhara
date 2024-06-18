@@ -7,7 +7,7 @@ const preperationsPage = (isRequired) => {
     name: "Preperations",
     title: {
       [ENGLISH_LOCALE]: "☑️ Preparation for the meditation program",
-      [SINHALA_LOCALE]: "☑️ භාවනා වැඩසටහන සදහා මුලික සුදානම් වීම",
+      [SINHALA_LOCALE]: "☑️ භාවනා වැඩසටහන සඳහා මුලික සුදානම් වීම",
     },
     description: {
       [ENGLISH_LOCALE]:
@@ -22,7 +22,7 @@ const preperationsPage = (isRequired) => {
           [ENGLISH_LOCALE]:
             "You should try to reduce the use of cell phones, the internet, and other sense-stimulating activities for some time (preferably two weeks, otherwise at least five days) prior to the retreat date.",
           [SINHALA_LOCALE]:
-            "ඔබ භාවනා වැඩසටහන සහභාගී වීමට නියමිත දිනට පෙර යම් කාලයක් (වඩාත් සුදුසු සති දෙකක්, එසේ නොමැති නම් අවම වශයෙන් දින පහක්) ජංගම දුරකථන, අන්තර්ජාලය සහ අනෙකුත් සංවේදී ක්‍රියාකාරකම් භාවිතය අවම කිරීමට උත්සාහ කළ යුතුය.",
+            "ඔබ භාවනා වැඩසටහන සහභාගී වීමට නියමිත දිනට පෙර යම් කාලයක් (වඩාත් සුදුසු සති දෙකක්, එසේ නොමැති නම් අවම වශයෙන් දින පහක්) ජංගම දුරකථන, අන්තර්ජාලය සහ අනෙකුත් සංවේදී ක්‍රියාකාරකම් භාවිතය අවම කිරීමට උත්සාහ කළ යුතු ය.",
         },
         isRequired
       ),
@@ -54,7 +54,7 @@ const preperationsPage = (isRequired) => {
           [ENGLISH_LOCALE]:
             "Practice compassion (Maithree Bhavana) at least two weeks prior to the retreat.",
           [SINHALA_LOCALE]:
-            "භාවනා වැඩසටහන පෙර අවම වශයෙන් සති දෙකකට පෙර සිටම මෛත්‍රීය භාවනාව පුහුණු කිරීම.",
+            "භාවනා වැඩසටහන පෙර අවම වශයෙන් සති දෙකකට පෙර සිටම මෛ​​ත්‍රේය භාවනාව පුහුණු කිරීම.",
         },
         isRequired
       ),
@@ -64,7 +64,7 @@ const preperationsPage = (isRequired) => {
           [ENGLISH_LOCALE]:
             "With the understanding of the virtues of 'Trivida Rathna', cultivate pure and honest faith and practice Buddhanussathi, Dhammanussathi, Sanghanussathi at least two weeks prior to the retreat in advance.",
           [SINHALA_LOCALE]:
-            "'ත්‍රිවිධ රත්නයේ' ගුණ අවබෝධ කරගෙන පිරිසුදු අවංක ශ්‍රද්ධාව වඩවාගෙන බුද්ධානුස්සති, ධම්මානුස්සති, සංඝානුස්සති යන පිළිවෙත් පුරුදු පුහුණු වීම.",
+            "'ත්‍රිවිධ රත්නයේ' ගුණ අවබෝධ කරගෙන එකී ගුණයන් ශ්‍රද්ධා සමුප්‍රයුක්තව වඩවාගෙන බුද්ධානුස්සති, ධම්මානුස්සති, සංඝානුස්සති යන පිළිවෙත් පුරුදු පුහුණු වීම.",
         },
         isRequired
       ),
@@ -74,7 +74,7 @@ const preperationsPage = (isRequired) => {
           [ENGLISH_LOCALE]:
             "Have some Dhamma knowledge about the basic facts (four noble truths) of Buddhism - (Peruse the book 'The Word of the Buddha' written by the German monk Most Venerable Nyanatiloka Thero)",
           [SINHALA_LOCALE]:
-            "බුදුදහමේ මූලික කරුණු (උතුම් චතුරාර්ය සත්‍යය) පිළිබඳව යම් දහම් දැනුමක් ලබා ගැනීම - (ඒ සඳහා ඔබට ගෞරවනීය ස්වාමීන්වහන්සේ විසින් අනුදැන වදාළ පරිදි ජර්මානු ජාතික අතිපූජනීය ඤාණතිලෝක ස්වාමීන් වහන්සේ විසින් ලියන ලද ‘බුද්ධ වචනය’ ග්‍රන්ථය පරිශීලනය කළ හැකිය)",
+            "බුදුදහමේ මූලික කරුණු (උතුම් චතුරාර්ය සත්‍යය) පිළිබඳ යම් දහම් දැනුමක් ලබා ගැනීම - (ඒ සඳහා ඔබට ගෞරවනීය ස්වාමීන්වහන්සේ විසින් අනුදැන වදාළ පරිදි ජර්මානු ජාතික අතිපූජනීය ඤාණතිලෝක ස්වාමීන් වහන්සේ විසින් ලියන ලද ‘බුද්ධ වචනය’ ග්‍රන්ථය පරිශීලනය කළ හැකිය)",
         },
         isRequired
       ),

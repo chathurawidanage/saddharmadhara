@@ -6,7 +6,7 @@ const agreementPage = {
   name: "Agreement",
   title: {
     [ENGLISH_LOCALE]: "🤝 Agreement",
-    [SINHALA_LOCALE]: "🤝 එකගතාව​ය",
+    [SINHALA_LOCALE]: "🤝 එකඟතාව​ය",
   },
   elements: [
     agreeDisagreeQuestion(

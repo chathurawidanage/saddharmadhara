@@ -22,7 +22,7 @@ const personalPage = (isRequired) => {
         name: "NameWithInitials",
         title: {
           [ENGLISH_LOCALE]: "Name with Initials",
-          [SINHALA_LOCALE]: "මුලකුරු සමග නම",
+          [SINHALA_LOCALE]: "මුලකුරු සමඟ නම",
         },
         type: "text",
         isRequired,
@@ -124,7 +124,7 @@ const personalPage = (isRequired) => {
         type: "text",
         title: {
           [ENGLISH_LOCALE]: "Number of Vassa (rain retreats) observed",
-          [SINHALA_LOCALE]: "සම්පුර්ණ කල වස් ප්‍රමාණය",
+          [SINHALA_LOCALE]: "සම්පුර්ණ කළ වස් ප්‍රමාණය",
         },
         inputType: "number",
         isRequired,

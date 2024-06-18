@@ -4,7 +4,7 @@ const sinhalaLocaleStrings = {
   pagePrevText: "පෙ​ර පිටුවට",
   pageNextText: "ඊළඟ පිටුවට",
   completeText: "අයදුම් කරන්න",
-  requiredError: "මෙම දත්තය ඇතුලත් කිරීම අනිවාර්‍ය ​වේ.",
+  requiredError: "මෙම දත්තය ඇතුළත් කිරීම අනිවාර්‍ය ​වේ.",
   exceedMaxSize: "ගොනු​වේ විශාලත්වය {0} නොඉක්මවිය යුතුය.",
   booleanCheckedLabel: "​ඔව්",
   booleanUncheckedLabel: "නැත",
