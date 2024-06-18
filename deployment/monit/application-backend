@@ -1,0 +1,7 @@
+check host application-backend with address localhost
+start program = "/usr/local/bin/pm2 start /home/dhis/saddharmadhara/application-backend/index.js"
+as uid dhis gid dhis
+stop program = "/usr/local/bin/pm2 stop /home/dhis/saddharmadhara/application-backend/index.js"
+as uid dhis gid dhis
+if failed port 5000 protocol http request "/health" then alert
+if failed port 5000 protocol http request "/health" for 5 cycles then restart

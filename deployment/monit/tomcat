@@ -1,0 +1,7 @@
+check host tomcat with address localhost
+start program = "/home/dhis/tomcat-dhis/bin/startup.sh"
+as uid dhis gid dhis
+stop program = "/home/dhis/tomcat-dhis/bin/shutdown.sh"
+as uid dhis gid dhis
+if failed port 8080 protocol http then alert
+if failed port 8080 protocol http for 5 cycles then restart
