@@ -8,7 +8,7 @@ Developed as a charity project, this application is available for similar purpos
 
 If you have a similar requirement and have similar [objects](https://srisambuddhamission.org/objects-of-the-trust/), please contact me, or the [Sri Sambuddha Mission Charitable Trust](https://srisambuddhamission.org/contact/). Any additional development, installation, maintenance, and training needed will be provided free of charge.
 
-**May this effort help guide more people towards the supreme bliss of Nibbana.**
+**May this effort help guide many towards the supreme bliss of Nibbana.**
 
 ### Features
 
