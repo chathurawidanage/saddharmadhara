@@ -1,4 +1,4 @@
-# Saddharmadhara
+# 🪷 Saddharmadhara
 
 This application was developed to manage applicants for meditation programs conducted by the Most Venerable Bambalapitiya Gnanaloka Thero.
 
