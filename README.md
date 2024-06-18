@@ -2,7 +2,7 @@
 
 This application was developed to manage applicants for meditation programs conducted by the Most Venerable Bambalapitiya Gnanaloka Thero.
 
-For more information, visit: [Sri Sambuddha Mission](https://srisambuddhamission.org/saddharmadhara/)
+For more information, visit: [Sri Sambuddha Mission Trust Website](https://srisambuddhamission.org/saddharmadhara/)
 
 Developed as a charity project, this application is available for similar purposes aimed at protecting and fostering the Buddha Sasana, and preserving the pristine teachings of the Lord Buddha as enshrined in the Pali Tipitaka of Theravada Buddhism.
 
