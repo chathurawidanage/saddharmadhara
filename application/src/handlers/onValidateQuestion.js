@@ -7,7 +7,6 @@ const onValidateQuestion = (survey, options) => {
         if (!options.question.isRequired && (options.question.value === "" || options.question.value === undefined)) {
             return;
         } else if (options.question.getPropertyValue(PHONE_NUMBER_QUESTION_VALIDITY_PROPERTY) === false) {
-            console.log(options.question.isRequired, options.question.value);
             options.error = 'Invalid phone number';
         }
     }
