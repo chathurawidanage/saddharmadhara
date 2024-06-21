@@ -22,7 +22,7 @@ const readynessCheckPage = (isRequired) => {
           [ENGLISH_LOCALE]:
             "Do you have full permission from your spouse/parents/guardian/employer or any such duty-bound relationships (for venerables, this could be the Monastery Head, Upajjhāya, or Ācariya) to attend the residential meditation program?",
           [SINHALA_LOCALE]:
-            "ඔබට මෙම නේවාසික භාවනා වැඩසටහන හා සම්බන්ධ වීමට දෙමව්පියන්ගෙන්/භාරකරුගෙන්/රැකියා කරන ස්ථානයෙන් සහ වෙනත් එවැනි විශේෂ වගකිවයුතු සම්බන්ධතාවලින් සම්පූර්ණ අවසරය ලැබී තිබේ ද? පූජ්‍ය පක්ෂය  සඳහා විහාරාධිපති ස්වාමින්වහන්සේ ගේ හෝ උපාධ්‍යන්වහන්සේගේ සුම්පූර්ණ අවසරය අවශ්‍ය වේ.", // TODO
+            "ඔබට මෙම නේවාසික භාවනා වැඩසටහන හා සම්බන්ධ වීමට දෙමව්පියන්ගෙන්/භාරකරුගෙන්/රැකියා කරන ස්ථානයෙන් සහ වෙනත් එවැනි විශේෂ වගකිවයුතු සම්බන්ධතාවලින් සම්පූර්ණ අවසරය ලැබී තිබේ ද? පූජ්‍ය පක්ෂය  සඳහා විහාරාධිපති ස්වාමින්වහන්සේ ගේ හෝ උපාධ්‍යන්වහන්සේගේ සම්පූර්ණ අවසරය අවශ්‍ය වේ.", // TODO
         },
         isRequired,
         false

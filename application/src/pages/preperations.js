@@ -64,7 +64,7 @@ const preperationsPage = (isRequired) => {
           [ENGLISH_LOCALE]:
             "With the understanding of the virtues of 'Trivida Rathna', cultivate pure and honest faith and practice Buddhanussathi, Dhammanussathi, Sanghanussathi at least two weeks prior to the retreat in advance.",
           [SINHALA_LOCALE]:
-            "'ත්‍රිවිධ රත්නයේ' ගුණ අවබෝධ කරගෙන එකී ගුණයන් ශ්‍රද්ධා සමුප්‍රයුක්තව වඩවාගෙන බුද්ධානුස්සති, ධම්මානුස්සති, සංඝානුස්සති යන පිළිවෙත් පුරුදු පුහුණු වීම.",
+            "'ත්‍රිවිධ රත්නයේ' ගුණ අවබෝධ කරගෙන එකී ගුණයන් ශ්‍රද්ධා සම්ප්‍රයුක්තව වඩවාගෙන බුද්ධානුස්සති, ධම්මානුස්සති, සංඝානුස්සති යන පිළිවෙත් පුරුදු පුහුණු වීම.",
         },
         isRequired
       ),
