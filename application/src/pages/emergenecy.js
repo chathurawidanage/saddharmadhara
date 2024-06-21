@@ -1,3 +1,4 @@
+import { PHONE_NUMBER_QUESTION_TYPE } from "../components/PhoneNumberTextBox";
 import { ENGLISH_LOCALE } from "../locale/english";
 import { SINHALA_LOCALE } from "../locale/sinhala";
 
@@ -33,7 +34,7 @@ const emergenecyContactPage = (isRequired = true) => {
       },
       {
         name: "EmergencyContactPhone",
-        type: "text",
+        type: PHONE_NUMBER_QUESTION_TYPE,
         title: {
           [ENGLISH_LOCALE]: "Phone number of the emergency contact.",
           [SINHALA_LOCALE]:

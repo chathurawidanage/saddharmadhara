@@ -28,6 +28,10 @@ import RetreatCheckboxItem, {
   RETREAT_CHECKBOX_ITEM_NAME,
 } from "./components/RetreatCheckboxItem";
 import { SURVEY_TIME_LIMIT_SECONDS } from "./properties";
+import { registerPhoneNumberTextBox } from "./components/PhoneNumberTextBox";
+import onValidateQuestion from "./handlers/onValidateQuestion";
+
+registerPhoneNumberTextBox();
 
 ReactElementFactory.Instance.registerElement(
   RETREAT_CHECKBOX_ITEM_NAME,
@@ -50,7 +54,6 @@ const surveyJson = {
   maxTimeToFinish: SURVEY_TIME_LIMIT_SECONDS,
   showProgressBar: "top",
   showPreviewBeforeComplete: "showAnsweredQuestions",
-  checkErrorsMode: "onValueChanged",
   showTOC: true,
   completedHtml: {
     [ENGLISH_LOCALE]: "<h4>Thank you for applying to Saddharmadhara!</h4>",
@@ -58,15 +61,15 @@ const surveyJson = {
   },
   pages: [
     languagePage,
-    instructionsPage,
-    identificationPage,
-    personalPage(isRequired),
-    emergenecyContactPage(isRequired),
-    spiritualPursuitsPage(isRequired),
-    readynessCheckPage(isRequired),
-    preperationsPage(isRequired),
-    specialCommentsPage,
-    retreatsPage,
+    // instructionsPage,
+    // identificationPage,
+    // personalPage(isRequired),
+    // emergenecyContactPage(isRequired),
+    // spiritualPursuitsPage(isRequired),
+    // readynessCheckPage(isRequired),
+    // preperationsPage(isRequired),
+    // specialCommentsPage,
+    // retreatsPage,
     agreementPage,
   ],
 };
@@ -91,6 +94,7 @@ function App() {
         onComplete={onComplete}
         onCurrentPageChanging={onCurrentPageChanging}
         onPropertyChanged={onPropertyChanged}
+        onValidateQuestion={onValidateQuestion}
       />
     </div>
   );

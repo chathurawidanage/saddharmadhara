@@ -1,3 +1,4 @@
+import { PHONE_NUMBER_QUESTION_TYPE } from "../components/PhoneNumberTextBox";
 import { ENGLISH_LOCALE } from "../locale/english";
 import { SINHALA_LOCALE } from "../locale/sinhala";
 
@@ -145,8 +146,7 @@ const personalPage = (isRequired) => {
           [ENGLISH_LOCALE]: "Mobile Phone",
           [SINHALA_LOCALE]: "ජංගම දුරකථන අංකය",
         },
-        type: "text",
-        inputType: "tel",
+        type: PHONE_NUMBER_QUESTION_TYPE,
         isRequired,
       },
       {
@@ -155,8 +155,7 @@ const personalPage = (isRequired) => {
           [ENGLISH_LOCALE]: "Home Phone",
           [SINHALA_LOCALE]: "ස්ථාවර දුරකථන අංකය",
         },
-        type: "text",
-        inputType: "tel",
+        type: PHONE_NUMBER_QUESTION_TYPE
       },
       {
         name: "Whatsapp",
@@ -164,8 +163,7 @@ const personalPage = (isRequired) => {
           [ENGLISH_LOCALE]: "Whatsapp",
           [SINHALA_LOCALE]: "වට්ස්ඇප් අංකය",
         },
-        type: "text",
-        inputType: "tel",
+        type: PHONE_NUMBER_QUESTION_TYPE,
         isRequired,
       },
       {
