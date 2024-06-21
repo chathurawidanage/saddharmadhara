@@ -26,7 +26,7 @@ const dataToAttributesAndEvents = (data) => {
   let events = [];
 
   // special comment is saved as an event and applicants can send them multiple times
-  if (surveyJsAttributes.SpecialComment) {
+  if (surveyJsAttributes.SpecialComments) {
     events.push({
       occurredAt: Date.now(),
       programStage: DHIS2_SPECIAL_COMMENT_PROGRAM_STAGE,
@@ -36,11 +36,11 @@ const dataToAttributesAndEvents = (data) => {
         {
           occurredAt: Date.now(),
           dataElement: DHIS2_SPECIAL_COMMENT_DATA_ELEMENT,
-          value: surveyJsAttributes.SpecialComment,
+          value: surveyJsAttributes.SpecialComments,
         },
       ],
     });
-    delete surveyJsAttributes.SpecialComment;
+    delete surveyJsAttributes.SpecialComments;
   }
 
   // retreats are saved as events and applicants can send them multiple times
