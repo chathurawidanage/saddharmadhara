@@ -46,7 +46,7 @@ const getEndDate = (startDate, noOfDays) => {
 const Retreat = (props) => {
   const retreat = mapRetreatFromD2(props.retreat);
   const navigate = useNavigate();
-  const endDate = getEndDate(retreat.date, retreat.noOfDays);
+  const endDate = getEndDate(retreat.date, parseInt(retreat.noOfDays) + 1);
 
   // hide after 7 days
   if (Date.now() > endDate.getTime() + 7 * 24 * 60 * 60 * 1000) {

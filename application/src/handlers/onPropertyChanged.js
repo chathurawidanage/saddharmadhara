@@ -27,8 +27,7 @@ const onPropertyChanged = (survey, options) => {
                 <div>📅 ${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()}</div>
                 <div>⏲️ ${noOfDays} Days</div>
               </div>
-            </div>`,
-            routeTextToHtml: true
+            </div>`
           }
         });
       });
