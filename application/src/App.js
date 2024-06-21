@@ -30,6 +30,7 @@ import RetreatCheckboxItem, {
 import { SURVEY_TIME_LIMIT_SECONDS } from "./properties";
 import { registerPhoneNumberTextBox } from "./components/PhoneNumberTextBox";
 import onValidateQuestion from "./handlers/onValidateQuestion";
+import onTextMarkdown from "./handlers/onTextMarkdown";
 
 registerPhoneNumberTextBox();
 
@@ -95,6 +96,7 @@ function App() {
         onCurrentPageChanging={onCurrentPageChanging}
         onPropertyChanged={onPropertyChanged}
         onValidateQuestion={onValidateQuestion}
+        onTextMarkdown={onTextMarkdown}
       />
     </div>
   );
