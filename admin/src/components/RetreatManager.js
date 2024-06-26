@@ -7,6 +7,8 @@ import {
   DHIS2_RETREAT_SELECTION_STATE_DATA_ELEMENT,
   DHIS2_TEI_ATTRIBUTE_FULL_NAME,
   DHIS2_TEI_ATTRIBUTE_GENDER,
+  DHIS2_TEI_ATTRIBUTE_HAS_KIDS,
+  DHIS2_TEI_ATTRIBUTE_HAS_KIDS_COMMENT,
   DHIS2_TEI_ATTRIBUTE_MOBILE,
   DHIS_PROGRAM,
   DHIS_RETREAT_SELECTION_STATE_OPTION_SET_ID,
@@ -32,6 +34,9 @@ import {
   IconArrowLeft16,
 } from "@dhis2/ui";
 import RetreatLocation from "./RetreatLocation";
+import Gender from "./indicators/Gender";
+import { HasKids } from "./indicators/BooleanWithComment";
+import "./RetreatManager.css";
 
 const styles = {
   container: {
@@ -72,7 +77,11 @@ const YogiRow = (props) => {
         return (
           <tr>
             <td>{attributeIdToValueMap[DHIS2_TEI_ATTRIBUTE_FULL_NAME]}</td>
-            <td>{attributeIdToValueMap[DHIS2_TEI_ATTRIBUTE_GENDER]}</td>
+            <td className="indicators">
+              <Gender gender={attributeIdToValueMap[DHIS2_TEI_ATTRIBUTE_GENDER]} />
+              <HasKids hasKids={attributeIdToValueMap[DHIS2_TEI_ATTRIBUTE_HAS_KIDS]}
+                comment={attributeIdToValueMap[DHIS2_TEI_ATTRIBUTE_HAS_KIDS_COMMENT]} />
+            </td>
             <td>{attributeIdToValueMap[DHIS2_TEI_ATTRIBUTE_MOBILE]}</td>
             <td>
               {dateApplied.toDateString()} {dateApplied.toLocaleTimeString()}
@@ -239,8 +248,8 @@ const YogisList = ({ retreat, selectionStates }) => {
             <Table striped bordered hover>
               <thead>
                 <tr>
-                  <th>Name</th>
-                  <th>Gender</th>
+                  <th width="40%">Name</th>
+                  <th>Indicators</th>
                   <th>Phone</th>
                   <th>Date Applied</th>
                   <th>Action</th>

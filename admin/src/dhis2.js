@@ -19,6 +19,8 @@ export const DHIS2_RETREAT_SELECTION_STATE_DATA_ELEMENT = "MVaziT78i7p";
 export const DHIS2_TEI_ATTRIBUTE_FULL_NAME = "fvk2p04ylAA";
 export const DHIS2_TEI_ATTRIBUTE_GENDER = "tuKFO1uF5x5";
 export const DHIS2_TEI_ATTRIBUTE_MOBILE = "lLXB9cYYgEP";
+export const DHIS2_TEI_ATTRIBUTE_HAS_KIDS = "Bpce3m4do80";
+export const DHIS2_TEI_ATTRIBUTE_HAS_KIDS_COMMENT = "i3RptmIeSwR";
 
 export const mapRetreatFromD2 = (dhis2RetreatOption) => {
   let attributeIdToValueMap = {};

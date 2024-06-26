@@ -1,0 +1,26 @@
+.indicator {
+    border-radius: 500px;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    justify-content: center;
+    transition: transform .2s; 
+}
+
+.indicator:hover {
+    transform: scale(1.5); 
+}
+
+.indicator img {
+    margin-top: 2px;
+    width: 20px;
+    height: 20px;
+}
+
+.gender-indicator {
+    background: #37474F;
+}
+
+.has-kids-indicator {
+    background: #1A237E;
+}

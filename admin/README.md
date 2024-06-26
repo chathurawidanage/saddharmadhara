@@ -43,3 +43,9 @@ You can learn more about the platform in the [DHIS2 Application Platform Documen
 You can learn more about the runtime in the [DHIS2 Application Runtime Documentation](https://runtime.dhis2.nu/).
 
 To learn React, check out the [React documentation](https://reactjs.org/).
+
+## Attributions
+
+<a href="https://www.flaticon.com/free-icons/baby" title="baby icons">Baby icons created by Freepik - Flaticon</a>
+<a href="https://www.flaticon.com/free-icons/male" title="male icons">Male icons created by Freepik - Flaticon</a>
+<a href="https://www.flaticon.com/free-icons/female" title="female icons">Female icons created by Freepik - Flaticon</a>
