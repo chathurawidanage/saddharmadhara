@@ -26,7 +26,6 @@ const ActiveApplicationIndicator = ({ currentRetreat, enrollments }) => {
             }
         });
     }
-    console.log("C", currentRetreat, "E", enrollments, "A", allYogiApplications);
 
     return (
         <div className="active-applications">
