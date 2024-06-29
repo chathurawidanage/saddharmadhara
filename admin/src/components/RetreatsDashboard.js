@@ -49,7 +49,7 @@ const Retreat = (props) => {
   const endDate = getEndDate(retreat.date, parseInt(retreat.noOfDays) + 1);
 
   // hide after 7 days
-  if (Date.now() > endDate.getTime() + 7 * 24 * 60 * 60 * 1000) {
+  if (Date.now() > endDate.getTime() + 14 * 24 * 60 * 60 * 1000) {
     return null;
   }
 

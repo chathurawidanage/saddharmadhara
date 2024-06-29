@@ -12,6 +12,7 @@ import {
   Tab,
   TabBar,
   Tag,
+  Pagination
 } from "@dhis2/ui";
 import React, { useEffect, useState } from "react";
 import { Col, Container, Row, Table } from "react-bootstrap";
@@ -61,10 +62,16 @@ const YogisList = ({ retreat, selectionStates }) => {
   const { loading, error, data, refetch } = useDataQuery(yogiListquery);
   const [selectionState, setSelectionState] = useState(selectionStates[0]);
   const [yogisByStateMap, setYogisByStateMap] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(25);
 
   useEffect(() => {
     refetch({ retreatName: retreat.name });
   }, []);
+
+  useEffect(()=>{
+    setCurrentPage(1);
+  }, [selectionState])
 
   useEffect(() => {
     if (data) {
@@ -144,6 +151,12 @@ const YogisList = ({ retreat, selectionStates }) => {
               <tbody>
                 {yogisByStateMap[selectionState.code]?.map(
                   (instance, index) => {
+                    // pagination
+                    if (!(index >= ((currentPage - 1) * pageSize)
+                      && index < currentPage * pageSize)) {
+                      return null;
+                    }
+
                     return (
                       <YogiRow
                         trackedEntity={instance.trackedEntity}
@@ -186,6 +199,17 @@ const YogisList = ({ retreat, selectionStates }) => {
                 )}
               </tbody>
             </Table>
+            <Pagination
+              page={currentPage}
+              pageCount={Math.ceil(yogisByStateMap[selectionState.code]?.length / pageSize)}
+              pageSize={pageSize}
+              total={yogisByStateMap[selectionState.code]?.length}
+              hidePageSelect
+              hidePageSizeSelect
+              onPageChange={(page) => {
+                setCurrentPage(page);
+              }}
+            />
           </div>
         )}
       </div>

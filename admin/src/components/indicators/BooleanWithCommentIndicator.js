@@ -3,7 +3,7 @@ import "./indicators.css";
 import { Tooltip } from "@dhis2/ui";
 import KIDS from "./img/kids.png";
 
-const BooleanWithComment = ({ bool, showIf, comment, img, className }) => {
+const BooleanWithCommentIndicator = ({ bool, showIf, comment, img, className }) => {
     if (!bool || bool !== showIf) {
         return null;
     }
@@ -17,7 +17,7 @@ const BooleanWithComment = ({ bool, showIf, comment, img, className }) => {
     )
 };
 
-export const HasKids = ({hasKids, comment}) =>{
-    return <BooleanWithComment bool={hasKids} showIf="true" comment={comment}
+export const HasKidsIndicator = ({hasKids, comment}) =>{
+    return <BooleanWithCommentIndicator bool={hasKids} showIf="true" comment={comment}
         img={KIDS} className="has-kids-indicator" />
 };

@@ -1,10 +1,11 @@
 import { DataQuery, useConfig } from "@dhis2/app-runtime";
 import {
-    Button
+    Button,
+    CircularLoader
 } from "@dhis2/ui";
 import { DHIS2_TEI_ATTRIBUTE_FULL_NAME, DHIS2_TEI_ATTRIBUTE_GENDER, DHIS2_TEI_ATTRIBUTE_HAS_KIDS, DHIS2_TEI_ATTRIBUTE_HAS_KIDS_COMMENT, DHIS2_TEI_ATTRIBUTE_MOBILE } from "../../dhis2";
-import { HasKids } from "../indicators/BooleanWithComment";
-import Gender from "../indicators/Gender";
+import { HasKidsIndicator } from "../indicators/BooleanWithCommentIndicator";
+import GenderIndicator from "../indicators/GenderIndicator";
 
 const styles = {
     actionButton: {
@@ -42,8 +43,8 @@ const YogiRow = ({ trackedEntity, dateApplied, actions }) => {
                     <tr>
                         <td>{attributeIdToValueMap[DHIS2_TEI_ATTRIBUTE_FULL_NAME]}</td>
                         <td style={styles.indicators}>
-                            <Gender gender={attributeIdToValueMap[DHIS2_TEI_ATTRIBUTE_GENDER]} />
-                            <HasKids hasKids={attributeIdToValueMap[DHIS2_TEI_ATTRIBUTE_HAS_KIDS]}
+                            <GenderIndicator gender={attributeIdToValueMap[DHIS2_TEI_ATTRIBUTE_GENDER]} />
+                            <HasKidsIndicator hasKids={attributeIdToValueMap[DHIS2_TEI_ATTRIBUTE_HAS_KIDS]}
                                 comment={attributeIdToValueMap[DHIS2_TEI_ATTRIBUTE_HAS_KIDS_COMMENT]} />
                         </td>
                         <td>{attributeIdToValueMap[DHIS2_TEI_ATTRIBUTE_MOBILE]}</td>

@@ -3,7 +3,7 @@ import FEMALE from "./img/female.png";
 import "./indicators.css";
 import { Tooltip } from "@dhis2/ui";
 
-const Gender = ({ gender }) => {
+const GenderIndicator = ({ gender }) => {
     if (!gender) {
         return null;
     }
@@ -17,4 +17,4 @@ const Gender = ({ gender }) => {
     )
 };
 
-export default Gender;
+export default GenderIndicator;
