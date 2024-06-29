@@ -48,7 +48,7 @@ const readynessCheckPage = (isRequired) => {
         "UnattendedDeformities",
         {
           [ENGLISH_LOCALE]:
-            "Are you free from illnesses or deformities from birth, or which have arisen in a later period in life, which have not been cured up till now or there has been no medication found so far?",
+            "If you have suffered any diseases or disabilities since childhood, or have later developed them in life, with no remedies or treatment proving to be helpful?",
           [SINHALA_LOCALE]:
             "ඔබ උපතේ සිටම පවතින රෝගාබාධවලින් හෝ විකෘතිතාවලින් පෙළෙන්නේද, එසේත් නැතිනම් ජීවිතයේ පසු කාලයක ඇති වූ මෙතෙක් සුව නොවූ හෝ මෙතෙක් ඖෂධ සොයාගෙන නොමැති සංකූලතාවයන් ඇති වී තිබේද?",
         },
