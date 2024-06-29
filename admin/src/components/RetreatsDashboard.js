@@ -1,12 +1,11 @@
-import React, { useState } from "react";
-import { useDataQuery } from "@dhis2/app-runtime";
-import "bootstrap/dist/css/bootstrap.min.css";
 import { Button, CircularLoader, Tag } from "@dhis2/ui";
-import { Container, Card, Row, Col } from "react-bootstrap";
-import RetreatModel from "./RetreatModal";
-import { DHIS_RETREATS_OPTION_SET_ID, mapRetreatFromD2 } from "../dhis2";
+import "bootstrap/dist/css/bootstrap.min.css";
+import React, { useState } from "react";
+import { Card, Col, Container, Row } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import RetreatLocation from "./RetreatLocation";
+import RetreatModel from "./RetreatModal";
+import useCachedRetreats from "./useCachedRetreats";
 
 const styles = {
   headerRow: {
@@ -29,29 +28,8 @@ const styles = {
   },
 };
 
-const retreatsQuery = {
-  retreats: {
-    resource: `optionSets/${DHIS_RETREATS_OPTION_SET_ID}.json`,
-    params: {
-      fields: "options[id,name,code,attributeValues]",
-    },
-  },
-};
-
-const getEndDate = (startDate, noOfDays) => {
-  let endDate = new Date(startDate.getTime() + noOfDays * 24 * 60 * 60 * 1000);
-  return endDate;
-};
-
-const Retreat = (props) => {
-  const retreat = mapRetreatFromD2(props.retreat);
+const Retreat = ({ retreat }) => {
   const navigate = useNavigate();
-  const endDate = getEndDate(retreat.date, parseInt(retreat.noOfDays) + 1);
-
-  // hide after 7 days
-  if (Date.now() > endDate.getTime() + 14 * 24 * 60 * 60 * 1000) {
-    return null;
-  }
 
   return (
     <Col md={3}>
@@ -79,7 +57,7 @@ const Retreat = (props) => {
                 day: "numeric",
               })}{" "}
               -{" "}
-              {endDate.toLocaleDateString("en-US", {
+              {retreat.endDate.toLocaleDateString("en-US", {
                 year: "numeric",
                 month: "short",
                 day: "numeric",
@@ -120,7 +98,7 @@ const Retreat = (props) => {
 
 const RetreatsDashboard = () => {
   const [hideRetreatModel, setHideRetreatModel] = useState(true);
-  const { error, loading, data, refetch } = useDataQuery(retreatsQuery);
+  const { error, loading, data, refetch } = useCachedRetreats();
 
   if (error) return <span>ERROR</span>;
   if (loading) return <CircularLoader extrasmall />;
@@ -150,7 +128,7 @@ const RetreatsDashboard = () => {
         </Row>
       </div>
       <Row>
-        {data?.retreats.options.map((retreat) => {
+        {data?.map((retreat) => {
           return <Retreat retreat={retreat} key={retreat.id} />;
         })}
       </Row>

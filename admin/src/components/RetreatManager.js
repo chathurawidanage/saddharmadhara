@@ -28,6 +28,7 @@ import {
 import RetreatLocation from "./RetreatLocation";
 import StateChangeButton from "./manager/StateChangeButton";
 import YogiRow from "./manager/YogiRow";
+import "./RetreatManager.css";
 
 const styles = {
   container: {
@@ -69,7 +70,7 @@ const YogisList = ({ retreat, selectionStates }) => {
     refetch({ retreatName: retreat.name });
   }, []);
 
-  useEffect(()=>{
+  useEffect(() => {
     setCurrentPage(1);
   }, [selectionState])
 
@@ -138,7 +139,18 @@ const YogisList = ({ retreat, selectionStates }) => {
         {error && <span>ERROR</span>}
         {data && (
           <div>
-            <Table striped bordered hover>
+            <Pagination
+              page={currentPage}
+              pageCount={Math.ceil(yogisByStateMap[selectionState.code]?.length / pageSize)}
+              pageSize={pageSize}
+              total={yogisByStateMap[selectionState.code]?.length}
+              hidePageSizeSelect
+              onPageChange={(page) => {
+                setCurrentPage(page);
+              }}
+              className="pagination"
+            />
+            <Table striped bordered hover className="yogi-table">
               <thead>
                 <tr>
                   <th width="40%">Name</th>
@@ -162,6 +174,7 @@ const YogisList = ({ retreat, selectionStates }) => {
                         trackedEntity={instance.trackedEntity}
                         dateApplied={new Date(instance.occurredAt)}
                         key={instance.trackedEntity}
+                        currentRetreat={retreat}
                         actions={
                           <DropdownButton
                             small
@@ -204,11 +217,11 @@ const YogisList = ({ retreat, selectionStates }) => {
               pageCount={Math.ceil(yogisByStateMap[selectionState.code]?.length / pageSize)}
               pageSize={pageSize}
               total={yogisByStateMap[selectionState.code]?.length}
-              hidePageSelect
               hidePageSizeSelect
               onPageChange={(page) => {
                 setCurrentPage(page);
               }}
+              className="pagination"
             />
           </div>
         )}

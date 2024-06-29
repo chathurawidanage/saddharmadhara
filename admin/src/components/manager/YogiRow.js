@@ -3,9 +3,10 @@ import {
     Button,
     CircularLoader
 } from "@dhis2/ui";
-import { DHIS2_TEI_ATTRIBUTE_FULL_NAME, DHIS2_TEI_ATTRIBUTE_GENDER, DHIS2_TEI_ATTRIBUTE_HAS_KIDS, DHIS2_TEI_ATTRIBUTE_HAS_KIDS_COMMENT, DHIS2_TEI_ATTRIBUTE_MOBILE } from "../../dhis2";
+import { DHIS2_TEI_ATTRIBUTE_FULL_NAME, DHIS2_TEI_ATTRIBUTE_GENDER, DHIS2_TEI_ATTRIBUTE_HAS_KIDS, DHIS2_TEI_ATTRIBUTE_HAS_KIDS_COMMENT, DHIS2_TEI_ATTRIBUTE_MOBILE, DHIS_PROGRAM } from "../../dhis2";
 import { HasKidsIndicator } from "../indicators/BooleanWithCommentIndicator";
 import GenderIndicator from "../indicators/GenderIndicator";
+import ActiveApplicationIndicator from "../indicators/ActiveApplicationsIndicator";
 
 const styles = {
     actionButton: {
@@ -13,26 +14,36 @@ const styles = {
     },
     indicators: {
         display: "flex",
-        columnGap: 2
+        columnGap: 2,
+        rowGap: 2,
+        flexDirection: "column"
+    },
+    miniIndicators:{
+        display: "flex",
+        columnGap: 2,
+        rowGap: 2,
+        flexDirection: "row"
     }
 }
 
-const YogiRow = ({ trackedEntity, dateApplied, actions }) => {
+const YogiRow = ({ trackedEntity, dateApplied, currentRetreat, actions }) => {
     const { baseUrl } = useConfig();
     const query = {
         trackedEntity: {
             resource: `tracker/trackedEntities/${trackedEntity}`,
             params: {
                 inactive: false,
-                fields: "attributes[attribute,value]",
+                fields: "attributes[attribute,value],enrollments[events[programStage,dataValues[dataElement,value]]]",
+                program: DHIS_PROGRAM
             },
         },
     };
+
     return (
         <DataQuery query={query}>
             {({ error, loading, data }) => {
                 if (error) return <span>ERROR</span>;
-                if (loading) return <CircularLoader extrasmall />;
+                if (loading) return <tr><td><CircularLoader extrasmall /></td></tr>;
 
                 let attributeIdToValueMap = {};
                 data.trackedEntity.attributes.forEach((attribute) => {
@@ -43,9 +54,14 @@ const YogiRow = ({ trackedEntity, dateApplied, actions }) => {
                     <tr>
                         <td>{attributeIdToValueMap[DHIS2_TEI_ATTRIBUTE_FULL_NAME]}</td>
                         <td style={styles.indicators}>
-                            <GenderIndicator gender={attributeIdToValueMap[DHIS2_TEI_ATTRIBUTE_GENDER]} />
-                            <HasKidsIndicator hasKids={attributeIdToValueMap[DHIS2_TEI_ATTRIBUTE_HAS_KIDS]}
-                                comment={attributeIdToValueMap[DHIS2_TEI_ATTRIBUTE_HAS_KIDS_COMMENT]} />
+                            <div style={styles.miniIndicators}>
+                                <GenderIndicator gender={attributeIdToValueMap[DHIS2_TEI_ATTRIBUTE_GENDER]} />
+                                <HasKidsIndicator hasKids={attributeIdToValueMap[DHIS2_TEI_ATTRIBUTE_HAS_KIDS]}
+                                    comment={attributeIdToValueMap[DHIS2_TEI_ATTRIBUTE_HAS_KIDS_COMMENT]} />
+                            </div>
+                            <div>
+                                <ActiveApplicationIndicator currentRetreat={currentRetreat} enrollments={data.trackedEntity.enrollments} />
+                            </div>
                         </td>
                         <td>{attributeIdToValueMap[DHIS2_TEI_ATTRIBUTE_MOBILE]}</td>
                         <td>

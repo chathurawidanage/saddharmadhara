@@ -1,0 +1,1 @@
+SQLs in this folder are used to create [DHIS2 SQL Views](https://docs.dhis2.org/en/use/user-guides/dhis-core-version-240/configuring-the-system/metadata.html?h=sql+view+2.40#maintenance_sql_view).

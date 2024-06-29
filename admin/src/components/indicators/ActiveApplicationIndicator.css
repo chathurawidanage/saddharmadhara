@@ -1,0 +1,42 @@
+.active-applications {
+    display: flex;
+    flex-direction: column;
+    column-gap: 2px;
+    row-gap: 2px;
+}
+
+.active-application {
+    text-align: center;
+    border-radius: 10px;
+    background-color: #546E7A;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    color: white;
+    font-size: 14px;
+}
+
+.active-application-retreat {
+    font-size: calc(100vw / 110);
+}
+
+.active-application-state {
+    font-weight: bold;
+    width: 100%;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    text-transform: uppercase;
+    font-size: calc(100vw / 130);
+}
+
+.active-application-state-applied {
+    background-color: #F9A825;
+}
+
+.active-application-state-selected {
+    background-color: #2E7D32;
+}
+
+.active-application-state-deselected {
+    background-color: #D32F2F;
+}

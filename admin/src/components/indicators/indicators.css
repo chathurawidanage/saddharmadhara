@@ -4,11 +4,6 @@
     height: 24px;
     display: flex;
     justify-content: center;
-    transition: transform .2s; 
-}
-
-.indicator:hover {
-    transform: scale(1.5); 
 }
 
 .indicator img {
