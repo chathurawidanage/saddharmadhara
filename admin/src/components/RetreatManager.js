@@ -1,153 +1,40 @@
-import React, { useState, useEffect } from "react";
-import { Col, Container, Row, Table } from "react-bootstrap";
-import { useParams } from "react-router";
-import {
-  DHIS2_EXPRESSION_OF_INTEREST_PROGRAM_STAGE,
-  DHIS2_RETREAT_DATA_ELEMENT,
-  DHIS2_RETREAT_SELECTION_STATE_DATA_ELEMENT,
-  DHIS2_TEI_ATTRIBUTE_FULL_NAME,
-  DHIS2_TEI_ATTRIBUTE_GENDER,
-  DHIS2_TEI_ATTRIBUTE_HAS_KIDS,
-  DHIS2_TEI_ATTRIBUTE_HAS_KIDS_COMMENT,
-  DHIS2_TEI_ATTRIBUTE_MOBILE,
-  DHIS_PROGRAM,
-  DHIS_RETREAT_SELECTION_STATE_OPTION_SET_ID,
-  mapRetreatFromD2,
-} from "../dhis2";
-import { useNavigate } from "react-router-dom";
 import {
   DataQuery,
   useAlert,
-  useConfig,
-  useDataMutation,
-  useDataQuery,
+  useDataQuery
 } from "@dhis2/app-runtime";
 import {
   Button,
   CircularLoader,
-  Tag,
   DropdownButton,
-  TabBar,
-  Tab,
   FlyoutMenu,
-  MenuItem,
   IconArrowLeft16,
+  Tab,
+  TabBar,
+  Tag,
 } from "@dhis2/ui";
+import React, { useEffect, useState } from "react";
+import { Col, Container, Row, Table } from "react-bootstrap";
+import { useParams } from "react-router";
+import { useNavigate } from "react-router-dom";
+import {
+  DHIS2_EXPRESSION_OF_INTEREST_PROGRAM_STAGE,
+  DHIS2_RETREAT_DATA_ELEMENT,
+  DHIS2_RETREAT_SELECTION_STATE_DATA_ELEMENT,
+  DHIS_RETREAT_SELECTION_STATE_OPTION_SET_ID,
+  mapRetreatFromD2,
+} from "../dhis2";
 import RetreatLocation from "./RetreatLocation";
-import Gender from "./indicators/Gender";
-import { HasKids } from "./indicators/BooleanWithComment";
-import "./RetreatManager.css";
+import StateChangeButton from "./manager/StateChangeButton";
+import YogiRow from "./manager/YogiRow";
 
 const styles = {
   container: {
     marginTop: 5,
   },
-  actionButton: {
-    marginRight: 2,
-  },
   backButton: {
     marginBottom: 10,
   },
-};
-
-const YogiRow = (props) => {
-  const { baseUrl } = useConfig();
-  const query = {
-    trackedEntity: {
-      resource: `tracker/trackedEntities/${props.trackedEntity}`,
-      params: {
-        inactive: false,
-        fields: "attributes[attribute,value]",
-      },
-    },
-  };
-  return (
-    <DataQuery query={query}>
-      {({ error, loading, data }) => {
-        if (error) return <span>ERROR</span>;
-        if (loading) return <CircularLoader extrasmall />;
-
-        let attributeIdToValueMap = {};
-        data.trackedEntity.attributes.forEach((attribute) => {
-          attributeIdToValueMap[attribute.attribute] = attribute.value;
-        });
-
-        let dateApplied = new Date(props.dateApplied);
-
-        return (
-          <tr>
-            <td>{attributeIdToValueMap[DHIS2_TEI_ATTRIBUTE_FULL_NAME]}</td>
-            <td className="indicators">
-              <Gender gender={attributeIdToValueMap[DHIS2_TEI_ATTRIBUTE_GENDER]} />
-              <HasKids hasKids={attributeIdToValueMap[DHIS2_TEI_ATTRIBUTE_HAS_KIDS]}
-                comment={attributeIdToValueMap[DHIS2_TEI_ATTRIBUTE_HAS_KIDS_COMMENT]} />
-            </td>
-            <td>{attributeIdToValueMap[DHIS2_TEI_ATTRIBUTE_MOBILE]}</td>
-            <td>
-              {dateApplied.toDateString()} {dateApplied.toLocaleTimeString()}
-            </td>
-            <td>
-              <Button
-                small
-                onClick={() => {
-                  //TODO: change ou
-                  let tempElement = document.createElement("a");
-                  tempElement.href = baseUrl;
-                  window.open(
-                    new URL(
-                      `dhis-web-tracker-capture/index.html#/dashboard?tei=${props.trackedEntity}&program=${DHIS_PROGRAM}&ou=GRcUwrSIcZv`,
-                      tempElement.href
-                    ),
-                    "_blank"
-                  );
-                }}
-                style={styles.actionButton}
-              >
-                View Profile
-              </Button>
-              {props.actions}
-            </td>
-          </tr>
-        );
-      }}
-    </DataQuery>
-  );
-};
-
-const StateChangeButton = ({
-  label,
-  event,
-  selectionState,
-  retreatCode,
-  onComplete,
-  onError,
-}) => {
-  const mutation = {
-    resource: "events",
-    id: event,
-    data: {
-      program: DHIS_PROGRAM,
-      programStage: DHIS2_EXPRESSION_OF_INTEREST_PROGRAM_STAGE,
-      status: "COMPLETED",
-      dataValues: [
-        {
-          dataElement: DHIS2_RETREAT_SELECTION_STATE_DATA_ELEMENT,
-          value: selectionState,
-        },
-        {
-          dataElement: DHIS2_RETREAT_DATA_ELEMENT,
-          value: retreatCode,
-        },
-      ],
-    },
-    type: "update",
-  };
-  const [mutate, { called, loading, error, data }] = useDataMutation(mutation, {
-    onComplete,
-    onError,
-  });
-
-  return <MenuItem onClick={mutate} label={label} />;
 };
 
 const yogiListquery = {
@@ -189,7 +76,6 @@ const YogisList = ({ retreat, selectionStates }) => {
       });
 
       // optional: remove duplicates. Only first interest will be considered
-      // TODO: Ideally this should be prevented when applying
       let alreadyConsideredYogis = new Set();
       let yogisByStateMap = {};
       instances.forEach((yogi) => {
@@ -261,7 +147,7 @@ const YogisList = ({ retreat, selectionStates }) => {
                     return (
                       <YogiRow
                         trackedEntity={instance.trackedEntity}
-                        dateApplied={instance.occurredAt}
+                        dateApplied={new Date(instance.occurredAt)}
                         key={instance.trackedEntity}
                         actions={
                           <DropdownButton
