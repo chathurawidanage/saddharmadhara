@@ -20,8 +20,18 @@ export const DHIS2_RETREAT_SELECTION_STATE_DATA_ELEMENT = "MVaziT78i7p";
 export const DHIS2_TEI_ATTRIBUTE_FULL_NAME = "fvk2p04ylAA";
 export const DHIS2_TEI_ATTRIBUTE_GENDER = "tuKFO1uF5x5";
 export const DHIS2_TEI_ATTRIBUTE_MOBILE = "lLXB9cYYgEP";
+
 export const DHIS2_TEI_ATTRIBUTE_HAS_KIDS = "Bpce3m4do80";
 export const DHIS2_TEI_ATTRIBUTE_HAS_KIDS_COMMENT = "i3RptmIeSwR";
+
+export const DHIS2_TEI_ATTRIBUTE_HAS_PERMISSION = "QGXYhZMXfnc";
+export const DHIS2_TEI_ATTRIBUTE_HAS_PERMISSION_COMMENT = "QOGamVcvLPz";
+
+export const DHIS2_TEI_ATTRIBUTE_HAS_UNATTENDED_DEFOMITIES = "RpNKpAufHbn";
+export const DHIS2_TEI_ATTRIBUTE_HAS_UNATTENDED_DEFOMITIES_COMMENT = "HtW0OMmthFQ";
+
+export const DHIS2_TEI_ATTRIBUTE_HAS_STRESS = "dgky5acnvG3";
+export const DHIS2_TEI_ATTRIBUTE_HAS_STRESS_COMMENT = "Mp6LLGv4WOT";
 
 export const mapRetreatFromD2 = (dhis2RetreatOption) => {
   let attributeIdToValueMap = {};

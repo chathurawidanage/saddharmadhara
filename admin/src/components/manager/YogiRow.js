@@ -3,8 +3,8 @@ import {
     Button,
     CircularLoader
 } from "@dhis2/ui";
-import { DHIS2_TEI_ATTRIBUTE_FULL_NAME, DHIS2_TEI_ATTRIBUTE_GENDER, DHIS2_TEI_ATTRIBUTE_HAS_KIDS, DHIS2_TEI_ATTRIBUTE_HAS_KIDS_COMMENT, DHIS2_TEI_ATTRIBUTE_MOBILE, DHIS_PROGRAM } from "../../dhis2";
-import { HasKidsIndicator } from "../indicators/BooleanWithCommentIndicator";
+import { DHIS2_TEI_ATTRIBUTE_FULL_NAME, DHIS2_TEI_ATTRIBUTE_GENDER, DHIS2_TEI_ATTRIBUTE_HAS_KIDS, DHIS2_TEI_ATTRIBUTE_HAS_KIDS_COMMENT, DHIS2_TEI_ATTRIBUTE_HAS_PERMISSION, DHIS2_TEI_ATTRIBUTE_HAS_PERMISSION_COMMENT, DHIS2_TEI_ATTRIBUTE_HAS_STRESS, DHIS2_TEI_ATTRIBUTE_HAS_STRESS_COMMENT, DHIS2_TEI_ATTRIBUTE_HAS_UNATTENDED_DEFOMITIES, DHIS2_TEI_ATTRIBUTE_HAS_UNATTENDED_DEFOMITIES_COMMENT, DHIS2_TEI_ATTRIBUTE_MOBILE, DHIS_PROGRAM } from "../../dhis2";
+import { HasKidsIndicator, HasPermission, HasStress, HasUnattendedDeformities } from "../indicators/BooleanWithCommentIndicator";
 import GenderIndicator from "../indicators/GenderIndicator";
 import ActiveApplicationIndicator from "../indicators/ActiveApplicationsIndicator";
 
@@ -18,7 +18,7 @@ const styles = {
         rowGap: 2,
         flexDirection: "column"
     },
-    miniIndicators:{
+    miniIndicators: {
         display: "flex",
         columnGap: 2,
         rowGap: 2,
@@ -58,6 +58,12 @@ const YogiRow = ({ trackedEntity, dateApplied, currentRetreat, actions }) => {
                                 <GenderIndicator gender={attributeIdToValueMap[DHIS2_TEI_ATTRIBUTE_GENDER]} />
                                 <HasKidsIndicator hasKids={attributeIdToValueMap[DHIS2_TEI_ATTRIBUTE_HAS_KIDS]}
                                     comment={attributeIdToValueMap[DHIS2_TEI_ATTRIBUTE_HAS_KIDS_COMMENT]} />
+                                <HasPermission hasPermission={attributeIdToValueMap[DHIS2_TEI_ATTRIBUTE_HAS_PERMISSION]}
+                                    comment={attributeIdToValueMap[DHIS2_TEI_ATTRIBUTE_HAS_PERMISSION_COMMENT]} />
+                                <HasUnattendedDeformities hasUnattendedDeformities={attributeIdToValueMap[DHIS2_TEI_ATTRIBUTE_HAS_UNATTENDED_DEFOMITIES]}
+                                    comment={attributeIdToValueMap[DHIS2_TEI_ATTRIBUTE_HAS_UNATTENDED_DEFOMITIES_COMMENT]} />
+                                <HasStress hasStress={attributeIdToValueMap[DHIS2_TEI_ATTRIBUTE_HAS_STRESS]}
+                                    comment={attributeIdToValueMap[DHIS2_TEI_ATTRIBUTE_HAS_STRESS_COMMENT]} />
                             </div>
                             <div>
                                 <ActiveApplicationIndicator currentRetreat={currentRetreat} enrollments={data.trackedEntity.enrollments} />
@@ -76,7 +82,7 @@ const YogiRow = ({ trackedEntity, dateApplied, currentRetreat, actions }) => {
                                     tempElement.href = baseUrl;
                                     window.open(
                                         new URL(
-                                            `dhis-web-tracker-capture/index.html#/dashboard?tei=${props.trackedEntity}&program=${DHIS_PROGRAM}&ou=GRcUwrSIcZv`,
+                                            `dhis-web-tracker-capture/index.html#/dashboard?tei=${trackedEntity}&program=${DHIS_PROGRAM}&ou=GRcUwrSIcZv`,
                                             tempElement.href
                                         ),
                                         "_blank"
