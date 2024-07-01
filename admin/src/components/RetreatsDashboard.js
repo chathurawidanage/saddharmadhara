@@ -45,6 +45,7 @@ const Retreat = ({ retreat }) => {
                   {retreat.disabled ? "Disabled" : "Active"}
                 </Tag>
                 <Tag>{retreat.retreatType?.toUpperCase()}</Tag>
+                <Tag neutral>{retreat.retreatCode}</Tag>
               </Col>
             </Row>
           </Card.Title>

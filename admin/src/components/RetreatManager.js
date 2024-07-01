@@ -23,12 +23,12 @@ import {
   DHIS2_RETREAT_DATA_ELEMENT,
   DHIS2_RETREAT_SELECTION_STATE_DATA_ELEMENT,
   DHIS_RETREAT_SELECTION_STATE_OPTION_SET_ID,
-  mapRetreatFromD2,
 } from "../dhis2";
 import RetreatLocation from "./RetreatLocation";
 import StateChangeButton from "./manager/StateChangeButton";
 import YogiRow from "./manager/YogiRow";
 import "./RetreatManager.css";
+import { useCachedRetreat } from "./useCachedRetreats";
 
 const styles = {
   container: {
@@ -52,16 +52,22 @@ const yogiListquery = {
       };
     },
   },
+  selectionStates: {
+    resource: `optionSets/${DHIS_RETREAT_SELECTION_STATE_OPTION_SET_ID}.json`,
+    params: {
+      fields: "options[code,name,style]",
+    },
+  },
 };
 
-const YogisList = ({ retreat, selectionStates }) => {
+const YogisList = ({ retreat }) => {
   const { showError } = useAlert("Failed to change the state.", {
     duration: 3000,
     critical: true,
   });
 
   const { loading, error, data, refetch } = useDataQuery(yogiListquery);
-  const [selectionState, setSelectionState] = useState(selectionStates[0]);
+  const [selectionState, setSelectionState] = useState();
   const [yogisByStateMap, setYogisByStateMap] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
@@ -101,12 +107,14 @@ const YogisList = ({ retreat, selectionStates }) => {
         }
       });
       setYogisByStateMap(yogisByStateMap);
+
+      setSelectionState(data.selectionStates?.options[0])
     }
   }, [data]);
 
   const onStateChanged = (index, toStateCode) => {
-    let toRemove = yogisByStateMap[selectionState.code][index];
-    yogisByStateMap[selectionState.code].splice(index, 1);
+    let toRemove = yogisByStateMap[selectionState?.code][index];
+    yogisByStateMap[selectionState?.code].splice(index, 1);
     if (yogisByStateMap[toStateCode]) {
       yogisByStateMap[toStateCode].push(toRemove);
     } else {
@@ -115,15 +123,18 @@ const YogisList = ({ retreat, selectionStates }) => {
     setYogisByStateMap({ ...yogisByStateMap });
   };
 
+  if (error) return <span>ERROR</span>;
+  if (loading || !selectionState) return <CircularLoader extrasmall />;
+
   return (
     <div>
       <div>
         <TabBar>
-          {selectionStates.map((state) => {
+          {data?.selectionStates?.options?.map((state) => {
             return (
               <Tab
                 key={state.code}
-                selected={selectionState.code === state.code}
+                selected={selectionState?.code === state.code}
                 onClick={() => {
                   setSelectionState(state);
                 }}
@@ -135,15 +146,13 @@ const YogisList = ({ retreat, selectionStates }) => {
         </TabBar>
       </div>
       <div>
-        {loading && <CircularLoader extrasmall />}
-        {error && <span>ERROR</span>}
         {data && (
           <div>
             <Pagination
               page={currentPage}
-              pageCount={Math.ceil(yogisByStateMap[selectionState.code]?.length / pageSize)}
+              pageCount={Math.ceil(yogisByStateMap[selectionState?.code]?.length / pageSize)}
               pageSize={pageSize}
-              total={yogisByStateMap[selectionState.code]?.length}
+              total={yogisByStateMap[selectionState?.code]?.length}
               hidePageSizeSelect
               onPageChange={(page) => {
                 setCurrentPage(page);
@@ -156,7 +165,6 @@ const YogisList = ({ retreat, selectionStates }) => {
                   <th width="40%">Name</th>
                   <th>Indicators</th>
                   <th>Phone</th>
-                  <th>Date Applied</th>
                   <th>Action</th>
                 </tr>
               </thead>
@@ -180,7 +188,7 @@ const YogisList = ({ retreat, selectionStates }) => {
                             small
                             component={
                               <FlyoutMenu>
-                                {selectionStates
+                                {data?.selectionStates?.options
                                   .filter(
                                     (state) =>
                                       state.code !== selectionState.code
@@ -214,9 +222,9 @@ const YogisList = ({ retreat, selectionStates }) => {
             </Table>
             <Pagination
               page={currentPage}
-              pageCount={Math.ceil(yogisByStateMap[selectionState.code]?.length / pageSize)}
+              pageCount={Math.ceil(yogisByStateMap[selectionState?.code]?.length / pageSize)}
               pageSize={pageSize}
-              total={yogisByStateMap[selectionState.code]?.length}
+              total={yogisByStateMap[selectionState?.code]?.length}
               hidePageSizeSelect
               onPageChange={(page) => {
                 setCurrentPage(page);
@@ -233,73 +241,54 @@ const YogisList = ({ retreat, selectionStates }) => {
 const RetreatManager = () => {
   const params = useParams();
   const navigate = useNavigate();
+  const { error, loading, retreat } = useCachedRetreat(params.retreatId);
 
-  const query = {
-    retreat: {
-      resource: `options/${params.retreatId}.json`,
-      params: {
-        fields: "id,name,code,attributeValues",
-      },
-    },
-    selectionStates: {
-      resource: `optionSets/${DHIS_RETREAT_SELECTION_STATE_OPTION_SET_ID}.json`,
-      params: {
-        fields: "options[code,name,style]",
-      },
-    },
-  };
+  if (error) return <span>ERROR</span>;
+  if (loading || !retreat) return <CircularLoader extrasmall />;
 
   return (
     <Container style={styles.container}>
-      <DataQuery query={query}>
-        {({ error, loading, data }) => {
-          if (error) return <span>ERROR</span>;
-          if (loading) return <CircularLoader extrasmall />;
-
-          const retreat = mapRetreatFromD2(data.retreat);
-          return (
-            <div>
-              <div>
-                <Row>
-                  <Col style={styles.backButton}>
-                    <Button
-                      small
-                      icon={<IconArrowLeft16 />}
-                      onClick={() => {
-                        navigate("/");
-                      }}
-                    >
-                      Back to Retreats List
-                    </Button>
-                  </Col>
-                </Row>
-                <Row>
-                  <Col>
-                    <h3>{retreat.name} </h3>
-                  </Col>
-                </Row>
-                <Row>
-                  <Col>
-                    <Tag>{retreat.retreatType?.toUpperCase()}</Tag>
-                  </Col>
-                  <Col>📅 {retreat.date.toDateString()}</Col>
-                  <Col>⛺ {retreat.noOfDays} Days</Col>
-                  <Col>
-                    📍 <RetreatLocation locationId={retreat.location} />
-                  </Col>
-                  <Col>🧘‍♂️ {retreat.totalYogis}</Col>
-                </Row>
-              </div>
-              <div>
-                <YogisList
-                  retreat={retreat}
-                  selectionStates={data.selectionStates?.options}
-                />
-              </div>
-            </div>
-          );
-        }}
-      </DataQuery>
+      <div>
+        <div>
+          <Row>
+            <Col style={styles.backButton}>
+              <Button
+                small
+                icon={<IconArrowLeft16 />}
+                onClick={() => {
+                  navigate("/");
+                }}
+              >
+                Back to Retreats List
+              </Button>
+            </Col>
+          </Row>
+          <Row>
+            <Col>
+              <h3>{retreat.name} </h3>
+            </Col>
+          </Row>
+          <Row>
+            <Col>
+              <Tag>{retreat.retreatType?.toUpperCase()}</Tag>
+            </Col>
+            <Col>
+              <Tag neutral>{retreat.retreatCode}</Tag>
+            </Col>
+            <Col>📅 {retreat.date.toDateString()}</Col>
+            <Col>⛺ {retreat.noOfDays} Days</Col>
+            <Col>
+              📍 <RetreatLocation locationId={retreat.location} />
+            </Col>
+            <Col>🧘‍♂️ {retreat.totalYogis}</Col>
+          </Row>
+        </div>
+        <div>
+          <YogisList
+            retreat={retreat}
+          />
+        </div>
+      </div>
     </Container>
   );
 };

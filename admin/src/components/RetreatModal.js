@@ -13,9 +13,11 @@ import {
   InputFieldFF,
   CircularLoader,
   SingleSelectFieldFF,
+  NoticeBox
 } from "@dhis2/ui";
 import { Row, Col } from "react-bootstrap";
 import {
+  DHIS2_RETREAT_CODE,
   DHIS2_RETREAT_DATE_ATTRIBUTE,
   DHIS2_RETREAT_DISABLED_ATTRIBUTE,
   DHIS2_RETREAT_LOCATION_ATTRIBUTE,
@@ -32,7 +34,7 @@ const { Form, Field } = ReactFinalForm;
 const styles = {
   fieldRow: {
     marginBottom: 10,
-  },
+  }
 };
 
 const retreatModelQuery = {
@@ -68,7 +70,7 @@ const RetreatModel = (props) => {
   ] = useDataMutation(optionMutation, {
     onComplete: () => {
       props.onCancel();
-    },
+    }
   });
 
   if (errorLoadingData) return <span>ERROR</span>;
@@ -102,6 +104,10 @@ const RetreatModel = (props) => {
             attribute: { id: DHIS2_RETREAT_DISABLED_ATTRIBUTE },
             value: false,
           },
+          {
+            attribute: { id: DHIS2_RETREAT_CODE },
+            value: values.code,
+          },
         ];
 
         let code = `${new Date(values.date)
@@ -120,24 +126,35 @@ const RetreatModel = (props) => {
           <Modal>
             <ModalTitle>New Retreat</ModalTitle>
             <ModalContent>
-              <Row style={styles.fieldRow}>
-                <Col>
-                  <h6>{`${values.date} ${values.location?.displayName}`}</h6>
-                </Col>
-              </Row>
-              <Row style={styles.fieldRow}>
-                <Col>
-                  <Field
-                    required
-                    name="date"
-                    label="Date"
-                    component={InputFieldFF}
-                    type="date"
-                    validate={hasValue}
-                  />
-                </Col>
-              </Row>
-              <Row style={styles.fieldRow}>
+              <div style={styles.fieldRow}>
+                <h6>{`${values.date} ${values.location?.displayName}`}</h6>
+              </div>
+              <div style={styles.fieldRow}>
+                <Field
+                  required
+                  name="code"
+                  label="Code"
+                  placeholder="5GS1"
+                  component={InputFieldFF}
+                  type="text"
+                  validate={hasValue}
+                />
+
+              </div>
+              <div style={styles.fieldRow}>
+
+                <Field
+                  required
+                  name="date"
+                  label="Date"
+                  component={InputFieldFF}
+                  type="date"
+                  validate={hasValue}
+                />
+
+              </div>
+              <div style={styles.fieldRow}>
+
                 <Field
                   required
                   name="noOfDays"
@@ -146,8 +163,10 @@ const RetreatModel = (props) => {
                   type="number"
                   validate={hasValue}
                 />
-              </Row>
-              <Row style={styles.fieldRow}>
+
+              </div>
+              <div style={styles.fieldRow}>
+
                 <Field
                   name="location"
                   label="Location"
@@ -170,8 +189,10 @@ const RetreatModel = (props) => {
                     </div>
                   )}
                 </Field>
-              </Row>
-              <Row style={styles.fieldRow}>
+
+              </div>
+              <div style={styles.fieldRow}>
+
                 <Field
                   required
                   name="noOfYogis"
@@ -180,8 +201,10 @@ const RetreatModel = (props) => {
                   type="number"
                   validate={hasValue}
                 />
-              </Row>
-              <Row style={styles.fieldRow}>
+
+              </div>
+              <div style={styles.fieldRow}>
+
                 <Field
                   required
                   name="retreatType"
@@ -195,7 +218,15 @@ const RetreatModel = (props) => {
                     };
                   })}
                 />
-              </Row>
+
+              </div>
+              <div style={styles.fieldRow}>
+                {errorMutate &&
+                  <NoticeBox error title="Retreat creation failed">
+                    {errorMutate?.details?.response?.errorReports?.map(report => report.message).join(",")}
+                  </NoticeBox>
+                }
+              </div>
             </ModalContent>
             <ModalActions>
               <ButtonStrip end>
@@ -213,7 +244,7 @@ const RetreatModel = (props) => {
                   primary
                   type="submit"
                   loading={submitting || loadingMutate}
-                  disabled={submitting || loadingMutate || calledMutate}
+                  disabled={submitting || loadingMutate}
                   onClick={handleSubmit}
                 >
                   Create

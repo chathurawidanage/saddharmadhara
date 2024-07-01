@@ -1,6 +1,6 @@
 .active-applications {
     display: flex;
-    flex-direction: column;
+    flex-wrap: wrap;
     column-gap: 2px;
     row-gap: 2px;
 }
@@ -11,22 +11,22 @@
     background-color: #546E7A;
     display: flex;
     align-items: center;
-    flex-direction: column;
+    flex-direction: row;
     color: white;
-    font-size: 14px;
+    font-size: 12px;
+    cursor: default;
 }
 
 .active-application-retreat {
-    font-size: calc(100vw / 110);
+    font-weight: bold;
+    padding: 2px;
 }
 
 .active-application-state {
-    font-weight: bold;
-    width: 100%;
-    border-bottom-left-radius: 10px;
+    border-top-right-radius: 10px;
     border-bottom-right-radius: 10px;
     text-transform: uppercase;
-    font-size: calc(100vw / 130);
+    padding: 2px;
 }
 
 .active-application-state-applied {

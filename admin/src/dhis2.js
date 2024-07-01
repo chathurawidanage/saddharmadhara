@@ -12,6 +12,7 @@ export const DHIS2_RETREAT_LOCATION_ATTRIBUTE = "TuaBW7iXTGw";
 export const DHIS2_RETREAT_TOTAL_YOGIS_ATTRIBUTE = "DkyFJvcKgL2";
 export const DHIS2_RETREAT_NO_OF_DAYS_ATTRIBUTE = "vl3IQiIavWD";
 export const DHIS2_RETREAT_TYPE_ATTRIBUTE = "AJZR2ji582g";
+export const DHIS2_RETREAT_CODE = "lzIri3GkWM2";
 
 export const DHIS2_EXPRESSION_OF_INTEREST_PROGRAM_STAGE = "BLn1j2VgLZf";
 export const DHIS2_RETREAT_DATA_ELEMENT = "rYqV3VQu7LS";
@@ -32,23 +33,3 @@ export const DHIS2_TEI_ATTRIBUTE_HAS_UNATTENDED_DEFOMITIES_COMMENT = "HtW0OMmthF
 
 export const DHIS2_TEI_ATTRIBUTE_HAS_STRESS = "dgky5acnvG3";
 export const DHIS2_TEI_ATTRIBUTE_HAS_STRESS_COMMENT = "Mp6LLGv4WOT";
-
-export const mapRetreatFromD2 = (dhis2RetreatOption) => {
-  let attributeIdToValueMap = {};
-  dhis2RetreatOption.attributeValues?.forEach((attribute) => {
-    attributeIdToValueMap[attribute.attribute.id] = attribute.value;
-  });
-
-  return {
-    id: dhis2RetreatOption.id,
-    name: dhis2RetreatOption.name,
-    code: dhis2RetreatOption.code,
-    date: new Date(attributeIdToValueMap[DHIS2_RETREAT_DATE_ATTRIBUTE]),
-    disabled:
-      attributeIdToValueMap[DHIS2_RETREAT_DISABLED_ATTRIBUTE] === "true",
-    location: attributeIdToValueMap[DHIS2_RETREAT_LOCATION_ATTRIBUTE],
-    totalYogis: attributeIdToValueMap[DHIS2_RETREAT_TOTAL_YOGIS_ATTRIBUTE],
-    retreatType: attributeIdToValueMap[DHIS2_RETREAT_TYPE_ATTRIBUTE],
-    noOfDays: attributeIdToValueMap[DHIS2_RETREAT_NO_OF_DAYS_ATTRIBUTE],
-  };
-};

@@ -71,9 +71,6 @@ const YogiRow = ({ trackedEntity, dateApplied, currentRetreat, actions }) => {
                         </td>
                         <td>{attributeIdToValueMap[DHIS2_TEI_ATTRIBUTE_MOBILE]}</td>
                         <td>
-                            {dateApplied.toDateString()} {dateApplied.toLocaleTimeString()}
-                        </td>
-                        <td>
                             <Button
                                 small
                                 onClick={() => {

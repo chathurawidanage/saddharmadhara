@@ -1,6 +1,6 @@
 import { useDataEngine } from "@dhis2/app-runtime";
 import { useState, useCallback, useEffect } from "react";
-import { DHIS2_ACTIVE_RETREATS_SQL_VIEW, DHIS2_RETREAT_DATE_ATTRIBUTE, DHIS2_RETREAT_DISABLED_ATTRIBUTE, DHIS2_RETREAT_LOCATION_ATTRIBUTE, DHIS2_RETREAT_NO_OF_DAYS_ATTRIBUTE, DHIS2_RETREAT_TOTAL_YOGIS_ATTRIBUTE, DHIS2_RETREAT_TYPE_ATTRIBUTE } from "../dhis2";
+import { DHIS2_ACTIVE_RETREATS_SQL_VIEW, DHIS2_RETREAT_CODE, DHIS2_RETREAT_DATE_ATTRIBUTE, DHIS2_RETREAT_DISABLED_ATTRIBUTE, DHIS2_RETREAT_LOCATION_ATTRIBUTE, DHIS2_RETREAT_NO_OF_DAYS_ATTRIBUTE, DHIS2_RETREAT_TOTAL_YOGIS_ATTRIBUTE, DHIS2_RETREAT_TYPE_ATTRIBUTE } from "../dhis2";
 
 const retreatsQuery = {
     retreats: {
@@ -26,6 +26,7 @@ const transformRetreats = (data) => {
             id: row[0],
             name: row[1],
             code: row[2],
+            retreatCode: attributeIdToValueMap[DHIS2_RETREAT_CODE],
             date,
             endDate,
             disabled:
@@ -72,6 +73,28 @@ const useCachedRetreats = () => {
 
     return {
         data, loading, error, refetch
+    };
+};
+
+export const useCachedRetreat = (retreatId) => {
+    const { error, loading, data, refetch } = useCachedRetreats();
+    const [retreat, setRetreat] = useState();
+    const [retreatError, setRetreatError] = useState(error);
+
+    useEffect(() => {
+        if (data) {
+            let retreatFound = data.find(el => el.id === retreatId);
+            if (retreatFound) {
+                setRetreat(retreatFound)
+            } else {
+                setRetreatError("Not Found");
+            }
+        }
+    }, [data, retreatId])
+
+
+    return {
+        retreat, loading, error: retreatError || error, refetch
     };
 };
 

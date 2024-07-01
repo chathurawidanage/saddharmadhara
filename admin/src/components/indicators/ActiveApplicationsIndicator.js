@@ -1,7 +1,8 @@
 import { DHIS2_EXPRESSION_OF_INTEREST_PROGRAM_STAGE, DHIS2_RETREAT_DATA_ELEMENT, DHIS2_RETREAT_SELECTION_STATE_DATA_ELEMENT } from "../../dhis2";
 import useCachedRetreats from "../useCachedRetreats";
 import {
-    CircularLoader
+    CircularLoader,
+    Tooltip
 } from "@dhis2/ui";
 import "./ActiveApplicationIndicator.css";
 
@@ -33,14 +34,16 @@ const ActiveApplicationIndicator = ({ currentRetreat, enrollments }) => {
                 .filter(r => allYogiApplications[r.code])
                 .map(r => {
                     return (
-                        <div className="active-application" key={r.code}>
-                            <div className="active-application-retreat">
-                                {r.name}
+                        <Tooltip content={r.name}>
+                            <div className="active-application" key={r.code}>
+                                <div className="active-application-retreat">
+                                    {r.retreatCode || "UNKW"}
+                                </div>
+                                <div className={`active-application-state active-application-state-${allYogiApplications[r.code]}`}>
+                                    {allYogiApplications[r.code]}
+                                </div>
                             </div>
-                            <div className={`active-application-state active-application-state-${allYogiApplications[r.code]}`}>
-                                {allYogiApplications[r.code]}
-                            </div>
-                        </div>
+                        </Tooltip>
                     );
                 })}
         </div>
