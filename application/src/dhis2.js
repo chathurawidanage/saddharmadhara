@@ -69,4 +69,5 @@ export const SURVEY_JS_NAME_TO_D2_TRACKED_ENTITY_ATTRIBUTES_MAP = {
   Whatsapp: "CpF36JSasMJ",
   YearOfFullOrdination: "MCCX4BAduLq",
   NumberOfVassa: "pUPux4ovXEA",
+  VirtueObserved: "wOpDOCpAxuv"
 };

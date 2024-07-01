@@ -110,6 +110,32 @@ const personalPage = (isRequired) => {
         isRequired,
       },
       {
+        name: "VirtueObserved",
+        type: "dropdown",
+        title: {
+          [ENGLISH_LOCALE]: "State which virtue is being observed",
+          [SINHALA_LOCALE]: "සමාදන් වී ඇති ශීලය කුමක්ද යන්න සදහන් කරන්න"
+        },
+        isRequired,
+        visibleIf: "({MaritalStatus} = 'reverend')",
+        choices: [
+          {
+            value: "Samanera",
+            text: {
+              [ENGLISH_LOCALE]: "Samanera",
+              [SINHALA_LOCALE]: "සාමනේර"
+            }
+          },
+          {
+            value: "Upasampada",
+            text: {
+              [ENGLISH_LOCALE]: "Upasampada",
+              [SINHALA_LOCALE]: "උපසම්පදා"
+            }
+          }
+        ]
+      },
+      {
         name: "YearOfFullOrdination",
         type: "text",
         title: {
@@ -118,7 +144,7 @@ const personalPage = (isRequired) => {
         },
         inputType: "number",
         isRequired,
-        visibleIf: "({MaritalStatus} = 'reverend')",
+        visibleIf: "({MaritalStatus} = 'reverend' and {VirtueObserved} = 'Upasampada')",
       },
       {
         name: "NumberOfVassa",
@@ -129,7 +155,7 @@ const personalPage = (isRequired) => {
         },
         inputType: "number",
         isRequired,
-        visibleIf: "({MaritalStatus} = 'reverend')",
+        visibleIf: "({MaritalStatus} = 'reverend') and {VirtueObserved} = 'Upasampada')",
       },
       {
         name: "Address",
