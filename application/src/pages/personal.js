@@ -155,7 +155,7 @@ const personalPage = (isRequired) => {
         },
         inputType: "number",
         isRequired,
-        visibleIf: "({MaritalStatus} = 'reverend') and {VirtueObserved} = 'Upasampada')",
+        visibleIf: "({MaritalStatus} = 'reverend' and {VirtueObserved} = 'Upasampada')",
       },
       {
         name: "Address",
