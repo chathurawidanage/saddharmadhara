@@ -3,7 +3,7 @@ import {
     Button,
     CircularLoader
 } from "@dhis2/ui";
-import { DHIS2_TEI_ATTRIBUTE_FULL_NAME, DHIS2_TEI_ATTRIBUTE_GENDER, DHIS2_TEI_ATTRIBUTE_HAS_KIDS, DHIS2_TEI_ATTRIBUTE_HAS_KIDS_COMMENT, DHIS2_TEI_ATTRIBUTE_HAS_PERMISSION, DHIS2_TEI_ATTRIBUTE_HAS_PERMISSION_COMMENT, DHIS2_TEI_ATTRIBUTE_HAS_STRESS, DHIS2_TEI_ATTRIBUTE_HAS_STRESS_COMMENT, DHIS2_TEI_ATTRIBUTE_HAS_UNATTENDED_DEFOMITIES, DHIS2_TEI_ATTRIBUTE_HAS_UNATTENDED_DEFOMITIES_COMMENT, DHIS2_TEI_ATTRIBUTE_MOBILE, DHIS_PROGRAM } from "../../dhis2";
+import { DHIS2_TEI_ATTRIBUTE_FULL_NAME, DHIS2_TEI_ATTRIBUTE_GENDER, DHIS2_TEI_ATTRIBUTE_HAS_KIDS, DHIS2_TEI_ATTRIBUTE_HAS_KIDS_COMMENT, DHIS2_TEI_ATTRIBUTE_HAS_PERMISSION, DHIS2_TEI_ATTRIBUTE_HAS_PERMISSION_COMMENT, DHIS2_TEI_ATTRIBUTE_HAS_STRESS, DHIS2_TEI_ATTRIBUTE_HAS_STRESS_COMMENT, DHIS2_TEI_ATTRIBUTE_HAS_UNATTENDED_DEFORMITIES, DHIS2_TEI_ATTRIBUTE_HAS_UNATTENDED_DEFORMITIES_COMMENT, DHIS2_TEI_ATTRIBUTE_MOBILE, DHIS_PROGRAM } from "../../dhis2";
 import { HasKidsIndicator, HasPermission, HasStress, HasUnattendedDeformities } from "../indicators/BooleanWithCommentIndicator";
 import GenderIndicator from "../indicators/GenderIndicator";
 import ActiveApplicationIndicator from "../indicators/ActiveApplicationsIndicator";
@@ -60,8 +60,8 @@ const YogiRow = ({ trackedEntity, dateApplied, currentRetreat, actions }) => {
                                     comment={attributeIdToValueMap[DHIS2_TEI_ATTRIBUTE_HAS_KIDS_COMMENT]} />
                                 <HasPermission hasPermission={attributeIdToValueMap[DHIS2_TEI_ATTRIBUTE_HAS_PERMISSION]}
                                     comment={attributeIdToValueMap[DHIS2_TEI_ATTRIBUTE_HAS_PERMISSION_COMMENT]} />
-                                <HasUnattendedDeformities hasUnattendedDeformities={attributeIdToValueMap[DHIS2_TEI_ATTRIBUTE_HAS_UNATTENDED_DEFOMITIES]}
-                                    comment={attributeIdToValueMap[DHIS2_TEI_ATTRIBUTE_HAS_UNATTENDED_DEFOMITIES_COMMENT]} />
+                                <HasUnattendedDeformities hasUnattendedDeformities={attributeIdToValueMap[DHIS2_TEI_ATTRIBUTE_HAS_UNATTENDED_DEFORMITIES]}
+                                    comment={attributeIdToValueMap[DHIS2_TEI_ATTRIBUTE_HAS_UNATTENDED_DEFORMITIES_COMMENT]} />
                                 <HasStress hasStress={attributeIdToValueMap[DHIS2_TEI_ATTRIBUTE_HAS_STRESS]}
                                     comment={attributeIdToValueMap[DHIS2_TEI_ATTRIBUTE_HAS_STRESS_COMMENT]} />
                             </div>

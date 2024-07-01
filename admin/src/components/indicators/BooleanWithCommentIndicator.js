@@ -4,7 +4,7 @@ import { Tooltip } from "@dhis2/ui";
 import KIDS from "./img/kids.png";
 import PERMISSION from "./img/key.png";
 import CROSS from "./img/cross.png";
-import STRESS from "./img/stress.png";
+import STRESS from "./img/stressv3.png";
 
 const BooleanWithCommentIndicator = ({ bool, showIf, comment, img, className }) => {
     if (!bool || bool !== showIf) {
