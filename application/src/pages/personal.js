@@ -145,6 +145,9 @@ const personalPage = (isRequired) => {
         inputType: "number",
         isRequired,
         visibleIf: "({MaritalStatus} = 'reverend' and {VirtueObserved} = 'Upasampada')",
+        validators: [
+          { type: "numeric", minValue: 1900 }
+        ]
       },
       {
         name: "NumberOfVassa",
@@ -156,6 +159,9 @@ const personalPage = (isRequired) => {
         inputType: "number",
         isRequired,
         visibleIf: "({MaritalStatus} = 'reverend' and {VirtueObserved} = 'Upasampada')",
+        validators: [
+          { type: "numeric", minValue: 0, maxValue: 100 }
+        ]
       },
       {
         name: "Address",
