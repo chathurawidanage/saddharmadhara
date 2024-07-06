@@ -74,7 +74,7 @@ const YogiRow = observer(({ trackedEntity, currentRetreat, actions, store }) => 
                         tempElement.href = baseUrl;
                         window.open(
                             new URL(
-                                `dhis-web-tracker-capture/index.html#/dashboard?tei=${trackedEntity}&program=${DHIS_PROGRAM}&ou=${DHIS2_ROOT_ORG}`,
+                                `dhis-web-tracker-capture/index.html#/dashboard?tei=${trackedEntity.id}&program=${DHIS_PROGRAM}&ou=${DHIS2_ROOT_ORG}`,
                                 tempElement.href
                             ),
                             "_blank"
