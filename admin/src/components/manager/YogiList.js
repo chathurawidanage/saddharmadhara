@@ -3,7 +3,7 @@ import {
     useDataQuery
 } from "@dhis2/app-runtime";
 import {
-    CircularLoader,
+    LinearLoader,
     DropdownButton,
     FlyoutMenu,
     Pagination,
@@ -57,6 +57,8 @@ const YogisList = observer(({ retreat, store }) => {
     const [yogiIdList, setYogiIdList] = useState([]);
     const [yogisFetched, setYogisFetched] = useState(false);
 
+    const [loadProgress, setLoadProgress] = useState(0);
+
     const { show: alertStateChangeStatus } = useAlert(({ yogiName, toState, success }) => {
         if (success) {
             return `${yogiName} moved to ${toState}`
@@ -84,7 +86,7 @@ const YogisList = observer(({ retreat, store }) => {
 
     useEffect(() => {
         refetch({ retreatName: retreat.name });
-    }, []);
+    }, [retreat]);
 
     useEffect(() => {
         setCurrentPage(1);
@@ -96,8 +98,14 @@ const YogisList = observer(({ retreat, store }) => {
             // optional: remove duplicates. Only first interest will be considered
             const yogiIdList = [...new Set(data.yogis?.instances.map(i => i.trackedEntity))];
 
+            let completion = 0;
+
             let yogiFetchPromoises = yogiIdList.map((yogiId) => {
-                return store.yogis.fetchYogi(yogiId);
+                return store.yogis.fetchYogi(yogiId)
+                    .then(() => {
+                        completion++;
+                        setLoadProgress(completion * 100 / yogiIdList.length)
+                    });
             });
 
             Promise.all(yogiFetchPromoises).then(() => {
@@ -150,7 +158,9 @@ const YogisList = observer(({ retreat, store }) => {
     };
 
     if (error) return <span>ERROR</span>;
-    if (loading || !yogisFetched) return <CircularLoader extrasmall />;
+    if (loading || !yogisFetched) return (
+        <LinearLoader width="100%" amount={loadProgress} margin="0" />
+    );
 
     return (
         <div>
