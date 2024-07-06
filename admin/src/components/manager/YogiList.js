@@ -21,6 +21,7 @@ import {
     DHIS2_TEI_ATTRIBUTE_FULL_NAME
 } from "../../dhis2";
 import YogiRow from "./YogiRow";
+import "./YogiList.css";
 
 const yogiListquery = {
     yogis: {
@@ -154,7 +155,7 @@ const YogisList = observer(({ retreat, store }) => {
                 {data && (
                     <div>
                         {pagination()}
-                        <Table striped bordered hover className="yogi-table">
+                        <Table bordered hover className="yogi-table">
                             <thead>
                                 <tr>
                                     <th width="40%">Name</th>

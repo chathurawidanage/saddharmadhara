@@ -9,7 +9,6 @@ import { Col, Container, Row } from "react-bootstrap";
 import { useParams } from "react-router";
 import { useNavigate } from "react-router-dom";
 import RetreatLocation from "./RetreatLocation";
-import "./RetreatManager.css";
 import YogisList from "./manager/YogiList";
 
 const styles = {
