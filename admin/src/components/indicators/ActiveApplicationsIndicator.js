@@ -1,9 +1,8 @@
-import { DHIS2_EXPRESSION_OF_INTEREST_PROGRAM_STAGE, DHIS2_RETREAT_DATA_ELEMENT, DHIS2_RETREAT_SELECTION_STATE_DATA_ELEMENT } from "../../dhis2";
 import {
     Tooltip
 } from "@dhis2/ui";
-import "./ActiveApplicationIndicator.css";
 import { observer } from "mobx-react";
+import "./ActiveApplicationIndicator.css";
 
 const ActiveApplicationIndicator = observer(({ currentRetreat, trackedEntity, store }) => {
     const currentRetreats = store.metadata.currentRetreats;
