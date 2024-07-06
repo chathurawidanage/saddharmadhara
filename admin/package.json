@@ -19,6 +19,8 @@
   "dependencies": {
     "@dhis2/app-runtime": "^3.10.4",
     "bootstrap": "^5.3.3",
+    "mobx": "^6.13.0",
+    "mobx-react": "^9.1.1",
     "react-bootstrap": "^2.10.2",
     "react-router-dom": "^6.23.1"
   }

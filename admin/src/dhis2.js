@@ -1,4 +1,6 @@
 export const DHIS_PROGRAM = "KdYt2OP9VjD";
+export const DHIS2_ROOT_ORG = "GRcUwrSIcZv";
+
 
 export const DHIS2_ACTIVE_RETREATS_SQL_VIEW = "NyBDf8X8UxG";
 export const DHIS_RETREATS_OPTION_SET_ID = "ys2Pv9hTS0O";

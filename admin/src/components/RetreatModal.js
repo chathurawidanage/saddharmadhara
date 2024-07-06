@@ -1,21 +1,20 @@
-import React from "react";
+import { useDataMutation } from "@dhis2/app-runtime";
 import {
-  OrganisationUnitTree,
   Button,
+  ButtonStrip,
+  InputFieldFF,
+  Label,
   Modal,
   ModalActions,
   ModalContent,
-  ReactFinalForm,
   ModalTitle,
-  ButtonStrip,
-  Label,
-  hasValue,
-  InputFieldFF,
-  CircularLoader,
+  NoticeBox,
+  OrganisationUnitTree,
+  ReactFinalForm,
   SingleSelectFieldFF,
-  NoticeBox
+  hasValue
 } from "@dhis2/ui";
-import { Row, Col } from "react-bootstrap";
+import React from "react";
 import {
   DHIS2_RETREAT_CODE,
   DHIS2_RETREAT_DATE_ATTRIBUTE,
@@ -24,10 +23,9 @@ import {
   DHIS2_RETREAT_NO_OF_DAYS_ATTRIBUTE,
   DHIS2_RETREAT_TOTAL_YOGIS_ATTRIBUTE,
   DHIS2_RETREAT_TYPE_ATTRIBUTE,
-  DHIS_RETREATS_OPTION_SET_ID,
-  DHIS_RETREAT_TYPE_OPTION_SET_ID,
+  DHIS2_ROOT_ORG,
+  DHIS_RETREATS_OPTION_SET_ID
 } from "../dhis2";
-import { useDataMutation, useDataQuery } from "@dhis2/app-runtime";
 
 const { Form, Field } = ReactFinalForm;
 
@@ -35,15 +33,6 @@ const styles = {
   fieldRow: {
     marginBottom: 10,
   }
-};
-
-const retreatModelQuery = {
-  retreatTypes: {
-    resource: `optionSets/${DHIS_RETREAT_TYPE_OPTION_SET_ID}.json`,
-    params: {
-      fields: "options[name,code]",
-    },
-  },
 };
 
 const optionMutation = {
@@ -57,24 +46,13 @@ const optionMutation = {
   type: "create",
 };
 
-const RetreatModel = (props) => {
-  const {
-    loading: loadingData,
-    error: errorLoadingData,
-    data,
-  } = useDataQuery(retreatModelQuery);
-
-  const [
-    mutate,
-    { called: calledMutate, loading: loadingMutate, error: errorMutate },
-  ] = useDataMutation(optionMutation, {
+const RetreatModel = ({ store, onCancel }) => {
+  const [mutate, { called, loading, error }] = useDataMutation(optionMutation, {
     onComplete: () => {
-      props.onCancel();
+      onCancel();
+      store.metadata.loadRetreats();
     }
   });
-
-  if (errorLoadingData) return <span>ERROR</span>;
-  if (loadingData) return <CircularLoader extrasmall />;
 
   return (
     <Form
@@ -177,7 +155,7 @@ const RetreatModel = (props) => {
                     <div>
                       <Label required>Location</Label>
                       <OrganisationUnitTree
-                        roots="GRcUwrSIcZv"
+                        roots={DHIS2_ROOT_ORG}
                         onChange={(e) => {
                           props.input.onChange(e);
                         }}
@@ -211,7 +189,7 @@ const RetreatModel = (props) => {
                   label="Retreat Type"
                   component={SingleSelectFieldFF}
                   validate={hasValue}
-                  options={data.retreatTypes.options.map((option) => {
+                  options={store.metadata.retreatTypes.map((option) => {
                     return {
                       label: option.name,
                       value: option.code,
@@ -221,9 +199,9 @@ const RetreatModel = (props) => {
 
               </div>
               <div style={styles.fieldRow}>
-                {errorMutate &&
+                {error &&
                   <NoticeBox error title="Retreat creation failed">
-                    {errorMutate?.details?.response?.errorReports?.map(report => report.message).join(",")}
+                    {error?.details?.response?.errorReports?.map(report => report.message).join(",")}
                   </NoticeBox>
                 }
               </div>
@@ -233,7 +211,7 @@ const RetreatModel = (props) => {
                 <Button
                   onClick={() => {
                     form.reset();
-                    props.onCancel();
+                    onCancel();
                   }}
                   disabled={submitting}
                   secondary
@@ -243,8 +221,8 @@ const RetreatModel = (props) => {
                 <Button
                   primary
                   type="submit"
-                  loading={submitting || loadingMutate}
-                  disabled={submitting || loadingMutate}
+                  loading={submitting || loading}
+                  disabled={submitting || loading}
                   onClick={handleSubmit}
                 >
                   Create

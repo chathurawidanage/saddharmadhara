@@ -1,11 +1,11 @@
-import { Button, CircularLoader, Tag } from "@dhis2/ui";
+import { Button, Tag } from "@dhis2/ui";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { observer } from "mobx-react";
 import React, { useState } from "react";
 import { Card, Col, Container, Row } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import RetreatLocation from "./RetreatLocation";
 import RetreatModel from "./RetreatModal";
-import useCachedRetreats from "./useCachedRetreats";
 
 const styles = {
   headerRow: {
@@ -26,6 +26,9 @@ const styles = {
   retreatTitle: {
     marginBottom: 5,
   },
+  olderRetreats: {
+    marginTop: 20
+  }
 };
 
 const Retreat = ({ retreat }) => {
@@ -97,12 +100,8 @@ const Retreat = ({ retreat }) => {
   );
 };
 
-const RetreatsDashboard = () => {
+const RetreatsDashboard = observer(({ store }) => {
   const [hideRetreatModel, setHideRetreatModel] = useState(true);
-  const { error, loading, data, refetch } = useCachedRetreats();
-
-  if (error) return <span>ERROR</span>;
-  if (loading) return <CircularLoader extrasmall />;
 
   return (
     <Container>
@@ -119,9 +118,9 @@ const RetreatsDashboard = () => {
             </Button>
             {!hideRetreatModel && (
               <RetreatModel
+                store={store}
                 onCancel={() => {
                   setHideRetreatModel(true);
-                  refetch();
                 }}
               />
             )}
@@ -129,12 +128,27 @@ const RetreatsDashboard = () => {
         </Row>
       </div>
       <Row>
-        {data?.map((retreat) => {
+        <Col>
+          <h3>Current Retreats</h3>
+        </Col>
+      </Row>
+      <Row>
+        {store.metadata.currentRetreats.map((retreat) => {
+          return <Retreat retreat={retreat} key={retreat.id} />;
+        })}
+      </Row>
+      <Row style={styles.olderRetreats}>
+        <Col>
+          <h3>Old Retreats</h3>
+        </Col>
+      </Row>
+      <Row>
+        {store.metadata.retreats.filter(retreat => !retreat.current).map((retreat) => {
           return <Retreat retreat={retreat} key={retreat.id} />;
         })}
       </Row>
     </Container>
   );
-};
+});
 
 export default RetreatsDashboard;

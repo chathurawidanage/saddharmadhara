@@ -1,6 +1,6 @@
 import { useDataQuery } from "@dhis2/app-runtime";
-import React from "react";
 import { CircularLoader } from "@dhis2/ui";
+import React from "react";
 
 const RetreatLocation = ({ locationId }) => {
   const { error, loading, data } = useDataQuery({
