@@ -11,11 +11,13 @@ import {
     DHIS2_TEI_ATTRIBUTE_HAS_STRESS, DHIS2_TEI_ATTRIBUTE_HAS_STRESS_COMMENT,
     DHIS2_TEI_ATTRIBUTE_HAS_UNATTENDED_DEFORMITIES,
     DHIS2_TEI_ATTRIBUTE_HAS_UNATTENDED_DEFORMITIES_COMMENT,
+    DHIS2_TEI_ATTRIBUTE_MARITAL_STATE,
     DHIS2_TEI_ATTRIBUTE_MOBILE, DHIS_PROGRAM
 } from "../../dhis2";
 import ActiveApplicationIndicator from "../indicators/ActiveApplicationsIndicator";
 import { HasKidsIndicator, HasPermission, HasStress, HasUnattendedDeformities } from "../indicators/BooleanWithCommentIndicator";
 import GenderIndicator from "../indicators/GenderIndicator";
+import "./YogiRow.css";
 
 const styles = {
     actionButton: {
@@ -38,10 +40,16 @@ const styles = {
 const YogiRow = observer(({ trackedEntity, currentRetreat, actions, store }) => {
     const { baseUrl } = useConfig();
 
+    const rowClassNames = [];
+
+    if (trackedEntity.attributes[DHIS2_TEI_ATTRIBUTE_MARITAL_STATE] === 'reverend') {
+        rowClassNames.push("yogi-row-reverend");
+    }
+
     return (
-        <tr>
-            <td>{trackedEntity.attributes[DHIS2_TEI_ATTRIBUTE_FULL_NAME]}</td>
-            <td style={styles.indicators}>
+        <tr className={rowClassNames.join(" ")}>
+            <td className="yogi-row-td">{trackedEntity.attributes[DHIS2_TEI_ATTRIBUTE_FULL_NAME]}</td>
+            <td style={styles.indicators} className="yogi-row-td">
                 <div style={styles.miniIndicators}>
                     <GenderIndicator gender={trackedEntity.attributes[DHIS2_TEI_ATTRIBUTE_GENDER]} />
                     <HasKidsIndicator hasKids={trackedEntity.attributes[DHIS2_TEI_ATTRIBUTE_HAS_KIDS]}
@@ -57,8 +65,8 @@ const YogiRow = observer(({ trackedEntity, currentRetreat, actions, store }) => 
                     <ActiveApplicationIndicator currentRetreat={currentRetreat} trackedEntity={trackedEntity} store={store} />
                 </div>
             </td>
-            <td>{trackedEntity.attributes[DHIS2_TEI_ATTRIBUTE_MOBILE]}</td>
-            <td>
+            <td className="yogi-row-td">{trackedEntity.attributes[DHIS2_TEI_ATTRIBUTE_MOBILE]}</td>
+            <td className="yogi-row-td">
                 <Button
                     small
                     onClick={() => {

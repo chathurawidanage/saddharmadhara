@@ -18,7 +18,8 @@ import { Table } from "react-bootstrap";
 import {
     DHIS2_EXPRESSION_OF_INTEREST_PROGRAM_STAGE,
     DHIS2_RETREAT_DATA_ELEMENT,
-    DHIS2_TEI_ATTRIBUTE_FULL_NAME
+    DHIS2_TEI_ATTRIBUTE_FULL_NAME,
+    DHIS2_TEI_ATTRIBUTE_MARITAL_STATE
 } from "../../dhis2";
 import YogiRow from "./YogiRow";
 import "./YogiList.css";
@@ -36,6 +37,15 @@ const yogiListquery = {
             };
         },
     }
+};
+
+const getYogiSortScore = (yogiObj) => {
+    // reverands comes first
+    let score = 0;
+    if (yogiObj.attributes[DHIS2_TEI_ATTRIBUTE_MARITAL_STATE] === 'reverend') {
+        score += Math.pow(10, 5);
+    }
+    return score;
 };
 
 const YogisList = observer(({ retreat, store }) => {
@@ -93,9 +103,19 @@ const YogisList = observer(({ retreat, store }) => {
             Promise.all(yogiFetchPromoises).then(() => {
                 // sort by criterias
                 yogiIdList.sort((y1, y2) => {
-                    let y1RegisteredDate = new Date(store.yogis.yogiIdToObjectMap[y1].expressionOfInterests[retreat.code].occurredAt);
-                    let y2RegisteredDate = new Date(store.yogis.yogiIdToObjectMap[y2].expressionOfInterests[retreat.code].occurredAt);
-                    return y1RegisteredDate.getTime() - y2RegisteredDate.getTime();
+                    // reverands comes first
+                    let y1Score = getYogiSortScore(store.yogis.yogiIdToObjectMap[y1]);
+                    let y2Score = getYogiSortScore(store.yogis.yogiIdToObjectMap[y2]);
+
+                    if (y1Score == y2Score) {
+                        // finally sort by applied date, lowest date comes first
+                        let y1RegisteredDate = new Date(store.yogis.yogiIdToObjectMap[y1].expressionOfInterests[retreat.code].occurredAt);
+                        let y2RegisteredDate = new Date(store.yogis.yogiIdToObjectMap[y2].expressionOfInterests[retreat.code].occurredAt);
+                        return y1RegisteredDate.getTime() - y2RegisteredDate.getTime();
+                    }
+
+                    // higest score comes first
+                    return y2Score - y1Score;
                 });
                 setYogiIdList(yogiIdList);
                 setYogisFetched(true);
