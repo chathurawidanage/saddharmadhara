@@ -1,4 +1,4 @@
-import { makeAutoObservable, runInAction, values } from "mobx";
+import { makeAutoObservable, runInAction } from "mobx";
 import {
     DHIS2_EXPRESSION_OF_INTEREST_PROGRAM_STAGE,
     DHIS2_RETREAT_DATA_ELEMENT, DHIS2_RETREAT_SELECTION_STATE_DATA_ELEMENT,

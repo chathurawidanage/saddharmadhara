@@ -1,4 +1,6 @@
 const fs = require("fs");
+const util = require('util');
+
 const readline = require('readline');
 
 const DHIS2_API_URL = "http://localhost:8080/api";
@@ -14,7 +16,7 @@ const DHIS2_PROGRAM = "KdYt2OP9VjD";
 const DHIS2_TEI_ATTRIBUTE_NIC = "W1fmUMMnQdu";
 const DHIS2_TEI_ATTRIBUTE_PASSPORD = "hv3aLM80Mrn";
 
-const rootPath = process.env.ROOT_PATH;
+const rootPath = "../junk";
 
 const findYogi = async (identification) => {
 
@@ -37,13 +39,13 @@ const findYogi = async (identification) => {
     }
 };
 
-const readFile = (fileName) => {
+const readFile = async (fileName) => {
     console.log("Processing", fileName);
     const lineReader = readline.createInterface({
         input: fs.createReadStream(`${rootPath}/${fileName}`)
     });
 
-    lineReader.on('line', function (idNumber) {
+    lineReader.on('line', async (idNumber) =>{
         findYogi(idNumber).then(x => {
             if (!x) {
                 console.log(idNumber, fileName);
@@ -52,17 +54,12 @@ const readFile = (fileName) => {
     })
 };
 
-// fs.readdir(rootPath, (err, files) => {
-//     files.forEach(file => {
-//         readFile(file);
-//     });
-// });
-
-findYogi("").then(x => {
-    if (!x) {
-        console.log(idNumber, fileName);
+fs.readdir(rootPath, async (err, files) => {
+    for (let index = 0; index < files.length; index++) {
+        await readFile(file);
     }
-})
+});
+
 
 
 
