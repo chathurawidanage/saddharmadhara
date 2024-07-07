@@ -13,7 +13,7 @@ class YogiStore {
     }
 
     fetchYogi = async (yogiId, forceRefetch = false) => {
-        if (this.yogiIdToObjectMap[yogiId]) {
+        if (this.yogiIdToObjectMap[yogiId] && !forceRefetch) {
             return;
         }
 
