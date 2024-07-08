@@ -45,18 +45,30 @@ const readFile = async (fileName) => {
         input: fs.createReadStream(`${rootPath}/${fileName}`)
     });
 
-    lineReader.on('line', async (idNumber) =>{
-        findYogi(idNumber).then(x => {
+    let missing = 0;
+
+    let checks = [];
+
+    for await (const idNumber of lineReader) {
+        checks.push(findYogi(idNumber).then(x => {
             if (!x) {
-                console.log(idNumber, fileName);
+                console.log("missing", idNumber);
+                missing++;
             }
-        })
-    })
+        }))
+    }
+
+    await Promise.all(checks);
+
+    if (missing === 0) {
+        console.log(fileName, "is safe to import!!!");
+    }
+    console.log("");
 };
 
 fs.readdir(rootPath, async (err, files) => {
     for (let index = 0; index < files.length; index++) {
-        await readFile(file);
+        await readFile(files[index]);
     }
 });
 

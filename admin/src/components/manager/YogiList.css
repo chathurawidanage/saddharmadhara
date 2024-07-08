@@ -7,3 +7,31 @@
 .yogi-table {
     margin-bottom: 0;
 }
+
+.selection-progress-reverend {
+    background-color: #FF8F00;
+}
+
+.selection-progress-male {
+    background-color: #1565C0;
+}
+
+.selection-progress-female {
+    background-color: #D81B60;
+}
+
+.yogi-list-top-bar {
+    margin-top: 20px;
+    display: flex;
+    column-gap: 20px;
+    align-items: center;
+    justify-content: center;
+}
+
+.yogi-selection-progress {
+    flex-grow: 1;
+}
+
+.selection-progress-remaining {
+    background-color: #CFD8DC;
+}

@@ -27,12 +27,7 @@ import GenderIndicator from "../indicators/GenderIndicator";
 import ReverendIndicator from "../indicators/ReverendIndicator";
 import "./YogiList.css";
 import YogiRow from "./YogiRow";
-
-const styles = {
-    filtersMenu: {
-        marginTop: 20
-    }
-}
+import { ProgressBar } from 'react-bootstrap';
 
 const yogiListquery = {
     yogis: {
@@ -165,34 +160,9 @@ const YogisList = observer(({ retreat, store }) => {
 
     return (
         <div>
-            <div style={styles.filtersMenu}>
-                <DropdownButton component={(
-                    <FlyoutMenu>
-                        <MenuItem label={(
-                            <Checkbox label={(
-                                <ReverendIndicator />
-                            )} checked={filters.reverend} />
-                        )} onClick={() => {
-                            setFilters({ ...filters, reverend: !filters.reverend })
-                        }} />
-                        <MenuItem label={(
-                            <Checkbox label={(
-                                <GenderIndicator gender="male" />
-                            )} checked={filters.male} />
-                        )} onClick={() => {
-                            setFilters({ ...filters, male: !filters.male })
-                        }} />
-                        <MenuItem label={(
-                            <Checkbox label={(
-                                <GenderIndicator gender="female" />
-                            )} checked={filters.female} />
-                        )} onClick={() => {
-                            setFilters({ ...filters, female: !filters.female })
-                        }} />
-                    </FlyoutMenu>
-                )}>
-                    Filters
-                </DropdownButton>
+            <div className="yogi-list-top-bar">
+                <YogiFilter filters={filters} setFilters={setFilters} />
+                <SelectionProgressBar yogiList={yogiList} retreat={retreat} className="yogi-selection-progress" />
             </div>
             <div>
                 <TabBar>
@@ -203,8 +173,7 @@ const YogisList = observer(({ retreat, store }) => {
                                 selected={selectionState === state.code}
                                 onClick={() => {
                                     setSelectionState(state.code);
-                                }}
-                            >
+                                }}>
                                 {state.name} [{countByState[state.code] || "0"}]
                             </Tab>
                         );
@@ -256,20 +225,88 @@ const YogisList = observer(({ retreat, store }) => {
     );
 });
 
+const SelectionProgressBar = observer(({ yogiList, retreat, className }) => {
+
+    const yogiCounts = computed(() => {
+        let yogiCounts = {
+            reverend: 0,
+            male: 0,
+            female: 0
+        };
+        yogiList.forEach(yogi => {
+            let state = yogi.expressionOfInterests[retreat.code]?.state;
+            if (state === "selected") {
+                if (yogi.attributes[DHIS2_TEI_ATTRIBUTE_MARITAL_STATE] === "reverend") {
+                    yogiCounts.reverend++;
+                } else if (yogi.attributes[DHIS2_TEI_ATTRIBUTE_GENDER].toLowerCase() === "male") {
+                    yogiCounts.male++;
+                } else {
+                    yogiCounts.female++;
+                }
+            }
+        });
+        return yogiCounts;
+    }).get();
+
+    let remaining = retreat.totalYogis - yogiCounts.female - yogiCounts.male - yogiCounts.reverend;
+
+    const toPercentage = (val) => {
+        return 100 * val / retreat.totalYogis;
+    };
+
+    return (
+        <ProgressBar className={className}>
+            <ProgressBar className="selection-progress-reverend" now={toPercentage(yogiCounts.reverend)} key={1} label={yogiCounts.reverend} />
+            <ProgressBar className="selection-progress-male" now={toPercentage(yogiCounts.male)} key={2} label={yogiCounts.male} />
+            <ProgressBar className="selection-progress-female" now={toPercentage(yogiCounts.female)} key={3} label={yogiCounts.female} />
+            <ProgressBar className="selection-progress-remaining" now={toPercentage(Math.max(0, remaining))} key={4} label={remaining} />
+        </ProgressBar>
+    );
+});
+
+const YogiFilter = ({ filters, setFilters }) => {
+    return (
+        <DropdownButton component={(
+            <FlyoutMenu>
+                <MenuItem label={(
+                    <Checkbox label={(
+                        <ReverendIndicator />
+                    )} checked={filters.reverend} />
+                )} onClick={() => {
+                    setFilters({ ...filters, reverend: !filters.reverend })
+                }} />
+                <MenuItem label={(
+                    <Checkbox label={(
+                        <GenderIndicator gender="male" />
+                    )} checked={filters.male} />
+                )} onClick={() => {
+                    setFilters({ ...filters, male: !filters.male })
+                }} />
+                <MenuItem label={(
+                    <Checkbox label={(
+                        <GenderIndicator gender="female" />
+                    )} checked={filters.female} />
+                )} onClick={() => {
+                    setFilters({ ...filters, female: !filters.female })
+                }} />
+            </FlyoutMenu>
+        )}>
+            Filters
+        </DropdownButton>
+    );
+};
+
 const StateChangeButton = ({ currentState, yogi, retreat, store }) => {
 
-    const { show: alertStateChangeStatus } = useAlert(({ yogiName, toState, success }) => {
-        if (success) {
-            return `${yogiName} moved to ${toState}`
-        }
-        return `Failed to move ${yogiName}`;
-    }, ({ success }) => {
-        return {
-            success,
-            critical: !success,
-            duration: 2000
-        }
-    });
+    const { show: alertStateChangeStatus } = useAlert(
+        ({ yogiName, toState, success }) => success ? `${yogiName} moved to ${toState}`
+            : `Failed to move ${yogiName}`, ({ success }) => {
+                return {
+                    success,
+                    critical: !success,
+                    duration: 2000
+                }
+            });
 
     const onStateChanged = async (toStateCode) => {
         let success = await store.yogis.changeRetreatState(yogi.id, retreat.code, toStateCode);
@@ -279,7 +316,6 @@ const StateChangeButton = ({ currentState, yogi, retreat, store }) => {
             success
         })
     };
-
 
     return (
         <DropdownButton
