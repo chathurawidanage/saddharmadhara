@@ -8,8 +8,20 @@
     margin-bottom: 0;
 }
 
-.selection-progress-reverend {
-    background-color: #FF8F00;
+.selection-progress-reverend-male {
+    background: repeating-linear-gradient(45deg,
+            #FF8F00,
+            #FF8F00 2px,
+            #1565C0 5px,
+            #1565C0 10px);
+}
+
+.selection-progress-reverend-female {
+    background: repeating-linear-gradient(-45deg,
+            #FF8F00,
+            #FF8F00 2px,
+            #D81B60 5px,
+            #D81B60 10px);
 }
 
 .selection-progress-male {

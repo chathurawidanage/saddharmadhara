@@ -229,7 +229,8 @@ const SelectionProgressBar = observer(({ yogiList, retreat, className }) => {
 
     const yogiCounts = computed(() => {
         let yogiCounts = {
-            reverend: 0,
+            reverendMale: 0,
+            reverendFemale: 0,
             male: 0,
             female: 0
         };
@@ -237,7 +238,11 @@ const SelectionProgressBar = observer(({ yogiList, retreat, className }) => {
             let state = yogi.expressionOfInterests[retreat.code]?.state;
             if (state === "selected") {
                 if (yogi.attributes[DHIS2_TEI_ATTRIBUTE_MARITAL_STATE] === "reverend") {
-                    yogiCounts.reverend++;
+                    if (yogi.attributes[DHIS2_TEI_ATTRIBUTE_GENDER].toLowerCase() === "male") {
+                        yogiCounts.reverendMale++;
+                    } else {
+                        yogiCounts.reverendFemale++;
+                    }
                 } else if (yogi.attributes[DHIS2_TEI_ATTRIBUTE_GENDER].toLowerCase() === "male") {
                     yogiCounts.male++;
                 } else {
@@ -248,7 +253,7 @@ const SelectionProgressBar = observer(({ yogiList, retreat, className }) => {
         return yogiCounts;
     }).get();
 
-    let remaining = retreat.totalYogis - yogiCounts.female - yogiCounts.male - yogiCounts.reverend;
+    let remaining = retreat.totalYogis - yogiCounts.female - yogiCounts.male - yogiCounts.reverendMale - yogiCounts.reverendFemale;
 
     const toPercentage = (val) => {
         return 100 * val / retreat.totalYogis;
@@ -256,7 +261,8 @@ const SelectionProgressBar = observer(({ yogiList, retreat, className }) => {
 
     return (
         <ProgressBar className={className}>
-            <ProgressBar className="selection-progress-reverend" now={toPercentage(yogiCounts.reverend)} key={1} label={yogiCounts.reverend} />
+            <ProgressBar className="selection-progress-reverend-male" now={toPercentage(yogiCounts.reverendMale)} key={1} label={yogiCounts.reverendMale} />
+            <ProgressBar className="selection-progress-reverend-female" now={toPercentage(yogiCounts.reverendFemale)} key={1} label={yogiCounts.reverendFemale} />
             <ProgressBar className="selection-progress-male" now={toPercentage(yogiCounts.male)} key={2} label={yogiCounts.male} />
             <ProgressBar className="selection-progress-female" now={toPercentage(yogiCounts.female)} key={3} label={yogiCounts.female} />
             <ProgressBar className="selection-progress-remaining" now={toPercentage(Math.max(0, remaining))} key={4} label={remaining} />
