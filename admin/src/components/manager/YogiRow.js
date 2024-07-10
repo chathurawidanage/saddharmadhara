@@ -18,6 +18,7 @@ import ActiveApplicationIndicator from "../indicators/ActiveApplicationsIndicato
 import { HasKidsIndicator, HasPermission, HasStress, HasUnattendedDeformities } from "../indicators/BooleanWithCommentIndicator";
 import GenderIndicator from "../indicators/GenderIndicator";
 import "./YogiRow.css";
+import SpecialCommentsIndicator from "../indicators/SpecialCommentsIndicator";
 
 const styles = {
     actionButton: {
@@ -48,7 +49,9 @@ const YogiRow = observer(({ trackedEntity, currentRetreat, actions, store }) => 
 
     return (
         <tr className={rowClassNames.join(" ")}>
-            <td className="yogi-row-td">{trackedEntity.attributes[DHIS2_TEI_ATTRIBUTE_FULL_NAME]}</td>
+            <td className="yogi-row-td">
+                {trackedEntity.attributes[DHIS2_TEI_ATTRIBUTE_FULL_NAME]}
+            </td>
             <td style={styles.indicators} className="yogi-row-td">
                 <div style={styles.miniIndicators}>
                     <GenderIndicator gender={trackedEntity.attributes[DHIS2_TEI_ATTRIBUTE_GENDER]} />
@@ -60,6 +63,7 @@ const YogiRow = observer(({ trackedEntity, currentRetreat, actions, store }) => 
                         comment={trackedEntity.attributes[DHIS2_TEI_ATTRIBUTE_HAS_UNATTENDED_DEFORMITIES_COMMENT]} />
                     <HasStress hasStress={trackedEntity.attributes[DHIS2_TEI_ATTRIBUTE_HAS_STRESS]}
                         comment={trackedEntity.attributes[DHIS2_TEI_ATTRIBUTE_HAS_STRESS_COMMENT]} />
+                    <SpecialCommentsIndicator trackedEntity={trackedEntity} />
                 </div>
                 <div>
                     <ActiveApplicationIndicator currentRetreat={currentRetreat} trackedEntity={trackedEntity} store={store} />

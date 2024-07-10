@@ -27,3 +27,20 @@
 .reverend-indicator {
     background: #BF360C;
 }
+
+.has-unattended-deformities-indicator {
+    background-color: #0D47A1;
+}
+
+.has-stress-indicator {
+    background-color: #6A1B9A;
+}
+
+.special-comment-indicator {
+    background-color: #0277BD;
+}
+
+.special-comments {
+    display: flex;
+    column-gap: 2px;
+}

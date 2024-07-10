@@ -2,6 +2,8 @@ import { makeAutoObservable, runInAction } from "mobx";
 import {
     DHIS2_EXPRESSION_OF_INTEREST_PROGRAM_STAGE,
     DHIS2_RETREAT_DATA_ELEMENT, DHIS2_RETREAT_SELECTION_STATE_DATA_ELEMENT,
+    DHIS2_SPECIAL_COMMENT_DATA_ELEMENT,
+    DHIS2_SPECIAL_COMMENT_PROGRAM_STAGE,
     DHIS_PROGRAM
 } from "../dhis2";
 
@@ -38,6 +40,7 @@ class YogiStore {
 
         // events
         let expressionOfInterests = {};
+        let specialComments = [];
         if (response.trackedEntity.enrollments.length > 0) {
             let enrollment = response.trackedEntity.enrollments[0];
             active = enrollment.status === 'ACTIVE';
@@ -54,6 +57,12 @@ class YogiStore {
                         state: dataElementIdToValueMap[DHIS2_RETREAT_SELECTION_STATE_DATA_ELEMENT],
                         occurredAt: event.occurredAt
                     }
+                } else if (event.programStage === DHIS2_SPECIAL_COMMENT_PROGRAM_STAGE) {
+                    specialComments.push({
+                        eventId: event.event,
+                        comment: dataElementIdToValueMap[DHIS2_SPECIAL_COMMENT_DATA_ELEMENT],
+                        occurredAt: event.occurredAt
+                    });
                 }
             });
         }
@@ -63,7 +72,8 @@ class YogiStore {
                 id: yogiId,
                 active,
                 attributes: attributeIdToValueMap,
-                expressionOfInterests
+                expressionOfInterests,
+                specialComments
             };
         })
     };
