@@ -2,23 +2,23 @@ import {
     Tooltip
 } from "@dhis2/ui";
 import { observer } from "mobx-react";
-import "./ActiveApplicationIndicator.css";
+import "./ApplicationIndicator.css";
 
 const ActiveApplicationIndicator = observer(({ currentRetreat, trackedEntity, store }) => {
     const currentRetreats = store.metadata.currentRetreats;
 
     return (
-        <div className="active-applications">
+        <div className="yogi-applications">
             {currentRetreats.filter(r => r.code !== currentRetreat.code)
                 .filter(r => trackedEntity.expressionOfInterests[r.code])
                 .map(r => {
                     return (
                         <Tooltip content={r.name} key={r.code}>
-                            <div className="active-application">
-                                <div className="active-application-retreat">
+                            <div className="yogi-application">
+                                <div className="yogi-application-retreat">
                                     {r.retreatCode || "UNKW"}
                                 </div>
-                                <div className={`active-application-state active-application-state-${trackedEntity.expressionOfInterests[r.code].state}`}>
+                                <div className={`yogi-application-state active-application-state-${trackedEntity.expressionOfInterests[r.code].state}`}>
                                     {trackedEntity.expressionOfInterests[r.code].state}
                                 </div>
                             </div>

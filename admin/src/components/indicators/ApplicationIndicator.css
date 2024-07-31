@@ -1,11 +1,11 @@
-.active-applications {
+.yogi-applications {
     display: flex;
     flex-wrap: wrap;
     column-gap: 2px;
     row-gap: 2px;
 }
 
-.active-application {
+.yogi-application {
     text-align: center;
     border-radius: 10px;
     background-color: #546E7A;
@@ -17,12 +17,12 @@
     cursor: default;
 }
 
-.active-application-retreat {
+.yogi-application-retreat {
     font-weight: bold;
     padding: 2px;
 }
 
-.active-application-state {
+.yogi-application-state {
     border-top-right-radius: 10px;
     border-bottom-right-radius: 10px;
     text-transform: uppercase;
@@ -33,10 +33,38 @@
     background-color: #F9A825;
 }
 
+.active-application-state-waiting {
+    background-color: #AFB42B;
+}
+
 .active-application-state-selected {
     background-color: #2E7D32;
 }
 
 .active-application-state-deselected {
-    background-color: #D32F2F;
+    background-color: #8D6E63;
+}
+
+.active-application-state-unattending {
+    background-color: #8D6E63;
+}
+
+.active-application-state-unconfirmed {
+    background-color: #E53935;
+}
+
+.active-application-state-pending {
+    background-color: #81C784;
+}
+
+.participation-state-attended {
+    background-color: #2E7D32;
+}
+
+.participation-state-noshow {
+    background-color: #E53935;
+}
+
+.participation-state-absent {
+    background-color: #2196F3;
 }

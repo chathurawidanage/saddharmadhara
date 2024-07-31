@@ -19,6 +19,7 @@ import { HasKidsIndicator, HasPermission, HasStress, HasUnattendedDeformities } 
 import GenderIndicator from "../indicators/GenderIndicator";
 import "./YogiRow.css";
 import SpecialCommentsIndicator from "../indicators/SpecialCommentsIndicator";
+import ParticipationIndicator from "../indicators/ParticipationIndicator";
 
 const styles = {
     actionButton: {
@@ -52,7 +53,7 @@ const YogiRow = observer(({ trackedEntity, currentRetreat, actions, store }) => 
             <td className="yogi-row-td">
                 {trackedEntity.attributes[DHIS2_TEI_ATTRIBUTE_FULL_NAME]}
             </td>
-            <td style={styles.indicators} className="yogi-row-td">
+            <td className="yogi-row-td">
                 <div style={styles.miniIndicators}>
                     <GenderIndicator gender={trackedEntity.attributes[DHIS2_TEI_ATTRIBUTE_GENDER]} />
                     <HasKidsIndicator hasKids={trackedEntity.attributes[DHIS2_TEI_ATTRIBUTE_HAS_KIDS]}
@@ -65,11 +66,13 @@ const YogiRow = observer(({ trackedEntity, currentRetreat, actions, store }) => 
                         comment={trackedEntity.attributes[DHIS2_TEI_ATTRIBUTE_HAS_STRESS_COMMENT]} />
                     <SpecialCommentsIndicator trackedEntity={trackedEntity} />
                 </div>
-                <div>
-                    <ActiveApplicationIndicator currentRetreat={currentRetreat} trackedEntity={trackedEntity} store={store} />
-                </div>
             </td>
-            <td className="yogi-row-td">{trackedEntity.attributes[DHIS2_TEI_ATTRIBUTE_MOBILE]}</td>
+            <td className="yogi-row-td">
+                <ActiveApplicationIndicator currentRetreat={currentRetreat} trackedEntity={trackedEntity} store={store} />
+            </td>
+            <td className="yogi-row-td">
+                <ParticipationIndicator trackedEntity={trackedEntity} store={store} />
+            </td>
             <td className="yogi-row-td">
                 <Button
                     small

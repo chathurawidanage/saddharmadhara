@@ -187,9 +187,10 @@ const YogisList = observer(({ retreat, store }) => {
                         <Table bordered hover className="yogi-table">
                             <thead>
                                 <tr>
-                                    <th width="40%">Name</th>
-                                    <th>Indicators</th>
-                                    <th>Phone</th>
+                                    <th width="40%">Profile</th>
+                                    <th>indicators</th>
+                                    <th width="250px">Applications</th>
+                                    <th>Partiticipation</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -262,9 +263,9 @@ const SelectionProgressBar = observer(({ yogiList, retreat, className }) => {
     return (
         <ProgressBar className={className}>
             <ProgressBar className="selection-progress-reverend-male" now={toPercentage(yogiCounts.reverendMale)} key={1} label={yogiCounts.reverendMale} />
-            <ProgressBar className="selection-progress-reverend-female" now={toPercentage(yogiCounts.reverendFemale)} key={1} label={yogiCounts.reverendFemale} />
             <ProgressBar className="selection-progress-male" now={toPercentage(yogiCounts.male)} key={2} label={yogiCounts.male} />
-            <ProgressBar className="selection-progress-female" now={toPercentage(yogiCounts.female)} key={3} label={yogiCounts.female} />
+            {/* <ProgressBar className="selection-progress-reverend-female" now={toPercentage(yogiCounts.reverendFemale)} key={1} label={yogiCounts.reverendFemale} /> */}
+            <ProgressBar className="selection-progress-female" now={toPercentage(yogiCounts.female + yogiCounts.reverendFemale)} key={3} label={yogiCounts.female + yogiCounts.reverendFemale} />
             <ProgressBar className="selection-progress-remaining" now={toPercentage(Math.max(0, remaining))} key={4} label={remaining} />
         </ProgressBar>
     );

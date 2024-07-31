@@ -82,6 +82,14 @@ class MetadataStore {
         return retreatsMap;
     };
 
+    get retreatsMapWithCodeKey() {
+        let retreatsMap = {};
+        this.retreats?.forEach(retreat => {
+            retreatsMap[retreat.code] = retreat;
+        });
+        return retreatsMap;
+    };
+
     get currentRetreats() {
         return this.retreats.filter(retreat => retreat.current);
     }
