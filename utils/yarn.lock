@@ -6,3 +6,8 @@ csv-parse@^5.5.6:
   version "5.5.6"
   resolved "https://registry.yarnpkg.com/csv-parse/-/csv-parse-5.5.6.tgz#0d726d58a60416361358eec291a9f93abe0b6b1a"
   integrity sha512-uNpm30m/AGSkLxxy7d9yRXpJQFrZzVWLFBkS+6ngPcZkw/5k3L/jjFuj7tVnEpRn+QgmiXr21nDlhCiUK4ij2A==
+
+lanka-nic-2019@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/lanka-nic-2019/-/lanka-nic-2019-1.0.3.tgz#1b4c7f3c9f6a91bff72ba8283339941e30404e4b"
+  integrity sha512-FC2dZuDqi8T+Z6wJ9l48714EYAXkiAtsgf7PGYCDrUasIIEDanYWOBghcVV1i1Q+EeUdyehbG/w34hWHyqnNTw==

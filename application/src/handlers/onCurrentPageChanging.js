@@ -14,6 +14,7 @@ import {
   EXISTING_YOGI_CHECK_DONE,
   EXISTING_YOGI_ENROLLMENT_ID_PROPERTY,
 } from "../properties";
+import lankaNic from 'lanka-nic-2019';
 
 const visiblePageNamesForExistingYogis = new Set([
   languagePage.name,
@@ -42,13 +43,22 @@ const trySearch = async (attribute, value) => {
 };
 
 const searchExisting = ({ NIC, Passport }) => {
-  return Promise.any([
-    trySearch(SURVEY_JS_NAME_TO_D2_TRACKED_ENTITY_ATTRIBUTES_MAP["NIC"], NIC),
-    trySearch(
-      SURVEY_JS_NAME_TO_D2_TRACKED_ENTITY_ATTRIBUTES_MAP["Passport"],
-      Passport
-    ),
-  ]);
+  let checks = [trySearch(
+    SURVEY_JS_NAME_TO_D2_TRACKED_ENTITY_ATTRIBUTES_MAP["Passport"],
+    Passport
+  )];
+
+  if (NIC !== undefined) {
+    let nicInfo = lankaNic.infoNic(NIC);
+    if (nicInfo.isValidated) {
+      checks.push(
+        trySearch(SURVEY_JS_NAME_TO_D2_TRACKED_ENTITY_ATTRIBUTES_MAP["NIC"], nicInfo.newFormat),
+        trySearch(SURVEY_JS_NAME_TO_D2_TRACKED_ENTITY_ATTRIBUTES_MAP["NIC"], nicInfo.oldFormat)
+      );
+    }
+  }
+
+  return Promise.any(checks);
 };
 
 const onCurrentPageChanging = (survey, options) => {
