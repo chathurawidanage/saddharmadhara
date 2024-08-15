@@ -5,3 +5,10 @@
 .yogi-row-td {
     background-color: transparent !important;
 }
+
+.yogi-row-actions {
+    display: flex;
+    flex-wrap: wrap;
+    row-gap: 2px;
+    column-gap: 2px;
+}

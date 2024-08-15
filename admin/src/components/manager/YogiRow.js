@@ -22,9 +22,6 @@ import SpecialCommentsIndicator from "../indicators/SpecialCommentsIndicator";
 import ParticipationIndicator from "../indicators/ParticipationIndicator";
 
 const styles = {
-    actionButton: {
-        marginRight: 2,
-    },
     indicators: {
         display: "flex",
         columnGap: 2,
@@ -73,7 +70,7 @@ const YogiRow = observer(({ trackedEntity, currentRetreat, actions, store }) => 
             <td className="yogi-row-td">
                 <ParticipationIndicator trackedEntity={trackedEntity} store={store} />
             </td>
-            <td className="yogi-row-td">
+            <td className="yogi-row-td yogi-row-actions">
                 <Button
                     small
                     onClick={() => {

@@ -4,10 +4,29 @@ import {
     DHIS2_EXPRESSION_OF_INTEREST_PROGRAM_STAGE,
     DHIS2_PARTICIPATION_PROGRAM_STAGE,
     DHIS2_RETREAT_DATA_ELEMENT, DHIS2_RETREAT_SELECTION_STATE_DATA_ELEMENT,
+    DHIS2_ROOM_ALLOCATION_DATA_ELEMENT,
     DHIS2_SPECIAL_COMMENT_DATA_ELEMENT,
     DHIS2_SPECIAL_COMMENT_PROGRAM_STAGE,
     DHIS_PROGRAM
 } from "../dhis2";
+
+const roomAllocationEventData = (roomCode, retreat) => {
+    return {
+        program: DHIS_PROGRAM,
+        programStage: DHIS2_PARTICIPATION_PROGRAM_STAGE,
+        status: "ACTIVE",
+        dataValues: [
+            {
+                dataElement: DHIS2_ROOM_ALLOCATION_DATA_ELEMENT,
+                value: roomCode,
+            },
+            {
+                dataElement: DHIS2_RETREAT_DATA_ELEMENT,
+                value: retreat.code,
+            },
+        ],
+    }
+};
 
 class YogiStore {
     yogiIdToObjectMap = {};
@@ -43,7 +62,7 @@ class YogiStore {
         // events
         let expressionOfInterests = {};
         let specialComments = [];
-        let participation = [];
+        let participation = {};
         if (response.trackedEntity.enrollments.length > 0) {
             let enrollment = response.trackedEntity.enrollments[0];
             active = enrollment.status === 'ACTIVE';
@@ -67,12 +86,13 @@ class YogiStore {
                         occurredAt: event.occurredAt
                     });
                 } else if (event.programStage === DHIS2_PARTICIPATION_PROGRAM_STAGE) {
-                    participation.push({
+                    participation[dataElementIdToValueMap[DHIS2_RETREAT_DATA_ELEMENT]] = {
                         eventId: event.event,
                         attendance: dataElementIdToValueMap[DHIS2_ATTENDANCE_DATA_ELEMENT],
+                        room: dataElementIdToValueMap[DHIS2_ROOM_ALLOCATION_DATA_ELEMENT],
                         retreat: dataElementIdToValueMap[DHIS2_RETREAT_DATA_ELEMENT],
                         occurredAt: event.occurredAt
-                    });
+                    };
                 }
             });
         }
@@ -87,6 +107,77 @@ class YogiStore {
                 participation
             };
         })
+    };
+
+    deletePartipationEvent = async (yogiId, retreat) => {
+        let eventId = this.yogiIdToObjectMap[yogiId].participation[retreat.code]?.eventId;
+        if (eventId) {
+            const mutation = {
+                resource: "events",
+                id: eventId,
+                type: "delete"
+            };
+            let response = await this.engine.mutate(mutation);
+            if (response.httpStatusCode === 200) {
+                runInAction(() => {
+                    delete this.yogiIdToObjectMap[yogiId].participation[retreat.code]
+                });
+            }
+            return response.httpStatusCode === 200;
+        } else {
+            return true;
+        }
+    };
+
+    assignRoom = async (yogiId, retreat, roomCode) => {
+        let eventId = this.yogiIdToObjectMap[yogiId].participation[retreat.code]?.eventId;
+
+        try {
+            if (eventId) {
+                let data = roomAllocationEventData(roomCode, retreat);
+                const mutation = {
+                    resource: "events",
+                    id: eventId,
+                    data,
+                    type: "update"
+                };
+                let response = await this.engine.mutate(mutation);
+                if (response.httpStatusCode === 200) {
+                    runInAction(() => {
+                        this.yogiIdToObjectMap[yogiId].participation[retreat.code].room = roomCode;
+                    });
+                }
+                return response.httpStatusCode === 200;
+            } else {
+                let data = roomAllocationEventData(roomCode, retreat);
+                data.trackedEntityInstance = yogiId;
+                data.orgUnit = retreat.location;
+                data.eventDate = new Date();
+
+                const mutation = {
+                    resource: "events",
+                    id: eventId,
+                    data,
+                    type: "create"
+                };
+                let response = await this.engine.mutate(mutation);
+
+                if (response.httpStatusCode === 200) {
+                    runInAction(() => {
+                        this.yogiIdToObjectMap[yogiId].participation[retreat.code] = {
+                            room: roomCode,
+                            eventId: response.response.importSummaries[0].reference,
+                            retreat: retreat.code,
+                            occurredAt: data.eventDate
+                        };
+                    });
+                }
+                return response.httpStatusCode === 200;
+            }
+        } catch (e) {
+            console.error("Room assignment failed", e);
+            return false;
+        }
     };
 
     changeRetreatState = async (yogiId, retreatCode, newState) => {
@@ -111,15 +202,21 @@ class YogiStore {
             type: "update",
         };
 
-        let response = await this.engine.mutate(mutation);
+        try {
 
-        if (response.httpStatusCode === 200) {
-            runInAction(() => {
-                this.yogiIdToObjectMap[yogiId].expressionOfInterests[retreatCode].state = newState;
-            });
+            let response = await this.engine.mutate(mutation);
+
+            if (response.httpStatusCode === 200) {
+                runInAction(() => {
+                    this.yogiIdToObjectMap[yogiId].expressionOfInterests[retreatCode].state = newState;
+                });
+            }
+
+            return response.httpStatusCode === 200;
+        } catch (e) {
+            console.error("Yogi state change failed", e);
+            return false;
         }
-
-        return response.httpStatusCode === 200;
     };
 }
 

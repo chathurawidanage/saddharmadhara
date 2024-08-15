@@ -10,7 +10,9 @@ import {
     MenuItem,
     Pagination,
     Tab,
-    TabBar
+    TabBar,
+    SingleSelectField,
+    SingleSelectOption
 } from "@dhis2/ui";
 import { computed } from "mobx";
 import { observer } from "mobx-react";
@@ -19,6 +21,7 @@ import { Table } from "react-bootstrap";
 import {
     DHIS2_EXPRESSION_OF_INTEREST_PROGRAM_STAGE,
     DHIS2_RETREAT_DATA_ELEMENT,
+    DHIS2_RETREAT_SELECTION_STATE_SELECTED_CODE,
     DHIS2_TEI_ATTRIBUTE_FULL_NAME,
     DHIS2_TEI_ATTRIBUTE_GENDER,
     DHIS2_TEI_ATTRIBUTE_MARITAL_STATE
@@ -210,7 +213,11 @@ const YogisList = observer(({ retreat, store }) => {
                                                 currentRetreat={retreat}
                                                 store={store}
                                                 actions={
-                                                    <StateChangeButton store={store} yogi={yogi} currentState={selectionState} retreat={retreat} />
+                                                    <>
+                                                        <StateChangeButton store={store} yogi={yogi} currentState={selectionState} retreat={retreat} />
+                                                        {selectionState === DHIS2_RETREAT_SELECTION_STATE_SELECTED_CODE ? <RoomSelect store={store} retreat={retreat}
+                                                            yogi={yogi} allYogis={yogiList} /> : null}
+                                                    </>
                                                 }
                                             />
                                         );
@@ -305,6 +312,8 @@ const YogiFilter = ({ filters, setFilters }) => {
 
 const StateChangeButton = ({ currentState, yogi, retreat, store }) => {
 
+    // todo changing state from Selected should clear any Partipicpation events
+    // and show a warning
     const { show: alertStateChangeStatus } = useAlert(
         ({ yogiName, toState, success }) => success ? `${yogiName} moved to ${toState}`
             : `Failed to move ${yogiName}`, ({ success }) => {
@@ -315,13 +324,44 @@ const StateChangeButton = ({ currentState, yogi, retreat, store }) => {
                 }
             });
 
-    const onStateChanged = async (toStateCode) => {
+    const { show: changeFromSelectedStatePrompt } = useAlert(
+        ({ yogiName }) => `Are you sure you want to remove ${yogiName} from the state 'Selected'? Doing so will discard their room allocations.`,
+        ({ onMoveClicked }) => {
+            return {
+                warning: true,
+                permanent: true,
+                actions: [
+                    { label: "Move", onClick: onMoveClicked },
+                    { label: "Don't Move", onClick: () => { } }
+                ]
+            }
+        });
+
+    const doStateChange = async (toStateCode) => {
         let success = await store.yogis.changeRetreatState(yogi.id, retreat.code, toStateCode);
         alertStateChangeStatus({
             yogiName: yogi.attributes[DHIS2_TEI_ATTRIBUTE_FULL_NAME],
             toState: toStateCode,
             success
         })
+    };
+
+    const onStateChanged = async (toStateCode) => {
+        if (currentState === DHIS2_RETREAT_SELECTION_STATE_SELECTED_CODE
+            && yogi.participation[retreat.code]?.room
+        ) {
+            changeFromSelectedStatePrompt({
+                yogiName: yogi.attributes[DHIS2_TEI_ATTRIBUTE_FULL_NAME],
+                onMoveClicked: async () => {
+                    let success = await store.yogis.deletePartipationEvent(yogi.id, retreat);
+                    if (success) {
+                        await doStateChange(toStateCode);
+                    }
+                }
+            });
+        } else {
+            await doStateChange(toStateCode);
+        }
     };
 
     return (
@@ -347,5 +387,47 @@ const StateChangeButton = ({ currentState, yogi, retreat, store }) => {
         </DropdownButton>
     );
 };
+
+
+const RoomSelect = observer(({ yogi, retreat, allYogis, store }) => {
+
+    let roomsAssignedToOthers = new Set(allYogis.filter(y => y.id !== yogi.id)
+        .map(y => {
+            return y.participation[retreat.code]?.room
+        })
+        .filter(roomCode => roomCode !== undefined)
+    );
+
+    let roomOptions = store.metadata.rooms
+        .filter(room => room.location === retreat.location)
+        .filter(room => !roomsAssignedToOthers.has(room.code))
+        .map(room => <SingleSelectOption label={room.name} value={room.code} key={room.code} />);
+
+    const { show: alertStateChangeStatus } = useAlert(
+        ({ yogiName, toRoomCode, success }) => success ? `${toRoomCode} assigned to ${yogiName}`
+            : `Failed to assign room  ${toRoomCode} to ${yogiName}`, ({ success }) => {
+                return {
+                    success,
+                    critical: !success,
+                    duration: 2000
+                }
+            });
+
+    const onRoomAssigned = async ({ selected: roomCode }) => {
+        let success = await store.yogis.assignRoom(yogi.id, retreat, roomCode);
+        alertStateChangeStatus({
+            yogiName: yogi.attributes[DHIS2_TEI_ATTRIBUTE_FULL_NAME],
+            toRoomCode: roomCode,
+            success
+        });
+    };
+
+    return (
+        <SingleSelectField clearable dense placeholder="Room" prefix="Room" onChange={onRoomAssigned}
+            selected={yogi.participation[retreat.code]?.room}>
+            {roomOptions}
+        </SingleSelectField>
+    );
+});
 
 export default YogisList;

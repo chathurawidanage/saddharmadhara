@@ -8,11 +8,10 @@ const ParticipationIndicator = observer(({ trackedEntity, store }) => {
 
     return (
         <div className="yogi-applications">
-            {trackedEntity.participation
-                .map(p => {
-
-                    let retreat = store.metadata.retreatsMapWithCodeKey[p.retreat];
-
+            {Object.keys(trackedEntity.participation)
+                .map(retreatId => {
+                    let retreat = store.metadata.retreatsMapWithCodeKey[retreatId];
+                    let p = trackedEntity.participation[retreatId];
                     return (
                         <Tooltip content={retreat.name} key={retreat.code}>
                             <div className="yogi-application">

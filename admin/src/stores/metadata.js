@@ -4,6 +4,8 @@ import {
     DHIS2_RETREAT_DATE_ATTRIBUTE, DHIS2_RETREAT_DISABLED_ATTRIBUTE,
     DHIS2_RETREAT_LOCATION_ATTRIBUTE, DHIS2_RETREAT_NO_OF_DAYS_ATTRIBUTE,
     DHIS2_RETREAT_TOTAL_YOGIS_ATTRIBUTE, DHIS2_RETREAT_TYPE_ATTRIBUTE,
+    DHIS2_ROOMS_FLOOR_ATTRIBUTE,
+    DHIS2_ROOMS_OPTION_SET_ID,
     DHIS_RETREAT_SELECTION_STATE_OPTION_SET_ID,
     DHIS_RETREAT_TYPE_OPTION_SET_ID
 } from '../dhis2';
@@ -43,6 +45,21 @@ const transformRetreats = (retreatsReponse) => {
 };
 // End of Retreats Transforming
 
+const transformRooms = (roomResponse) => {
+    return roomResponse.options.map(room => {
+        let attributeIdToValueMap = {};
+        room.attributeValues.forEach(attribute => {
+            attributeIdToValueMap[attribute.attribute.id] = attribute.value;
+        });
+        return {
+            code: room.code,
+            name: room.name,
+            location: attributeIdToValueMap[DHIS2_RETREAT_LOCATION_ATTRIBUTE],
+            floor: attributeIdToValueMap[DHIS2_ROOMS_FLOOR_ATTRIBUTE]
+        }
+    });
+};
+
 const metadataQuery = {
     retreatTypes: {
         resource: `optionSets/${DHIS_RETREAT_TYPE_OPTION_SET_ID}.json`,
@@ -62,12 +79,19 @@ const metadataQuery = {
             fields: "options[code,name,style]",
         },
     },
+    rooms: {
+        resource: `optionSets/${DHIS2_ROOMS_OPTION_SET_ID}.json`,
+        params: {
+            fields: "options[code,name,attributeValues]",
+        },
+    }
 };
 
 class MetadataStore {
     retreatTypes;
     retreats;
     selectionStates;
+    rooms;
 
     constructor(engine) {
         this.engine = engine;
@@ -104,6 +128,7 @@ class MetadataStore {
             this.retreatTypes = response.retreatTypes.options;
             this.selectionStates = response.selectionStates.options;
             this.retreats = transformRetreats(response.retreats);
+            this.rooms = transformRooms(response.rooms);
         });
     };
 };
