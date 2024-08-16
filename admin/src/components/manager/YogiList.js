@@ -423,7 +423,7 @@ const RoomSelect = observer(({ yogi, retreat, allYogis, store }) => {
     };
 
     return (
-        <SingleSelectField clearable dense placeholder="Room" prefix="Room" onChange={onRoomAssigned}
+        <SingleSelectField filterable clearable dense placeholder="Room" prefix="Room" onChange={onRoomAssigned}
             selected={yogi.participation[retreat.code]?.room}>
             {roomOptions}
         </SingleSelectField>
