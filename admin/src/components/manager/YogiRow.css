@@ -12,3 +12,11 @@
     row-gap: 2px;
     column-gap: 2px;
 }
+
+.yogi-profile-info {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    display: flex;
+    column-gap: 15px;
+    row-gap: 5px;
+}

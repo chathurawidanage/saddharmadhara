@@ -44,3 +44,17 @@
     display: flex;
     column-gap: 2px;
 }
+
+.profile-info {
+    height: 1.5em;
+    font-size: 0.8em;
+    line-height: 1.5em;
+    display: flex;
+    align-items: center;
+    column-gap: 2px;
+}
+
+.profile-info img {
+    width: 1.5em;
+    height: 1.5em;
+}

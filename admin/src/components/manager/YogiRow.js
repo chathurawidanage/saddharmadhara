@@ -5,6 +5,7 @@ import {
 import { observer } from "mobx-react";
 import {
     DHIS2_ROOT_ORG,
+    DHIS2_TEI_ATTRIBUTE_DOB,
     DHIS2_TEI_ATTRIBUTE_FULL_NAME, DHIS2_TEI_ATTRIBUTE_GENDER,
     DHIS2_TEI_ATTRIBUTE_HAS_KIDS, DHIS2_TEI_ATTRIBUTE_HAS_KIDS_COMMENT,
     DHIS2_TEI_ATTRIBUTE_HAS_PERMISSION, DHIS2_TEI_ATTRIBUTE_HAS_PERMISSION_COMMENT,
@@ -12,7 +13,7 @@ import {
     DHIS2_TEI_ATTRIBUTE_HAS_UNATTENDED_DEFORMITIES,
     DHIS2_TEI_ATTRIBUTE_HAS_UNATTENDED_DEFORMITIES_COMMENT,
     DHIS2_TEI_ATTRIBUTE_MARITAL_STATE,
-    DHIS2_TEI_ATTRIBUTE_MOBILE, DHIS_PROGRAM
+    DHIS2_TEI_ATTRIBUTE_MOBILE, DHIS2_TEI_ATTRIBUTE_NIC, DHIS2_TEI_ATTRIBUTE_PASSPORT, DHIS_PROGRAM
 } from "../../dhis2";
 import ActiveApplicationIndicator from "../indicators/ActiveApplicationsIndicator";
 import { HasKidsIndicator, HasPermission, HasStress, HasUnattendedDeformities } from "../indicators/BooleanWithCommentIndicator";
@@ -20,6 +21,7 @@ import GenderIndicator from "../indicators/GenderIndicator";
 import "./YogiRow.css";
 import SpecialCommentsIndicator from "../indicators/SpecialCommentsIndicator";
 import ParticipationIndicator from "../indicators/ParticipationIndicator";
+import { AgeProfileInfor, IdProfileInfo, PhoneProfileInfo } from "../indicators/ProfileInfo";
 
 const styles = {
     indicators: {
@@ -49,6 +51,11 @@ const YogiRow = observer(({ trackedEntity, currentRetreat, actions, store }) => 
         <tr className={rowClassNames.join(" ")}>
             <td className="yogi-row-td">
                 {trackedEntity.attributes[DHIS2_TEI_ATTRIBUTE_FULL_NAME]}
+                <div className="yogi-profile-info">
+                    <IdProfileInfo idArray={[trackedEntity.attributes[DHIS2_TEI_ATTRIBUTE_NIC], trackedEntity.attributes[DHIS2_TEI_ATTRIBUTE_PASSPORT]]} />
+                    <PhoneProfileInfo phonesArray={[trackedEntity.attributes[DHIS2_TEI_ATTRIBUTE_MOBILE]]} />
+                    <AgeProfileInfor birthday={trackedEntity.attributes[DHIS2_TEI_ATTRIBUTE_DOB]} />
+                </div>
             </td>
             <td className="yogi-row-td">
                 <div style={styles.miniIndicators}>
