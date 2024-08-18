@@ -19,7 +19,7 @@ const ParticipationIndicator = observer(({ trackedEntity, store }) => {
                                     {retreat.retreatCode || "UNKW"}
                                 </div>
                                 <div className={`yogi-application-state participation-state-${p.attendance}`}>
-                                    {p.attendance}
+                                    {p.attendance || "Pending"}
                                 </div>
                             </div>
                         </Tooltip>

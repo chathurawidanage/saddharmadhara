@@ -22,6 +22,7 @@ import {
     DHIS2_EXPRESSION_OF_INTEREST_PROGRAM_STAGE,
     DHIS2_RETREAT_DATA_ELEMENT,
     DHIS2_RETREAT_SELECTION_STATE_SELECTED_CODE,
+    DHIS2_TEI_ATTRIBUTE_DOB,
     DHIS2_TEI_ATTRIBUTE_FULL_NAME,
     DHIS2_TEI_ATTRIBUTE_GENDER,
     DHIS2_TEI_ATTRIBUTE_MARITAL_STATE
@@ -46,6 +47,10 @@ const yogiListquery = {
         },
     }
 };
+
+
+const SELECTION_PRIORITY_SORT = "selection-priority";
+const AGE_SORT = "age";
 
 const getYogiSortScore = (yogiObj) => {
     // reverands comes first
@@ -73,6 +78,44 @@ const YogisList = observer(({ retreat, store }) => {
         reverend: true
     });
 
+    const [sortBy, setSortBy] = useState(SELECTION_PRIORITY_SORT);
+
+    const selectionPrioritySorter = (y1, y2) => {
+        let y1Score = getYogiSortScore(y1);
+        let y2Score = getYogiSortScore(y2);
+
+        if (y1Score === y2Score) {
+            // finally sort by applied date, lowest date comes first
+            let y1RegisteredDate = new Date(y1.expressionOfInterests[retreat.code].occurredAt);
+            let y2RegisteredDate = new Date(y2.expressionOfInterests[retreat.code].occurredAt);
+            return y1RegisteredDate.getTime() - y2RegisteredDate.getTime();
+        }
+
+        // higest score comes first
+        return y2Score - y1Score;
+    };
+
+    const ageSorter = (y1, y2) => {
+        let dobY1 = new Date(y1.attributes[DHIS2_TEI_ATTRIBUTE_DOB]);
+        let dobY2 = new Date(y2.attributes[DHIS2_TEI_ATTRIBUTE_DOB]);
+
+        let diff = dobY1.getTime() - dobY2.getTime();
+
+        if (diff === 0) {
+            return selectionPrioritySorter(y1, y2)
+        } else {
+            return diff;
+        }
+    };
+
+    const sortYogiList = (yogiList) => {
+        if (sortBy === SELECTION_PRIORITY_SORT) {
+            yogiList.sort(selectionPrioritySorter);
+        } else if (sortBy === AGE_SORT) {
+            yogiList.sort(ageSorter);
+        }
+    };
+
     const countByState = computed(() => {
         let stateMap = {};
         yogiList.forEach(yogi => {
@@ -94,6 +137,12 @@ const YogisList = observer(({ retreat, store }) => {
     }, [selectionState, filters]);
 
     useEffect(() => {
+        let yogiListCopy = [...yogiList];
+        sortYogiList(yogiListCopy);
+        setYogiList(yogiListCopy);
+    }, [sortBy]);
+
+    useEffect(() => {
         if (data) {
             setYogisFetched(false);
             // optional: remove duplicates. Only first interest will be considered
@@ -110,25 +159,9 @@ const YogisList = observer(({ retreat, store }) => {
             });
 
             Promise.all(yogiFetchPromoises).then(() => {
-
                 let yogiList = yogiIdList.map(yogiId => store.yogis.yogiIdToObjectMap[yogiId]);
+                sortYogiList(yogiList, sortBy);
 
-                // sort by criterias
-                yogiList.sort((y1, y2) => {
-                    // reverands comes first
-                    let y1Score = getYogiSortScore(y1);
-                    let y2Score = getYogiSortScore(y2);
-
-                    if (y1Score === y2Score) {
-                        // finally sort by applied date, lowest date comes first
-                        let y1RegisteredDate = new Date(y1.expressionOfInterests[retreat.code].occurredAt);
-                        let y2RegisteredDate = new Date(y2.expressionOfInterests[retreat.code].occurredAt);
-                        return y1RegisteredDate.getTime() - y2RegisteredDate.getTime();
-                    }
-
-                    // higest score comes first
-                    return y2Score - y1Score;
-                });
                 setYogiList(yogiList);
                 setYogisFetched(true);
             }).catch(err => {
@@ -165,6 +198,14 @@ const YogisList = observer(({ retreat, store }) => {
         <div>
             <div className="yogi-list-top-bar">
                 <YogiFilter filters={filters} setFilters={setFilters} />
+                <SingleSelectField dense placeholder="Sort" prefix="Sort"
+                    onChange={(e) => {
+                        setSortBy(e.selected)
+                    }}
+                    selected={sortBy}>
+                    <SingleSelectOption value={SELECTION_PRIORITY_SORT} label="Selection Priority" />
+                    <SingleSelectOption value={AGE_SORT} label="Age" />
+                </SingleSelectField>
                 <SelectionProgressBar yogiList={yogiList} retreat={retreat} className="yogi-selection-progress" />
             </div>
             <div>
@@ -312,8 +353,6 @@ const YogiFilter = ({ filters, setFilters }) => {
 
 const StateChangeButton = ({ currentState, yogi, retreat, store }) => {
 
-    // todo changing state from Selected should clear any Partipicpation events
-    // and show a warning
     const { show: alertStateChangeStatus } = useAlert(
         ({ yogiName, toState, success }) => success ? `${yogiName} moved to ${toState}`
             : `Failed to move ${yogiName}`, ({ success }) => {
