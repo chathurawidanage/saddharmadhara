@@ -12,15 +12,15 @@ If you have a similar requirement and have similar [objects](https://srisambuddh
 
 ### Features
 
-- Bilingual Yogi Application
+- Bilingual Yogi Application for recording Expression of Interest
 - Streamlined Retreat Management and Yogi Selection
-- Yogi Profile
+- Yogi Profiles
 - Search and Filtering
 - Yogi attendance logging
+- Room allocation for Yogis
 
 Future work
 
-- Room allocation for Yogis
 - Semi automated application selection
 
 ### Screenshots
