@@ -31,7 +31,7 @@ Future work
 
 ![Saddharmadhara retreat management](docs/screenshots/retreat_managment.png)
 
-![Saddharmadhara retreat screen](docs/screenshots/applicants.png)
+![Saddharmadhara retreat screen](docs/screenshots/applicants_v2.png)
 
 ![Yogi Profile](docs/screenshots/yogi_profile.png)
 
