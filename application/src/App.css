@@ -1,8 +1,10 @@
-.retreat-checkbox-item {
-    
+.retreat-checkbox-item {}
+
+.retreat-checkbox-item-details div{
+    padding: 4px;
 }
 
 .retreat-checkbox-item h4 {
-    padding:0;
-    margin:0;
+    padding: 0;
+    margin: 0;
 }

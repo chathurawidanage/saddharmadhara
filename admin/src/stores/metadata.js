@@ -1,6 +1,6 @@
 import { makeAutoObservable, runInAction } from 'mobx';
 import {
-    DHIS2_ACTIVE_RETREATS_SQL_VIEW, DHIS2_RETREAT_CODE,
+    DHIS2_ACTIVE_RETREATS_SQL_VIEW, DHIS2_LANGUAGES_OPTION_SET_ID, DHIS2_RETREAT_CODE_ATTRIBUTE,
     DHIS2_RETREAT_DATE_ATTRIBUTE, DHIS2_RETREAT_DISABLED_ATTRIBUTE,
     DHIS2_RETREAT_LOCATION_ATTRIBUTE, DHIS2_RETREAT_NO_OF_DAYS_ATTRIBUTE,
     DHIS2_RETREAT_TOTAL_YOGIS_ATTRIBUTE, DHIS2_RETREAT_TYPE_ATTRIBUTE,
@@ -27,7 +27,7 @@ const transformRetreats = (retreatsReponse) => {
             code: row[1],
             name: row[2],
             current: row[4] === 'true',
-            retreatCode: attributeIdToValueMap[DHIS2_RETREAT_CODE],
+            retreatCode: attributeIdToValueMap[DHIS2_RETREAT_CODE_ATTRIBUTE],
             date,
             endDate,
             disabled:
@@ -60,6 +60,19 @@ const transformRooms = (roomResponse) => {
     });
 };
 
+const transformLanguages = (languagesResponse) => {
+    return languagesResponse.options.map(language => {
+        let attributeIdToValueMap = {};
+        language.attributeValues.forEach(attribute => {
+            attributeIdToValueMap[attribute.attribute.id] = attribute.value;
+        });
+        return {
+            code: language.code,
+            name: language.name
+        }
+    });
+}
+
 const metadataQuery = {
     retreatTypes: {
         resource: `optionSets/${DHIS_RETREAT_TYPE_OPTION_SET_ID}.json`,
@@ -84,6 +97,12 @@ const metadataQuery = {
         params: {
             fields: "options[code,name,attributeValues]",
         },
+    },
+    languages: {
+        resource: `optionSets/${DHIS2_LANGUAGES_OPTION_SET_ID}.json`,
+        params: {
+            fields: "options[code,name,attributeValues]",
+        },
     }
 };
 
@@ -92,6 +111,7 @@ class MetadataStore {
     retreats;
     selectionStates;
     rooms;
+    languages;
 
     constructor(engine) {
         this.engine = engine;
@@ -129,6 +149,7 @@ class MetadataStore {
             this.selectionStates = response.selectionStates.options;
             this.retreats = transformRetreats(response.retreats);
             this.rooms = transformRooms(response.rooms);
+            this.languages = transformLanguages(response.languages);
         });
     };
 };

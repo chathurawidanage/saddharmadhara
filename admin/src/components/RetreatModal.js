@@ -16,10 +16,11 @@ import {
 } from "@dhis2/ui";
 import React from "react";
 import {
-  DHIS2_RETREAT_CODE,
+  DHIS2_RETREAT_CODE_ATTRIBUTE,
   DHIS2_RETREAT_DATE_ATTRIBUTE,
   DHIS2_RETREAT_DISABLED_ATTRIBUTE,
   DHIS2_RETREAT_LOCATION_ATTRIBUTE,
+  DHIS2_RETREAT_MEDIUM_ATTRIBUTE,
   DHIS2_RETREAT_NO_OF_DAYS_ATTRIBUTE,
   DHIS2_RETREAT_TOTAL_YOGIS_ATTRIBUTE,
   DHIS2_RETREAT_TYPE_ATTRIBUTE,
@@ -83,9 +84,13 @@ const RetreatModel = ({ store, onCancel }) => {
             value: false,
           },
           {
-            attribute: { id: DHIS2_RETREAT_CODE },
+            attribute: { id: DHIS2_RETREAT_CODE_ATTRIBUTE },
             value: values.code,
           },
+          {
+            attribute: { id: DHIS2_RETREAT_MEDIUM_ATTRIBUTE },
+            value: values.medium
+          }
         ];
 
         let code = `${new Date(values.date)
@@ -180,6 +185,23 @@ const RetreatModel = ({ store, onCancel }) => {
                   validate={hasValue}
                 />
 
+              </div>
+              <div style={styles.fieldRow}>
+                <Field
+                  required
+                  name="medium"
+                  label="Medium"
+                  component={SingleSelectFieldFF}
+                  type="number"
+                  defaultValue="sinhala"
+                  validate={hasValue}
+                  options={store.metadata.languages.map((option) => {
+                    return {
+                      label: option.name,
+                      value: option.code,
+                    }
+                  })}
+                />
               </div>
               <div style={styles.fieldRow}>
 
