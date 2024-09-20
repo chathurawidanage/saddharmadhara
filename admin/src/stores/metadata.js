@@ -7,7 +7,8 @@ import {
     DHIS2_ROOMS_FLOOR_ATTRIBUTE,
     DHIS2_ROOMS_OPTION_SET_ID,
     DHIS_RETREAT_SELECTION_STATE_OPTION_SET_ID,
-    DHIS_RETREAT_TYPE_OPTION_SET_ID
+    DHIS_RETREAT_TYPE_OPTION_SET_ID,
+    DHIS2_RETREAT_MEDIUM_ATTRIBUTE
 } from '../dhis2';
 
 // Retreats Transforming
@@ -36,6 +37,7 @@ const transformRetreats = (retreatsReponse) => {
             totalYogis: attributeIdToValueMap[DHIS2_RETREAT_TOTAL_YOGIS_ATTRIBUTE],
             retreatType: attributeIdToValueMap[DHIS2_RETREAT_TYPE_ATTRIBUTE],
             noOfDays: attributeIdToValueMap[DHIS2_RETREAT_NO_OF_DAYS_ATTRIBUTE],
+            medium: attributeIdToValueMap[DHIS2_RETREAT_MEDIUM_ATTRIBUTE],
         };
     });
 

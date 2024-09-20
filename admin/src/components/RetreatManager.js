@@ -18,6 +18,9 @@ const styles = {
   backButton: {
     marginBottom: 10,
   },
+  mediumText: {
+    textTransform: "capitalize"
+  }
 };
 
 
@@ -55,6 +58,9 @@ const RetreatManager = observer(({ store }) => {
             </Col>
             <Col>
               <Tag neutral>{retreat.retreatCode}</Tag>
+            </Col>
+            <Col style={styles.mediumText}>
+              🌐 {retreat.medium || "Sinhala"}
             </Col>
             <Col>📅 {retreat.date.toDateString()}</Col>
             <Col>⛺ {retreat.noOfDays} Days</Col>
