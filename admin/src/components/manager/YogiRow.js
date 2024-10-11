@@ -22,6 +22,7 @@ import "./YogiRow.css";
 import SpecialCommentsIndicator from "../indicators/SpecialCommentsIndicator";
 import ParticipationIndicator from "../indicators/ParticipationIndicator";
 import { AgeProfileInfor, IdProfileInfo, PhoneProfileInfo } from "../indicators/ProfileInfo";
+import { BiLinkExternal } from "react-icons/bi";
 
 const styles = {
     indicators: {
@@ -50,7 +51,25 @@ const YogiRow = observer(({ trackedEntity, currentRetreat, actions, store }) => 
     return (
         <tr className={rowClassNames.join(" ")}>
             <td className="yogi-row-td">
-                {trackedEntity.attributes[DHIS2_TEI_ATTRIBUTE_FULL_NAME]}
+                <div className="yogi-name-row">
+                    {trackedEntity.attributes[DHIS2_TEI_ATTRIBUTE_FULL_NAME]}
+                    <Button
+                        small
+                        onClick={() => {
+                            let tempElement = document.createElement("a");
+                            tempElement.href = baseUrl;
+                            window.open(
+                                new URL(
+                                    `dhis-web-tracker-capture/index.html#/dashboard?tei=${trackedEntity.id}&program=${DHIS_PROGRAM}&ou=${DHIS2_ROOT_ORG}`,
+                                    tempElement.href
+                                ),
+                                "_blank"
+                            );
+                        }}
+                        style={styles.actionButton}>
+                        <BiLinkExternal />
+                    </Button>
+                </div>
                 <div className="yogi-profile-info">
                     <IdProfileInfo idArray={[trackedEntity.attributes[DHIS2_TEI_ATTRIBUTE_NIC], trackedEntity.attributes[DHIS2_TEI_ATTRIBUTE_PASSPORT]]} />
                     <PhoneProfileInfo phonesArray={[trackedEntity.attributes[DHIS2_TEI_ATTRIBUTE_MOBILE]]} />
@@ -78,23 +97,6 @@ const YogiRow = observer(({ trackedEntity, currentRetreat, actions, store }) => 
                 <ParticipationIndicator trackedEntity={trackedEntity} store={store} />
             </td>
             <td className="yogi-row-td yogi-row-actions">
-                <Button
-                    small
-                    onClick={() => {
-                        let tempElement = document.createElement("a");
-                        tempElement.href = baseUrl;
-                        window.open(
-                            new URL(
-                                `dhis-web-tracker-capture/index.html#/dashboard?tei=${trackedEntity.id}&program=${DHIS_PROGRAM}&ou=${DHIS2_ROOT_ORG}`,
-                                tempElement.href
-                            ),
-                            "_blank"
-                        );
-                    }}
-                    style={styles.actionButton}
-                >
-                    View Profile
-                </Button>
                 {actions}
             </td>
         </tr>

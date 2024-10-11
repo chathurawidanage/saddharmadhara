@@ -25,7 +25,8 @@ import {
     DHIS2_TEI_ATTRIBUTE_DOB,
     DHIS2_TEI_ATTRIBUTE_FULL_NAME,
     DHIS2_TEI_ATTRIBUTE_GENDER,
-    DHIS2_TEI_ATTRIBUTE_MARITAL_STATE
+    DHIS2_TEI_ATTRIBUTE_MARITAL_STATE,
+    DHIS2_TEI_ATTRIBUTE_YOGI_PRIORITY
 } from "../../dhis2";
 import GenderIndicator from "../indicators/GenderIndicator";
 import ReverendIndicator from "../indicators/ReverendIndicator";
@@ -58,6 +59,15 @@ const getYogiSortScore = (yogiObj) => {
     if (yogiObj.attributes[DHIS2_TEI_ATTRIBUTE_MARITAL_STATE] === 'reverend') {
         score += Math.pow(10, 5);
     }
+
+    if (yogiObj.attributes[DHIS2_TEI_ATTRIBUTE_YOGI_PRIORITY]?.toLowerCase() === 'trust_member') {
+        score += Math.pow(10, 4);
+    }
+
+    if (yogiObj.attributes[DHIS2_TEI_ATTRIBUTE_YOGI_PRIORITY]?.toLowerCase() === 'trust_members_family') {
+        score += Math.pow(10, 3);
+    }
+
     return score;
 };
 
@@ -232,10 +242,10 @@ const YogisList = observer(({ retreat, store }) => {
                             <thead>
                                 <tr>
                                     <th width="40%">Profile</th>
-                                    <th>indicators</th>
+                                    <th>Indicators</th>
                                     <th width="250px">Applications</th>
                                     <th>Partiticipation</th>
-                                    <th>Action</th>
+                                    <th width="180px">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -364,7 +374,7 @@ const StateChangeButton = ({ currentState, yogi, retreat, store }) => {
             });
 
     const { show: changeFromSelectedStatePrompt } = useAlert(
-        ({ yogiName }) => `Are you sure you want to remove ${yogiName} from the state 'Selected'? Doing so will discard their room allocations.`,
+        ({ yogiName }) => `Do you really want to remove ${yogiName} from the state 'Selected'? Doing so will discard their room allocations.`,
         ({ onMoveClicked }) => {
             return {
                 warning: true,
@@ -405,7 +415,6 @@ const StateChangeButton = ({ currentState, yogi, retreat, store }) => {
 
     return (
         <DropdownButton
-            small
             component={
                 <FlyoutMenu>
                     {store.metadata.selectionStates

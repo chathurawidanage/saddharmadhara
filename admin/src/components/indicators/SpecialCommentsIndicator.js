@@ -2,8 +2,8 @@ import {
     Tooltip
 } from "@dhis2/ui";
 import { observer } from "mobx-react";
-import COMMENT from "./img/comment.png"
-    ;
+import COMMENT from "./img/comment.png";
+
 const SpecialCommentsIndicator = observer(({ trackedEntity }) => {
     return (
         <div className="special-comments">

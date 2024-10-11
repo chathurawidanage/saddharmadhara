@@ -45,7 +45,7 @@ class YogiStore {
                 resource: `tracker/trackedEntities/${yogiId}`,
                 params: {
                     inactive: false,
-                    fields: "attributes[attribute,value],enrollments[status,events[programStage,event,occurredAt,dataValues[dataElement,value]]]",
+                    fields: "attributes[attribute,value],enrollments[status,notes[value,createdBy[username]],events[programStage,event,occurredAt,dataValues[dataElement,value]]]",
                     program: DHIS_PROGRAM
                 },
             },
@@ -63,6 +63,7 @@ class YogiStore {
         let expressionOfInterests = {};
         let specialComments = [];
         let participation = {};
+        let notes = [];
         if (response.trackedEntity.enrollments.length > 0) {
             let enrollment = response.trackedEntity.enrollments[0];
             active = enrollment.status === 'ACTIVE';
@@ -95,6 +96,7 @@ class YogiStore {
                     };
                 }
             });
+            notes.push(...enrollment.notes);
         }
 
         runInAction(() => {
@@ -104,7 +106,8 @@ class YogiStore {
                 attributes: attributeIdToValueMap,
                 expressionOfInterests,
                 specialComments,
-                participation
+                participation,
+                notes
             };
         })
     };

@@ -1,8 +1,8 @@
 .yogi-applications {
     display: flex;
+    flex-direction: row;
     flex-wrap: wrap;
-    column-gap: 2px;
-    row-gap: 2px;
+    gap: 5px;
 }
 
 .yogi-application {
