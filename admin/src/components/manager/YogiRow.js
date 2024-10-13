@@ -23,6 +23,7 @@ import SpecialCommentsIndicator from "../indicators/SpecialCommentsIndicator";
 import ParticipationIndicator from "../indicators/ParticipationIndicator";
 import { AgeProfileInfor, IdProfileInfo, PhoneProfileInfo } from "../indicators/ProfileInfo";
 import { BiLinkExternal } from "react-icons/bi";
+import NotesIndicator from "../indicators/NotesIndicator";
 
 const styles = {
     indicators: {
@@ -49,7 +50,7 @@ const YogiRow = observer(({ trackedEntity, currentRetreat, actions, store }) => 
     }
 
     return (
-        <tr className={rowClassNames.join(" ")}>
+        <tr className={rowClassNames.join(" ")} key={trackedEntity.id}>
             <td className="yogi-row-td">
                 <div className="yogi-name-row">
                     {trackedEntity.attributes[DHIS2_TEI_ATTRIBUTE_FULL_NAME]}
@@ -75,6 +76,9 @@ const YogiRow = observer(({ trackedEntity, currentRetreat, actions, store }) => 
                     <PhoneProfileInfo phonesArray={[trackedEntity.attributes[DHIS2_TEI_ATTRIBUTE_MOBILE]]} />
                     <AgeProfileInfor birthday={trackedEntity.attributes[DHIS2_TEI_ATTRIBUTE_DOB]} />
                 </div>
+                <div>
+                    <NotesIndicator trackedEntity={trackedEntity} />
+                </div>
             </td>
             <td className="yogi-row-td">
                 <div style={styles.miniIndicators}>
@@ -96,9 +100,11 @@ const YogiRow = observer(({ trackedEntity, currentRetreat, actions, store }) => 
             <td className="yogi-row-td">
                 <ParticipationIndicator trackedEntity={trackedEntity} store={store} />
             </td>
-            <td className="yogi-row-td yogi-row-actions">
-                {actions}
-            </td>
+            {!currentRetreat.finalized && (
+                <td className="yogi-row-td yogi-row-actions">
+                    {actions}
+                </td>
+            )}
         </tr>
     );
 });

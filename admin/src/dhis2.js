@@ -15,6 +15,7 @@ export const DHIS2_RETREAT_NO_OF_DAYS_ATTRIBUTE = "vl3IQiIavWD";
 export const DHIS2_RETREAT_TYPE_ATTRIBUTE = "AJZR2ji582g";
 export const DHIS2_RETREAT_CODE_ATTRIBUTE = "lzIri3GkWM2";
 export const DHIS2_RETREAT_MEDIUM_ATTRIBUTE = "E6fhBET5Xwj";
+export const DHIS2_RETREAT_FINALIZED_ATTRIBUTE = "XPzj6Lic3LA";
 
 export const DHIS2_EXPRESSION_OF_INTEREST_PROGRAM_STAGE = "BLn1j2VgLZf";
 export const DHIS2_RETREAT_DATA_ELEMENT = "rYqV3VQu7LS";
@@ -52,4 +53,23 @@ export const DHIS2_TEI_ATTRIBUTE_HAS_UNATTENDED_DEFORMITIES = "RpNKpAufHbn";
 export const DHIS2_TEI_ATTRIBUTE_HAS_UNATTENDED_DEFORMITIES_COMMENT = "HtW0OMmthFQ";
 
 export const DHIS2_TEI_ATTRIBUTE_HAS_STRESS = "dgky5acnvG3";
-export const DHIS2_TEI_ATTRIBUTE_HAS_STRESS_COMMENT = "Mp6LLGv4WOT";
+export const DHIS2_TEI_ATTRIBUTE_HAS_STRESS_COMMENT = "p6LLGv4WOT";
+
+export const DHIS2_ATTENDANCE_OPTION_SET_ID = "MkNQNfdZzz3";
+
+export const getFinalExcelDownloadLink = (retreatCode) => [`api/analytics/events/query/KdYt2OP9VjD.xls?dimension=pe:THIS_MONTH;LAST_12_MONTHS`,
+    `dimension=ou:${DHIS2_ROOT_ORG}`,
+    `dimension=${DHIS2_PARTICIPATION_PROGRAM_STAGE}.${DHIS2_RETREAT_DATA_ELEMENT}:EQ:${encodeURIComponent(retreatCode)}`,
+    `dimension=${DHIS2_PARTICIPATION_PROGRAM_STAGE}.${DHIS2_ROOM_ALLOCATION_DATA_ELEMENT}`,
+    `dimension=${DHIS2_PARTICIPATION_PROGRAM_STAGE}.${DHIS2_TEI_ATTRIBUTE_FULL_NAME}`,
+    `dimension=${DHIS2_PARTICIPATION_PROGRAM_STAGE}.${DHIS2_TEI_ATTRIBUTE_NIC}`,
+    `dimension=${DHIS2_PARTICIPATION_PROGRAM_STAGE}.${DHIS2_TEI_ATTRIBUTE_PASSPORT}`,
+    `dimension=${DHIS2_PARTICIPATION_PROGRAM_STAGE}.${DHIS2_TEI_ATTRIBUTE_MOBILE}`,
+    `stage=${DHIS2_PARTICIPATION_PROGRAM_STAGE}`,
+    `displayProperty=NAME`,
+    `totalPages=false`,
+    `outputType=EVENT`,
+    `asc=eventdate`,
+    `pageSize=100`,
+    `page=1`,
+    `outputIdScheme=NAME`].join("&");

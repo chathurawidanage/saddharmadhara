@@ -47,3 +47,15 @@
 .selection-progress-remaining {
     background-color: #CFD8DC;
 }
+
+.attendance-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.attendance-buttons {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}

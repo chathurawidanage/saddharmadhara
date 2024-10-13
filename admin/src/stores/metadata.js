@@ -8,7 +8,9 @@ import {
     DHIS2_ROOMS_OPTION_SET_ID,
     DHIS_RETREAT_SELECTION_STATE_OPTION_SET_ID,
     DHIS_RETREAT_TYPE_OPTION_SET_ID,
-    DHIS2_RETREAT_MEDIUM_ATTRIBUTE
+    DHIS2_RETREAT_MEDIUM_ATTRIBUTE,
+    DHIS2_RETREAT_FINALIZED_ATTRIBUTE,
+    DHIS2_ATTENDANCE_OPTION_SET_ID
 } from '../dhis2';
 
 // Retreats Transforming
@@ -38,6 +40,7 @@ const transformRetreats = (retreatsReponse) => {
             retreatType: attributeIdToValueMap[DHIS2_RETREAT_TYPE_ATTRIBUTE],
             noOfDays: attributeIdToValueMap[DHIS2_RETREAT_NO_OF_DAYS_ATTRIBUTE],
             medium: attributeIdToValueMap[DHIS2_RETREAT_MEDIUM_ATTRIBUTE],
+            finalized: attributeIdToValueMap[DHIS2_RETREAT_FINALIZED_ATTRIBUTE] === "true"
         };
     });
 
@@ -75,6 +78,15 @@ const transformLanguages = (languagesResponse) => {
     });
 }
 
+const transformAttendance = (attendanceResponse) => {
+    return attendanceResponse.options.map(attendance => {
+        return {
+            code: attendance.code,
+            name: attendance.name
+        }
+    });
+}
+
 const metadataQuery = {
     retreatTypes: {
         resource: `optionSets/${DHIS_RETREAT_TYPE_OPTION_SET_ID}.json`,
@@ -105,6 +117,12 @@ const metadataQuery = {
         params: {
             fields: "options[code,name,attributeValues]",
         },
+    },
+    attendance: {
+        resource: `optionSets/${DHIS2_ATTENDANCE_OPTION_SET_ID}.json`,
+        params: {
+            fields: "options[code,name]",
+        },
     }
 };
 
@@ -114,6 +132,7 @@ class MetadataStore {
     selectionStates;
     rooms;
     languages;
+    attendance;
 
     constructor(engine) {
         this.engine = engine;
@@ -144,6 +163,52 @@ class MetadataStore {
         return this.retreats.filter(retreat => !retreat.current);
     }
 
+    markRetreatAsFinalized = async (retreat) => {
+        const retreatObj = await this.engine.query({
+            retreat: {
+                resource: `options/${retreat.id}.json`,
+                params: {
+                    fields: "id,code,name,optionSet,attributeValues[attribute[id],value]",
+                },
+            }
+        });
+
+        const existingRetreatOnServer = retreatObj.retreat;
+        const finalizedAttributeIndex = existingRetreatOnServer.attributeValues.findIndex(attributeValue => attributeValue.attribute.id === DHIS2_RETREAT_FINALIZED_ATTRIBUTE);
+        if (finalizedAttributeIndex !== -1) {
+            // remove 
+            existingRetreatOnServer.attributeValues.splice(finalizedAttributeIndex, 1);
+        }
+
+        const mutatedRetreat = {
+            ...existingRetreatOnServer,
+            attributeValues: [
+                ...existingRetreatOnServer.attributeValues,
+                {
+                    attribute: {
+                        id: DHIS2_RETREAT_FINALIZED_ATTRIBUTE
+                    },
+                    value: true
+                }
+            ]
+        };
+
+        const retreatIndex = this.retreats.indexOf(retreat);
+        const mutation = {
+            resource: "options",
+            id: retreat.id,
+            data: mutatedRetreat,
+            type: "update"
+        };
+        let response = await this.engine.mutate(mutation);
+
+        if (response.httpStatusCode === 200) {
+            runInAction(() => {
+                this.retreats[retreatIndex].finalized = true;
+            });
+        }
+    };
+
     init = async () => {
         let response = await this.engine.query(metadataQuery);
         runInAction(() => {
@@ -152,6 +217,7 @@ class MetadataStore {
             this.retreats = transformRetreats(response.retreats);
             this.rooms = transformRooms(response.rooms);
             this.languages = transformLanguages(response.languages);
+            this.attendance = transformAttendance(response.attendance);
         });
     };
 };

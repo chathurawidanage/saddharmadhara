@@ -13,7 +13,7 @@ const ParticipationIndicator = observer(({ trackedEntity, store }) => {
                     let retreat = store.metadata.retreatsMapWithCodeKey[retreatId];
                     let p = trackedEntity.participation[retreatId];
                     return (
-                        <Tooltip content={retreat.name} key={retreat.code}>
+                        <Tooltip content={retreat.name} key={retreat.code + p.attendance}>
                             <div className="yogi-application">
                                 <div className="yogi-application-retreat">
                                     {retreat.retreatCode || "UNKW"}

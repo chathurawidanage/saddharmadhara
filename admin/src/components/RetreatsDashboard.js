@@ -44,6 +44,7 @@ const Retreat = ({ retreat }) => {
             </Row>
             <Row>
               <Col style={styles.tags}>
+                {retreat.finalized ? <Tag positive bold>Finalized</Tag> : null}
                 <Tag positive={!retreat.disabled} negative={retreat.disabled}>
                   {retreat.disabled ? "Disabled" : "Active"}
                 </Tag>

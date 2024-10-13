@@ -10,6 +10,9 @@ import { useParams } from "react-router";
 import { useNavigate } from "react-router-dom";
 import RetreatLocation from "./RetreatLocation";
 import YogisList from "./manager/YogiList";
+import RetreatFinaliseModal from "./RetreatFinaliseModal";
+import { getFinalExcelDownloadLink } from "../dhis2";
+import { useConfig } from "@dhis2/app-runtime";
 
 const styles = {
   container: {
@@ -20,16 +23,35 @@ const styles = {
   },
   mediumText: {
     textTransform: "capitalize"
+  },
+  retreatHeader: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 10,
+  },
+  retreatHeaderButtons: {
+    display: "flex",
+    flexDirection: "row",
+    columnGap: 10
+  },
+  retreatHeaderTitle: {
+    display: "flex",
+    flexDirection: "row",
+    columnGap: 10,
+    alignItems: "center"
   }
 };
 
 
 const RetreatManager = observer(({ store }) => {
+  const { baseUrl } = useConfig();
   const params = useParams();
   const navigate = useNavigate();
 
-  const retreat = store.metadata.retreatsMapWithIdKey[params.retreatId];
+  const [showFinaliseModel, setShowFinaliseModel] = React.useState(false);
 
+  const retreat = store.metadata.retreatsMapWithIdKey[params.retreatId];
   return (
     <Container style={styles.container}>
       <div>
@@ -48,8 +70,26 @@ const RetreatManager = observer(({ store }) => {
             </Col>
           </Row>
           <Row>
-            <Col>
-              <h3>{retreat.name} </h3>
+            <Col style={styles.retreatHeader}>
+              <div style={styles.retreatHeaderTitle}>
+                <h3 style={{ padding: 0, margin: 0 }}>{retreat.name} </h3>
+                {retreat.finalized ? <Tag positive bold>Finalized</Tag> : null}
+              </div>
+              <div style={styles.retreatHeaderButtons}>
+                <Button onClick={() => {
+                  let tempElement = document.createElement("a");
+                  tempElement.href = baseUrl;
+                  window.open(
+                    new URL(
+                      getFinalExcelDownloadLink(retreat.code),
+                      tempElement.href
+                    ),
+                    "_blank"
+                  );
+                }}>Download Selected</Button>
+                <Button primary disabled={(Date.now() - retreat.date.getTime()) < retreat.noOfDays * 24 * 60 * 60 * 1000 || retreat.finalized} onClick={() => setShowFinaliseModel(true)}>Finalise Retreat</Button>
+                {showFinaliseModel && <RetreatFinaliseModal retreat={retreat} store={store} onCancel={() => setShowFinaliseModel(false)} />}
+              </div>
             </Col>
           </Row>
           <Row>
