@@ -58,7 +58,7 @@ const surveyJson = {
   showTOC: true,
   completedHtml: {
     [ENGLISH_LOCALE]: "<h4>Thank you for applying to Saddharmadhara!</h4>",
-    [SINHALA_LOCALE]: "<h4>සද්ධර්මධාරා සඳහා අයදුම් කළ ඔ​බ​ට ස්තුතියි!</h4>",
+    [SINHALA_LOCALE]: "<h4>සද්ධර්මධාරා සඳහා අයදුම් කළ ඔබට ස්තුතියි!</h4>",
   },
   pages: [
     languagePage,

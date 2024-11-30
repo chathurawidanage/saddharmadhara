@@ -1,8 +1,8 @@
-import { Button, Tag } from "@dhis2/ui";
+import { Button, Tag, DropdownButton, Switch, FlyoutMenu, MenuItem } from "@dhis2/ui";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { observer } from "mobx-react";
 import React, { useState } from "react";
-import { Card, Col, Container, Row } from "react-bootstrap";
+import {Card, Col, Container, Row} from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import RetreatLocation from "./RetreatLocation";
 import RetreatModel from "./RetreatModal";
@@ -133,6 +133,13 @@ const RetreatsDashboard = observer(({ store }) => {
           <h3>Current Retreats</h3>
         </Col>
       </Row>
+      {store.metadata.currentRetreats.length === 0 && (
+        <Row>
+          <Col>
+            <p>There are no current retreats</p>
+          </Col>
+        </Row>
+      )}
       <Row>
         {store.metadata.currentRetreats.map((retreat) => {
           return <Retreat retreat={retreat} key={retreat.id} />;
