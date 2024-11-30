@@ -89,17 +89,19 @@ app.get("/api/dataStore/applications", async (req, res) => {
         dhis2Endpoint
     );
     try {
-        return await fetch(dataStoreUrl, {
+        let response = await fetch(dataStoreUrl, {
             method: "GET",
             headers: {
                 Authorization: dhis2Token,
             },
         }).then((res) => res.json());
+
+        res.send(response);
     } catch (e) {
         // assume defaults
-        return {
+        res.send({
             accepting: true,
-        }
+        });
     }
 });
 
