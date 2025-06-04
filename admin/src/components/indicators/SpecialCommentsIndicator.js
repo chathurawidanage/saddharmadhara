@@ -8,6 +8,7 @@ const SpecialCommentsIndicator = observer(({ trackedEntity }) => {
     return (
         <div className="special-comments">
             {trackedEntity.specialComments
+                .filter(comment => comment.comment?.trim().length > 0)
                 .map(comment => {
                     return (
                         <Tooltip content={<div>
