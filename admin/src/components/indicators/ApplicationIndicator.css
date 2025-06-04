@@ -17,16 +17,26 @@
     cursor: default;
 }
 
+.yogi-application-special-comment {
+    padding: 5px;
+}
+
 .yogi-application-retreat {
     font-weight: bold;
-    padding: 2px;
+    padding: 5px;
 }
 
 .yogi-application-state {
     border-top-right-radius: 10px;
     border-bottom-right-radius: 10px;
     text-transform: uppercase;
-    padding: 2px;
+    padding: 5px;
+}
+
+.yogi-application-state + .yogi-application-special-comment,
+.yogi-application-state:has(+ .yogi-application-special-comment) {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
 }
 
 .active-application-state-applied {

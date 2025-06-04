@@ -193,7 +193,7 @@ const YogisList = observer(({ retreat, store }) => {
                     onChange={(e) => {
                         setSortBy(e.selected)
                     }}
-                    selected={sortBy}>
+                    selected={sortBy} tabIndex="0">
                     <SingleSelectOption value={SELECTION_PRIORITY_SORT} label="Selection Priority" />
                     <SingleSelectOption value={AGE_SORT} label="Age" />
                 </SingleSelectField>
@@ -455,7 +455,7 @@ const RoomSelect = observer(({ yogi, retreat, allYogis, store }) => {
 
     return (
         <SingleSelectField filterable clearable dense placeholder="Room" prefix="Room" onChange={onRoomAssigned}
-            selected={yogi.participation[retreat.code]?.room}>
+            selected={yogi.participation[retreat.code]?.room} tabIndex="0">
             {roomOptions}
         </SingleSelectField>
     );
@@ -476,7 +476,7 @@ const AttendanceButton = observer(({ yogi, retreat, store }) => {
                 <ModalContent className="attendance-fields">
                     <SingleSelectField label="Status" required selected={status} onChange={(selection) => {
                         setStatus(selection.selected);
-                    }}>
+                    }} tabIndex="0">
                         {attendanceOptions}
                     </SingleSelectField>
                     <TextAreaField label="Special Comment" value={specialComment} onChange={(e) => setSpecialComment(e.value)} />

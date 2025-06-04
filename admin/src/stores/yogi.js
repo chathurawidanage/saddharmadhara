@@ -207,7 +207,7 @@ class YogiStore {
                     this.yogiIdToObjectMap[yogiId].participation[retreat.code] = {
                         attendance,
                         specialComment,
-                        eventId: response.response.importSummaries[0].reference,
+                        eventId: eventId || response.response.importSummaries[0].reference,
                         retreat: retreat.code,
                         occurredAt: data.eventDate
                     };
@@ -215,7 +215,7 @@ class YogiStore {
             }
             return response.httpStatusCode === 200;
         } catch (e) {
-            console.error("Room assignment failed", e);
+            console.error("Attendance marking failed", e);
             return false;
         }
     };
