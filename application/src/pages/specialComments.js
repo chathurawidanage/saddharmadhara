@@ -26,6 +26,10 @@ const specialCommentsPage = {
         [SINHALA_LOCALE]:
           "අයදුම්කරු පිළිබඳ විශේෂයෙන් දැනුවත් කිරීමට යමක් ඇති නම් ඒ පිළිබඳ තොරතුරු.",
       },
+      description: {
+        [ENGLISH_LOCALE]: "If your personal information has changed compared to the previous year, please be kind enough to indicate it here. For example: medical conditions, medication use, physical disabilities, lifestyle changes, phone numbers, personal addresses, etc.",
+        [SINHALA_LOCALE]: "ඔබගේ පුද්ගලික තොරතුරු පෙර වර්ෂයට වඩා වෙනස් වන්නේ නම්, එය මෙහි දැක්වීමට කාරුණික වන්න. උදා: රෝගී තත්ත්ව, ඖෂධ භාවිතය, ශාරීරික අපහසුතා, චර්යාමය වෙනස්කම්, දුරකථන අංක, පුද්ගලික ලිපිනයන් ..යනාදිය",
+      },
     },
   ],
 };

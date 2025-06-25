@@ -41,7 +41,7 @@ const SELECTION_PRIORITY_SORT = "selection-priority";
 const AGE_SORT = "age";
 
 const getYogiSortScore = (yogiObj) => {
-    // reverands comes first
+    // reverends comes first
     let score = 0;
     if (yogiObj.attributes[DHIS2_TEI_ATTRIBUTE_MARITAL_STATE] === 'reverend') {
         score += Math.pow(10, 5);
