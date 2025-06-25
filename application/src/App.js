@@ -92,8 +92,8 @@ function App() {
 
   return (
     <div className="App">
-      <Loader visible={loading} />
-      {accepting &&
+      <Loader visible={loading || accepting === undefined} />
+      {accepting === true &&
         <Survey
           model={survey}
           onValueChanged={onValueChanged}
@@ -106,7 +106,7 @@ function App() {
         />
       }
       {
-        !accepting &&
+        accepting === false &&
         <div className="program-closed">
           <div>
             <img src="favicon.png" alt="logo" width={100} />
