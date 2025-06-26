@@ -1,4 +1,3 @@
-import { PHONE_NUMBER_QUESTION_TYPE } from "../components/PhoneNumberTextBox";
 import { ENGLISH_LOCALE } from "../locale/english";
 import { SINHALA_LOCALE } from "../locale/sinhala";
 
