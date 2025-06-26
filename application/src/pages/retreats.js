@@ -23,7 +23,7 @@ const retreatsPage = {
         [ENGLISH_LOCALE]:
           "You may apply for up to four programs that are most convenient for you; however, you will be offered only one opportunity. Once the committee assigns a date based on your preferences, if you choose not to accept that date, your opportunity for this year will be forfeited.",
         [SINHALA_LOCALE]:
-          "මෙහිදී ඔබට වඩාත් පහසු වැඩසටහන් හතරක් සඳහා අයදුම් කළ හැකි නමුදු, ඒ අතරින් ඔබට හිමි වන්නේ එක් අවස්ථාවක් පමණි. ඔබගේ කැමැත්ත පරිදි ඉල්ලුම් කරන එම දිනය කමිටුව විසින් ලබා දුන් පසුව, ඔබ විසින් එම දිනය පිළිනොගන්නේ නම් මෙම වර්ෂයට හිමි අවස්ථාව ගිලී යනු ඇත.",
+          "මහිදී ඔබට වඩාත් පහසු වැඩසටහන් හතරක් සඳහා අයදුම් කළ හැක. ඒ අතරින් ඔබට හිමි වන්නේ එක් අවස්ථාවක් පමණි. ඔබගේ කැමැත්ත පරිදි ඉල්ලුම් කරණ එම දිනය කමිටුව විසින් ලබා දුන් පසුව, ඔබ විසින් එම දිනය පිළිනොගන්නේ නම් මෙම වර්ෂයට හිමි අවස්ථාව ඔබ වෙතින් ගිලිහී යනු ඇත.",
       },
       colCount: 1,
       maxSelectedChoices: 4,
