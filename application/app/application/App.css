@@ -1,0 +1,43 @@
+.retreat-checkbox-item {
+}
+
+.retreat-checkbox-item-details div {
+    padding: 4px;
+}
+
+.retreat-checkbox-item h4 {
+    padding: 0;
+    margin: 0;
+}
+
+.program-closed {
+    text-align: center;
+    max-width: 1024px;
+    margin: auto;
+}
+
+.youtube-btn {
+    background: #ff0000;
+    border-radius: 11px;
+    padding: 10px 20px;
+    color: #ffffff;
+    display: inline-block;
+    font: normal bold 13px/1 "Open Sans", sans-serif;
+    text-align: center;
+    text-decoration: none;
+}
+
+.whatsapp-btn {
+    background: #25D366;
+    border-radius: 11px;
+    padding: 10px 20px;
+    color: #ffffff;
+    display: inline-block;
+    font: normal bold 13px/1 "Open Sans", sans-serif;
+    text-align: center;
+    text-decoration: none;
+}
+
+.sd-container-modern {
+    min-height: 100vh;
+}
