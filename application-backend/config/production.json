@@ -1,8 +1,0 @@
-{
-  "dhis2": {
-    "token": "update the token here"
-  },
-  "cors": {
-    "origin": "update the origin here"
-  }
-}
