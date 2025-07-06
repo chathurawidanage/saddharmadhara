@@ -2,7 +2,6 @@ import {
   DHIS2_RETREAT_ATTRIBUTE_DATE,
   DHIS2_RETREAT_ATTRIBUTE_DAYS,
   DHIS2_RETREAT_ATTRIBUTE_MEDIUM,
-  RETREATS_LIST_URL,
 } from "../dhis2";
 import { RETREATS_QUESTION_NAME } from "../pages/retreats";
 import {
@@ -21,14 +20,6 @@ const getMediumText = (mediumCode: "sinhala" | "english") => {
 
 const onPropertyChanged = (survey: SurveyModel, options) => {
   if (options.name === EXISTING_YOGI_CHECK_DONE) {
-    // todo send the enrollment to select only relevant retreats
-    let url = new URL(RETREATS_LIST_URL);
-    if (survey.getPropertyValue(EXISTING_YOGI_ENROLLMENT_ID_PROPERTY)) {
-      url.searchParams.set(
-        "enrollment",
-        survey.getPropertyValue(EXISTING_YOGI_ENROLLMENT_ID_PROPERTY),
-      );
-    }
     getEligibleRetreats(
       survey.getPropertyValue(EXISTING_YOGI_ENROLLMENT_ID_PROPERTY),
     ).then((retreats) => {

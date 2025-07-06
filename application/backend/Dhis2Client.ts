@@ -1,7 +1,5 @@
 "use server";
 
-import httpProxy from "http-proxy";
-
 const dhis2Endpoint = process.env.DHIS2_ENDPOINT;
 const dhis2Token = "ApiToken " + process.env.DHIS2_TOKEN;
 
@@ -14,12 +12,6 @@ const DHIS2_RETREAT_DISABLED_ATTRIBUTE = "hp92k6RhLJS";
 const DHIS2_EXPRESSION_OF_INTEREST_PROGRAM_STAGE = "BLn1j2VgLZf";
 const DHIS2_PARTICIPATION_PROGRAM_STAGE = "NYxnKQd6goA";
 const DHIS2_RETREAT_DATA_ELEMENT = "rYqV3VQu7LS";
-
-const proxy = httpProxy.createProxyServer({});
-
-proxy.on("proxyReq", (proxyReq, req, res, options) => {
-  proxyReq.setHeader("Authorization", dhis2Token);
-});
 
 export async function uploadFile(formData: FormData): Promise<string> {
   return fetch(new URL("fileResources", dhis2Endpoint), {
@@ -38,14 +30,27 @@ export async function uploadFile(formData: FormData): Promise<string> {
     });
 }
 
-/*
-app.post("/api/tracker", (req, res) => {
-  proxy.web(req, res, {
-    target: new URL("tracker", dhis2Endpoint),
-  });
-});
-*/
-const getRetreatEngagement = async (enrollment: string) => {
+export async function saveTrackerPayload(trackerPayload) {
+  // todo consider adding a captcha if we want to avoid spam
+  try {
+    let trackerUrl = new URL("tracker", dhis2Endpoint);
+    trackerUrl.searchParams.set("async", "false");
+    let response = await fetch(trackerUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: dhis2Token,
+      },
+      body: JSON.stringify(trackerPayload),
+    });
+    return response.ok;
+  } catch (error) {
+    console.error("Error in saving", error);
+    return false;
+  }
+}
+
+const getRetreatEngagement = async (enrollment?: string) => {
   let retreatEngagement = {
     [DHIS2_EXPRESSION_OF_INTEREST_PROGRAM_STAGE]: new Set(),
     [DHIS2_PARTICIPATION_PROGRAM_STAGE]: new Set(),
@@ -100,7 +105,7 @@ export async function isAcceptingApplications() {
   }
 }
 
-export async function getEligibleRetreats(enrollment: string) {
+export async function getEligibleRetreats(enrollment?: string) {
   let optionSetUrl = new URL(
     "optionSets/" + DHIS2_RETREATS_OPTION_SET,
     dhis2Endpoint,

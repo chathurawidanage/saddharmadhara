@@ -32,6 +32,7 @@ import onValidateQuestion from "./handlers/onValidateQuestion";
 import onTextMarkdown from "./handlers/onTextMarkdown";
 import { isAcceptingApplications } from "../../backend/Dhis2Client";
 import "./App.css";
+import Image from "next/image";
 
 registerPhoneNumberTextBox();
 
@@ -76,7 +77,7 @@ const surveyJson = {
   ],
 };
 
-function App() {
+export default function Application() {
   const survey = useMemo(() => new Model(surveyJson), []);
   const [loading, setLoading] = useState(false);
   const [accepting, setAccepting] = useState(undefined);
@@ -111,7 +112,7 @@ function App() {
       {accepting === false && (
         <div className="program-closed">
           <div>
-            <img src="favicon.png" alt="logo" width={100} />
+            <Image src="/favicon.png" alt="logo" width={100} />
             <h1>සද්ධර්මධාරා - Saddharmadhara</h1>
             <h2>
               සැලසුම් කළ සද්ධර්මධාරා භාවනා වැඩසටහන් අවසන් වූ බැවින් ඒ සදහා
@@ -157,5 +158,3 @@ function App() {
     </div>
   );
 }
-
-export default App;

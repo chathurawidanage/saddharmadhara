@@ -16,8 +16,8 @@
     background: #fcfcff;
     padding: 10px;
     border-radius: 1000px;
-    width: 5.2vw;
-    height: 5.2vw;
+    width: 120px;
+    height: 120px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -25,5 +25,5 @@
 }
 
 .loader-bubble img {
-    width: 5vw;
+    width: 100px;
 }

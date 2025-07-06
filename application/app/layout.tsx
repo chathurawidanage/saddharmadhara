@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   title: "Saddharmadhara Application",
   description:
     "Application for Saddharmadhara meditation programs by Ven. Bambalapitiya Gnanaloka Thero.",
+  icons: "/favicon.png",
 };
 
 export default function RootLayout({

@@ -1,5 +1,4 @@
 import "./Loader.css";
-import LOTUS_IMG from "./lotus-loading.gif";
 import Image from "next/image";
 
 const Loader = (props: { visible: boolean }) => {
@@ -8,7 +7,15 @@ const Loader = (props: { visible: boolean }) => {
       {props.visible && (
         <div className="loader">
           <div className="loader-bubble">
-            <Image src={LOTUS_IMG} alt="loading" />
+            <Image
+              src="/lotus-loading.gif"
+              alt="loading"
+              width={96}
+              height={67}
+              style={{
+                height: "auto",
+              }}
+            />
           </div>
         </div>
       )}

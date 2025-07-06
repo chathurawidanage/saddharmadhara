@@ -67,7 +67,7 @@ const identificationPage = {
       validators: [{
         type: "regex", regex: "^[a-zA-Z0-9]{7,9}$", text: {
           [ENGLISH_LOCALE]: "Invalid Passport Number.",
-          [SINHALA_LOCALE]: "ගමන් බලපත්‍ර අංක​ය වලංගු නැත."
+          [SINHALA_LOCALE]: "ගමන් බලපත්‍ර අංකය වලංගු නැත."
         }
       }],
     },

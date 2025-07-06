@@ -53,9 +53,9 @@ const searchExisting = ({ NIC, Passport }) => {
 
 const onCurrentPageChanging = (survey: SurveyModel, options) => {
   if (
-    options.oldCurrentPage.name === identificationPage.name &&
+    options.oldCurrentPage?.name === identificationPage.name &&
     !survey.getPropertyValue(EXISTING_YOGI_CHECK_DONE) &&
-    !options.oldCurrentPage.readOnly // has already set to an existing yogi
+    !options.oldCurrentPage?.readOnly // has already set to an existing yogi
   ) {
     options.allowChanging = false;
     survey.setLoading(true);

@@ -6,12 +6,15 @@ import {
   DHIS2_ROOT_ORG_UNIT,
   DHIS2_SPECIAL_COMMENT_DATA_ELEMENT,
   DHIS2_SPECIAL_COMMENT_PROGRAM_STAGE,
-  DHIS2_SUBMIT_FORM_URL,
   DHIS2_TRACKED_ENTITY_TYPE,
   SURVEY_JS_NAME_TO_D2_TRACKED_ENTITY_ATTRIBUTES_MAP,
 } from "../dhis2";
-import { EXISTING_YOGI_ENROLLMENT_ID_PROPERTY, SURVEY_TIME_LIMIT_SECONDS } from "../properties";
+import {
+  EXISTING_YOGI_ENROLLMENT_ID_PROPERTY,
+  SURVEY_TIME_LIMIT_SECONDS,
+} from "../properties";
 import { SurveyModel } from "survey-core";
+import { saveTrackerPayload } from "../../../backend/Dhis2Client";
 
 const dataToAttributesAndEvents = (data) => {
   let Photo = data.Photo?.find((el) => el !== undefined)?.content;
@@ -71,7 +74,7 @@ const dataToAttributesAndEvents = (data) => {
 
   let dhis2Attributes = Object.entries(surveyJsAttributes)
     .filter(
-      (entry) => SURVEY_JS_NAME_TO_D2_TRACKED_ENTITY_ATTRIBUTES_MAP[entry[0]]
+      (entry) => SURVEY_JS_NAME_TO_D2_TRACKED_ENTITY_ATTRIBUTES_MAP[entry[0]],
     )
     .map((entry) => {
       return {
@@ -87,46 +90,40 @@ const dataToAttributesAndEvents = (data) => {
 };
 
 const postNewYogi = (attributes, events) => {
-  return fetch(DHIS2_SUBMIT_FORM_URL, {
-    method: "POST",
-    headers: new Headers({ "content-type": "application/json" }),
-    body: JSON.stringify({
-      trackedEntities: [
-        {
-          trackedEntityType: DHIS2_TRACKED_ENTITY_TYPE,
-          orgUnit: DHIS2_ROOT_ORG_UNIT,
-          attributes,
-          enrollments: [
-            {
-              orgUnit: DHIS2_ROOT_ORG_UNIT,
-              program: DHIS2_PROGRAM,
-              enrolledAt: Date.now(),
-              occurredAt: Date.now(),
-              events,
-            },
-          ],
-        },
-      ],
-    }),
+  return saveTrackerPayload({
+    trackedEntities: [
+      {
+        trackedEntityType: DHIS2_TRACKED_ENTITY_TYPE,
+        orgUnit: DHIS2_ROOT_ORG_UNIT,
+        attributes,
+        enrollments: [
+          {
+            orgUnit: DHIS2_ROOT_ORG_UNIT,
+            program: DHIS2_PROGRAM,
+            enrolledAt: Date.now(),
+            occurredAt: Date.now(),
+            events,
+          },
+        ],
+      },
+    ],
   });
 };
 
 const postEventsOnlyForExistingYogi = (enrollment, events) => {
-  return fetch(DHIS2_SUBMIT_FORM_URL, {
-    method: "POST",
-    headers: new Headers({ "content-type": "application/json" }),
-    body: JSON.stringify({
-      events: events.map((event) => {
-        event.enrollment = enrollment;
-        return event;
-      }),
+  return saveTrackerPayload({
+    events: events.map((event) => {
+      event.enrollment = enrollment;
+      return event;
     }),
   });
 };
 
-const onComplete = (survey:SurveyModel, options) => {
+const onComplete = (survey: SurveyModel, options) => {
   if (survey.timeSpent >= SURVEY_TIME_LIMIT_SECONDS) {
-    options.showSaveError("You spent more time on the application than allocated.");
+    options.showSaveError(
+      "You spent more time on the application than allocated.",
+    );
     return;
   }
 
@@ -134,14 +131,16 @@ const onComplete = (survey:SurveyModel, options) => {
 
   let { attributes, events } = dataToAttributesAndEvents(survey.data);
 
-  let existingYogiId = survey.getPropertyValue(EXISTING_YOGI_ENROLLMENT_ID_PROPERTY);
+  let existingYogiId = survey.getPropertyValue(
+    EXISTING_YOGI_ENROLLMENT_ID_PROPERTY,
+  );
 
   (existingYogiId
     ? postEventsOnlyForExistingYogi(existingYogiId, events)
     : postNewYogi(attributes, events)
   )
-    .then((response) => {
-      if (!response.ok) {
+    .then((saved) => {
+      if (!saved) {
         options.showSaveError();
       } else {
         options.showSaveSuccess();

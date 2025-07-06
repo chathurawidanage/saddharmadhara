@@ -1,5 +1,5 @@
-import App from "./application/App";
+import Application from "./forms/App";
 
 export default function Page() {
-  return <App />;
+  return <Application />;
 }
