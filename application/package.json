@@ -45,6 +45,7 @@
     ]
   },
   "devDependencies": {
+    "@types/crypto-js": "^4.2.2",
     "@types/showdown": "^2.0.6",
     "typescript": "5.8.3"
   }
