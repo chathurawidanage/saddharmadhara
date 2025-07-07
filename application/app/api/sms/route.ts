@@ -7,6 +7,7 @@ const dhis2Endpoint = process.env.DHIS2_ENDPOINT;
 const dhis2Token = process.env.DHIS2_TOKEN;
 const esmsUsername = process.env.ESMS_USERNAME;
 const esmsPassword = process.env.ESMS_PASSWORD;
+const esmsPushNotificationUrl = process.env.ESMS_PUSH_NOTIFICATION_URL;
 
 if (
   !esmsEndpoint ||
@@ -14,7 +15,8 @@ if (
   !dhis2Endpoint ||
   !dhis2Token ||
   !esmsUsername ||
-  !esmsPassword
+  !esmsPassword ||
+  !esmsPushNotificationUrl
 ) {
   throw new Error("One or more required environment variables are not set.");
 }
@@ -116,6 +118,7 @@ async function sendSms(
       }),
       message,
       transaction_id: Date.now(),
+      push_notification_url: esmsPushNotificationUrl,
     }),
   });
 }
