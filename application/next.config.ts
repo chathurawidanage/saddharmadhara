@@ -1,7 +1,20 @@
 import type { NextConfig } from "next";
+import webpack from "webpack";
 
 const nextConfig: NextConfig = {
-  distDir: "build", // Changes the build output directory to `build`
+  webpack: (config) => {
+    config.plugins.push(
+      new webpack.IgnorePlugin({
+        resourceRegExp: /^pg-native$|^cloudflare:sockets$/,
+      }),
+    );
+
+    config.cache = {
+      type: "memory",
+    };
+
+    return config;
+  },
 };
 
 export default nextConfig;
