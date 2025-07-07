@@ -80,10 +80,16 @@ async function getSmsToken(): Promise<string> {
   if (tokenGetResponse.ok) {
     const tokenData = await tokenGetResponse.json();
     if (tokenData.expiresAt > Date.now() + 10 * 60 * 1000) {
-      return CryptoJS.AES.decrypt(
-        tokenData.token,
-        esmsTokenEncryptionKey,
-      ).toString(CryptoJS.enc.Utf8);
+      try {
+        return CryptoJS.AES.decrypt(
+          tokenData.token,
+          esmsTokenEncryptionKey,
+        ).toString(CryptoJS.enc.Utf8);
+      } catch (e) {
+        // possible the encryption key has changed
+        console.error("Error decrypting token:", e);
+        // fall back to requesting a new token
+      }
     }
   }
 

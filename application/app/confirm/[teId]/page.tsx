@@ -6,5 +6,5 @@ export default async function Page(props: {
   }>;
 }) {
   const { teId } = await props.params;
-  return <Confirm/>;
+  return <Confirm teiId={teId} />;
 }

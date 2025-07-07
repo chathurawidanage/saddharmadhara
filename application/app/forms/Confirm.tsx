@@ -34,7 +34,7 @@ const surveyJson = {
   pages: [languagePage],
 };
 
-export default function Confirm() {
+export default function Confirm({ teiId }: { teiId: string }) {
   const survey = useMemo(() => new Model(surveyJson), []);
   const [loading, setLoading] = useState(false);
 
