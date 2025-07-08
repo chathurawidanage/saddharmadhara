@@ -1,7 +1,10 @@
 import {
   Button,
   IconArrowLeft16,
-  Tag
+  Tag,
+  DropdownButton,
+  MenuItem,
+  FlyoutMenu,
 } from "@dhis2/ui";
 import { observer } from "mobx-react";
 import React from "react";
@@ -11,7 +14,11 @@ import { useNavigate } from "react-router-dom";
 import RetreatLocation from "./RetreatLocation";
 import YogisList from "./manager/YogiList";
 import RetreatFinaliseModal from "./RetreatFinaliseModal";
-import { getFinalExcelDownloadLink } from "../dhis2";
+import {
+  DHIS2_EXPRESSION_OF_INTEREST_PROGRAM_STAGE,
+  DHIS2_RETREAT_SELECTION_STATE_DATA_ELEMENT,
+  getFinalExcelDownloadLink,
+} from "../dhis2";
 import { useConfig } from "@dhis2/app-runtime";
 
 const styles = {
@@ -22,7 +29,7 @@ const styles = {
     marginBottom: 10,
   },
   mediumText: {
-    textTransform: "capitalize"
+    textTransform: "capitalize",
   },
   retreatHeader: {
     display: "flex",
@@ -33,16 +40,15 @@ const styles = {
   retreatHeaderButtons: {
     display: "flex",
     flexDirection: "row",
-    columnGap: 10
+    columnGap: 10,
   },
   retreatHeaderTitle: {
     display: "flex",
     flexDirection: "row",
     columnGap: 10,
-    alignItems: "center"
-  }
+    alignItems: "center",
+  },
 };
-
 
 const RetreatManager = observer(({ store }) => {
   const { baseUrl } = useConfig();
@@ -52,6 +58,13 @@ const RetreatManager = observer(({ store }) => {
   const [showFinaliseModel, setShowFinaliseModel] = React.useState(false);
 
   const retreat = store.metadata.retreatsMapWithIdKey[params.retreatId];
+
+  const openDownloadLink = (url) => {
+    let tempElement = document.createElement("a");
+    tempElement.href = baseUrl;
+    window.open(new URL(url, tempElement.href), "_blank");
+  };
+
   return (
     <Container style={styles.container}>
       <div>
@@ -73,22 +86,93 @@ const RetreatManager = observer(({ store }) => {
             <Col style={styles.retreatHeader}>
               <div style={styles.retreatHeaderTitle}>
                 <h3 style={{ padding: 0, margin: 0 }}>{retreat.name} </h3>
-                {retreat.finalized ? <Tag positive bold>Finalized</Tag> : null}
+                {retreat.finalized ? (
+                  <Tag positive bold>
+                    Finalized
+                  </Tag>
+                ) : null}
               </div>
               <div style={styles.retreatHeaderButtons}>
-                <Button onClick={() => {
-                  let tempElement = document.createElement("a");
-                  tempElement.href = baseUrl;
-                  window.open(
-                    new URL(
-                      getFinalExcelDownloadLink(retreat.code),
-                      tempElement.href
-                    ),
-                    "_blank"
-                  );
-                }}>Download Selected</Button>
-                <Button primary disabled={(Date.now() - retreat.date.getTime()) < retreat.noOfDays * 24 * 60 * 60 * 1000 || retreat.finalized} onClick={() => setShowFinaliseModel(true)}>Finalise Retreat</Button>
-                {showFinaliseModel && <RetreatFinaliseModal retreat={retreat} store={store} onCancel={() => setShowFinaliseModel(false)} />}
+                <DropdownButton
+                  component={
+                    <FlyoutMenu>
+                      <MenuItem
+                        label="Applied"
+                        onClick={() => {
+                          openDownloadLink(
+                            getFinalExcelDownloadLink(
+                              retreat.code,
+                              DHIS2_EXPRESSION_OF_INTEREST_PROGRAM_STAGE,
+                              [
+                                {
+                                  dataElement:
+                                    DHIS2_RETREAT_SELECTION_STATE_DATA_ELEMENT,
+                                  value: "applied",
+                                },
+                              ],
+                            ),
+                          );
+                        }}
+                      />
+                      <MenuItem
+                        label="Pending Confirmation"
+                        onClick={() => {
+                          openDownloadLink(
+                            getFinalExcelDownloadLink(
+                              retreat.code,
+                              DHIS2_EXPRESSION_OF_INTEREST_PROGRAM_STAGE,
+                              [
+                                {
+                                  dataElement:
+                                    DHIS2_RETREAT_SELECTION_STATE_DATA_ELEMENT,
+                                  value: "pending",
+                                },
+                              ],
+                            ),
+                          );
+                        }}
+                      />
+                      <MenuItem
+                        label="Selected"
+                        onClick={() => {
+                          openDownloadLink(
+                            getFinalExcelDownloadLink(
+                              retreat.code,
+                              DHIS2_EXPRESSION_OF_INTEREST_PROGRAM_STAGE,
+                              [
+                                {
+                                  dataElement:
+                                    DHIS2_RETREAT_SELECTION_STATE_DATA_ELEMENT,
+                                  value: "selected",
+                                },
+                              ],
+                            ),
+                          );
+                        }}
+                      />
+                    </FlyoutMenu>
+                  }
+                >
+                  Download
+                </DropdownButton>
+                <Button
+                  primary
+                  disabled={
+                    Date.now() - retreat.date.getTime() <
+                      retreat.noOfDays * 24 * 60 * 60 * 1000 ||
+                    retreat.finalized
+                  }
+                  onClick={() => setShowFinaliseModel(true)}
+                >
+                  Finalise Retreat
+                </Button>
+                {showFinaliseModel && (
+                  <RetreatFinaliseModal
+                    retreat={retreat}
+                    store={store}
+                    onCancel={() => setShowFinaliseModel(false)}
+                  />
+                )}
               </div>
             </Col>
           </Row>
@@ -111,10 +195,7 @@ const RetreatManager = observer(({ store }) => {
           </Row>
         </div>
         <div>
-          <YogisList
-            retreat={retreat}
-            store={store}
-          />
+          <YogisList retreat={retreat} store={store} />
         </div>
       </div>
     </Container>
