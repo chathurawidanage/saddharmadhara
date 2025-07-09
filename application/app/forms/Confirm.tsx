@@ -6,7 +6,6 @@ import "survey-core/defaultV2.min.css";
 import { Survey } from "survey-react-ui";
 import englishLocaleStrings, { ENGLISH_LOCALE } from "./locale/english";
 import sinhalaLocaleStrings, { SINHALA_LOCALE } from "./locale/sinhala";
-import languagePage from "./pages/language";
 import onValueChanged from "./handlers/onValueChanged";
 import onUploadFiles from "./handlers/onUploadFiles";
 import onComplete from "./handlers/onComplete";
@@ -16,33 +15,51 @@ import onPropertyChanged from "./handlers/onPropertyChanged";
 import onValidateQuestion from "./handlers/onValidateQuestion";
 import onTextMarkdown from "./handlers/onTextMarkdown";
 import "./App.css";
+import attendance from "./pages/attendance";
+import { DHIS2_RETREAT_ATTRIBUTE_MEDIUM } from "./dhis2";
 
-surveyLocalization.locales[SINHALA_LOCALE] = sinhalaLocaleStrings;
+surveyLocalization.locales[SINHALA_LOCALE] = {
+  ...sinhalaLocaleStrings,
+  completeText: "සනාත කරන්න",
+};
 surveyLocalization.locales[ENGLISH_LOCALE] = englishLocaleStrings;
 
 const surveyJson = {
   title: {
-    [ENGLISH_LOCALE]: "🪷 Saddharmadhara Application",
-    [SINHALA_LOCALE]: "🪷 සද්ධර්මධාරා අයදුම්පත්‍රය",
+    [ENGLISH_LOCALE]: "🪷 Saddharmadhara Attendance Confirmation",
+    [SINHALA_LOCALE]: "🪷 සද්ධර්මධාරා පැමිණීම තහවුරු කිරීම",
   },
-  showPreviewBeforeComplete: "showAnsweredQuestions",
-  showTOC: true,
+  // showTOC: true,
   completedHtml: {
     [ENGLISH_LOCALE]: "<h4>Thank you for applying to Saddharmadhara!</h4>",
     [SINHALA_LOCALE]: "<h4>සද්ධර්මධාරා සඳහා අයදුම් කළ ඔබට ස්තුතියි!</h4>",
   },
-  pages: [languagePage],
+  pages: [],
 };
 
-export default function Confirm({ teiId }: { teiId: string }) {
-  const survey = useMemo(() => new Model(surveyJson), []);
+export default function Confirm({
+  expressionOfInterestEvent,
+  retreatObj,
+}: {
+  expressionOfInterestEvent: any;
+  retreatObj: any;
+}) {
+  const survey = useMemo(
+    () =>
+      new Model({
+        ...surveyJson,
+        pages: [...surveyJson.pages, attendance(retreatObj)],
+      }),
+    [expressionOfInterestEvent, retreatObj],
+  );
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    survey.locale = SINHALA_LOCALE;
+    let medium = retreatObj.attributes[DHIS2_RETREAT_ATTRIBUTE_MEDIUM];
+    survey.locale = medium === "english" ? ENGLISH_LOCALE : SINHALA_LOCALE;
     // attach setLoading as a property of survey
     survey.setLoading = setLoading;
-  }, [survey]);
+  }, [survey, retreatObj]);
 
   return (
     <div className="App">

@@ -6,12 +6,75 @@ const dhis2Token = "ApiToken " + process.env.DHIS2_TOKEN;
 const DHIS2_PROGRAM = "KdYt2OP9VjD";
 
 const DHIS2_RETREATS_OPTION_SET = "ys2Pv9hTS0O";
+const DHIS2_RETREATS_CODE_ATTRIBUTE = "lzIri3GkWM2";
+
 const DHIS2_RETREAT_DATE_ATTRIBUTE = "sCzsZZ7m37E";
 const DHIS2_RETREAT_DISABLED_ATTRIBUTE = "hp92k6RhLJS";
 
 const DHIS2_EXPRESSION_OF_INTEREST_PROGRAM_STAGE = "BLn1j2VgLZf";
 const DHIS2_PARTICIPATION_PROGRAM_STAGE = "NYxnKQd6goA";
 const DHIS2_RETREAT_DATA_ELEMENT = "rYqV3VQu7LS";
+
+const retreatCodeCache = new Map<string, any>();
+
+export async function getRetreatByCode(code: string) {
+  if (retreatCodeCache.has(code)) {
+    return retreatCodeCache.get(code);
+  }
+  const optionsUrl = new URL(
+    "optionSets/" + DHIS2_RETREATS_OPTION_SET,
+    dhis2Endpoint,
+  );
+  optionsUrl.searchParams.set("fields", "options[code,attributeValues]");
+  const optionsResponse = await fetch(optionsUrl, {
+    method: "GET",
+    headers: {
+      Authorization: dhis2Token,
+    },
+  }).then((res) => res.json());
+
+  const foundRetreat = optionsResponse?.options?.find(
+    (option) =>
+      option?.attributeValues?.find(
+        (attr) => attr?.attribute?.id === DHIS2_RETREATS_CODE_ATTRIBUTE,
+      )?.value === code,
+  );
+
+  if (foundRetreat) {
+    const flattenedRetreat = flattenRetreatOption(foundRetreat);
+    retreatCodeCache.set(code, flattenedRetreat);
+    return flattenedRetreat;
+  }
+  return null;
+}
+
+export async function getExpressionOfInterestEvent(
+  teiId: string,
+  retreatCode: string,
+) {
+  const trackedEntitiesUrl = new URL(
+    "tracker/trackedEntities/" + teiId,
+    dhis2Endpoint,
+  );
+  trackedEntitiesUrl.searchParams.set("fields", "enrollments[events]");
+
+  console.log(trackedEntitiesUrl.toString());
+
+  const trackedEntitiesResponse = await fetch(trackedEntitiesUrl, {
+    method: "GET",
+    headers: {
+      Authorization: dhis2Token,
+    },
+  }).then((res) => res.json());
+
+  return trackedEntitiesResponse?.enrollments?.[0]?.events?.find(
+    (event) =>
+      event?.programStage === DHIS2_EXPRESSION_OF_INTEREST_PROGRAM_STAGE &&
+      event?.dataValues?.find(
+        (e) => e?.dataElement === DHIS2_RETREAT_DATA_ELEMENT,
+      )?.value === retreatCode,
+  );
+}
 
 export async function uploadFile(formData: FormData): Promise<string> {
   return fetch(new URL("fileResources", dhis2Endpoint), {
@@ -122,14 +185,7 @@ export async function getEligibleRetreats(enrollment?: string) {
 
   return optionsResponse?.options
     ?.map((option) => {
-      return {
-        value: option?.code,
-        text: option?.name,
-        attributes: option?.attributeValues?.reduce((map, elem) => {
-          map[elem.attribute.id] = elem.value;
-          return map;
-        }, {}),
-      };
+      return flattenRetreatOption(option);
     })
     .filter((option) => {
       let retreatDisabled = option.attributes[DHIS2_RETREAT_DISABLED_ATTRIBUTE];
@@ -180,4 +236,15 @@ export async function getExistingEnrollment(
   } else {
     return Promise.reject("No enrollment found for this attribute and value");
   }
+}
+
+function flattenRetreatOption(option) {
+  return {
+    value: option?.code,
+    text: option?.name,
+    attributes: option?.attributeValues?.reduce((map, elem) => {
+      map[elem.attribute.id] = elem.value;
+      return map;
+    }, {}),
+  };
 }

@@ -11,7 +11,7 @@ import {
 import { getEligibleRetreats } from "../../../backend/Dhis2Client";
 import { SurveyModel } from "survey-core";
 
-const getMediumText = (mediumCode: "sinhala" | "english") => {
+export const getMediumText = (mediumCode: "sinhala" | "english") => {
   if (mediumCode && mediumCode === "english") {
     return "English Medium(ඉංග්‍රීසි මාධ්‍ය)";
   }
