@@ -20,6 +20,7 @@ import {
   getFinalExcelDownloadLink,
 } from "../dhis2";
 import { useConfig } from "@dhis2/app-runtime";
+import RetreatInvitationModal from "./RetreatInvitationModal";
 
 const styles = {
   container: {
@@ -56,6 +57,7 @@ const RetreatManager = observer(({ store }) => {
   const navigate = useNavigate();
 
   const [showFinaliseModel, setShowFinaliseModel] = React.useState(false);
+  const [showInvitationModel, setShowInvitationModel] = React.useState(false);
 
   const retreat = store.metadata.retreatsMapWithIdKey[params.retreatId];
 
@@ -93,6 +95,16 @@ const RetreatManager = observer(({ store }) => {
                 ) : null}
               </div>
               <div style={styles.retreatHeaderButtons}>
+                <Button onClick={() => setShowInvitationModel(true)}>
+                  Send Invitations
+                </Button>
+                {showInvitationModel && (
+                  <RetreatInvitationModal
+                    retreat={retreat}
+                    store={store}
+                    onCancel={() => setShowInvitationModel(false)}
+                  />
+                )}
                 <DropdownButton
                   component={
                     <FlyoutMenu>

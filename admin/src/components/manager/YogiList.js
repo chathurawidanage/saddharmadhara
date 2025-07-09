@@ -385,7 +385,7 @@ const StateChangeButton = ({ currentState, yogi, retreat, store }) => {
             changeFromSelectedStatePrompt({
                 yogiName: yogi.attributes[DHIS2_TEI_ATTRIBUTE_FULL_NAME],
                 onMoveClicked: async () => {
-                    let success = await store.yogis.deletePartipationEvent(yogi.id, retreat);
+                    let success = await store.yogis.deleteParticipationEvent(yogi.id, retreat);
                     if (success) {
                         await doStateChange(toStateCode);
                     }

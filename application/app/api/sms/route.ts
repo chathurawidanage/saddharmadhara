@@ -1,4 +1,5 @@
 import CryptoJS from "crypto-js";
+import type { Metadata } from "next";
 
 // --- Environment Variable Checks ---
 const esmsEndpoint = process.env.ESMS_ENDPOINT;
@@ -8,6 +9,12 @@ const dhis2Token = process.env.DHIS2_TOKEN;
 const esmsUsername = process.env.ESMS_USERNAME;
 const esmsPassword = process.env.ESMS_PASSWORD;
 const esmsPushNotificationUrl = process.env.ESMS_PUSH_NOTIFICATION_URL;
+
+export const metadata: Metadata = {
+  title: "Saddharmadhara Confirmation",
+  description:
+    "Confirmation for Saddharmadhara meditation programs by Ven. Bambalapitiya Gnanaloka Thero.",
+};
 
 if (
   !esmsEndpoint ||
@@ -139,30 +146,22 @@ export async function POST(request: Request) {
       return new Response("Unauthorized", { status: 401 });
     }
 
-    // token = dhis2UserName+":"+userGeneratedRandomString
-    // check in dataStore if the token is valid
-    // remove Bearer
-    const userAuthToken = extractBearerToken(authHeader);
-    if (!userAuthToken) {
-      return new Response("Unauthorized", { status: 401 });
-    }
-    const [dhis2UserName, userGeneratedRandomString] = userAuthToken.split(":");
-    const authTokenStoreUrl = new URL(
-      "dataStore/saddharmadhara/sms-auth-" + dhis2UserName,
-      dhis2Endpoint,
-    );
-    const tokenGetResponse = await fetch(authTokenStoreUrl, {
-      headers: {
-        Authorization: dhis2AuthHeader,
-      },
-    });
+    // do a dhis2 call to check if the user is authenticated
 
-    if (!tokenGetResponse.ok) {
-      return new Response("Unauthorized", { status: 401 });
-    }
+    try {
+      const dhis2User = await fetch(new URL("me", dhis2Endpoint), {
+        headers: {
+          Authorization: authHeader,
+        },
+      });
+      const dhis2UserJson = await dhis2User.json();
 
-    const tokenData = await tokenGetResponse.json();
-    if (tokenData.token !== userGeneratedRandomString) {
+      if (!dhis2User.ok) {
+        return new Response("Unauthorized", { status: 401 });
+      }
+      console.log("SMS request sent by", dhis2UserJson.username);
+    } catch (e) {
+      console.error("Error in dhis2 auth check:", e);
       return new Response("Unauthorized", { status: 401 });
     }
     // end of auth
@@ -191,7 +190,13 @@ export async function POST(request: Request) {
       );
     }
 
-    return new Response("SMS sent successfully.", { status: 200 });
+    return new Response(
+      JSON.stringify({
+        success: true,
+        ...(await smsResponse.json()).data,
+      }),
+      { status: 200 },
+    );
   } catch (error) {
     console.error("An unexpected error occurred:", error);
     return new Response("An internal server error occurred.", { status: 500 });
