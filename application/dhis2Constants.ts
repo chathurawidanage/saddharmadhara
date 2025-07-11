@@ -1,0 +1,17 @@
+export const dhis2Endpoint = process.env.DHIS2_ENDPOINT;
+export const dhis2Token = "ApiToken " + process.env.DHIS2_TOKEN;
+
+export const DHIS2_PROGRAM = "KdYt2OP9VjD";
+
+export const DHIS2_RETREATS_OPTION_SET = "ys2Pv9hTS0O";
+export const DHIS2_RETREATS_CODE_ATTRIBUTE = "lzIri3GkWM2";
+export const DHIS2_RETREAT_DATE_ATTRIBUTE = "sCzsZZ7m37E";
+export const DHIS2_RETREAT_DISABLED_ATTRIBUTE = "hp92k6RhLJS";
+
+export const DHIS2_EXPRESSION_OF_INTEREST_PROGRAM_STAGE = "BLn1j2VgLZf";
+export const DHIS2_PARTICIPATION_PROGRAM_STAGE = "NYxnKQd6goA";
+
+export const DHIS2_RETREAT_DATA_ELEMENT = "rYqV3VQu7LS";
+export const DHIS2_RETREAT_SELECTION_STATE_DATA_ELEMENT = "MVaziT78i7p";
+
+export const DHIS2_TEI_ATTRIBUTE_NAME = "fvk2p04ylAA";

@@ -1,65 +1,86 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
-import { Model, surveyLocalization } from "survey-core";
+import { Model, surveyLocalization, SurveyModel } from "survey-core";
 import "survey-core/defaultV2.min.css";
 import { Survey } from "survey-react-ui";
 import englishLocaleStrings, { ENGLISH_LOCALE } from "./locale/english";
 import sinhalaLocaleStrings, { SINHALA_LOCALE } from "./locale/sinhala";
-import onValueChanged from "./handlers/onValueChanged";
-import onUploadFiles from "./handlers/onUploadFiles";
-import onComplete from "./handlers/onComplete";
 import Loader from "./components/Loader";
-import onCurrentPageChanging from "./handlers/onCurrentPageChanging";
-import onPropertyChanged from "./handlers/onPropertyChanged";
-import onValidateQuestion from "./handlers/onValidateQuestion";
-import onTextMarkdown from "./handlers/onTextMarkdown";
 import "./App.css";
 import attendance from "./pages/attendance";
 import { DHIS2_RETREAT_ATTRIBUTE_MEDIUM } from "./dhis2";
+import { confirmAttendance } from "../../backend/Dhis2Client";
 
 surveyLocalization.locales[SINHALA_LOCALE] = {
   ...sinhalaLocaleStrings,
-  completeText: "සනාත කරන්න",
+  completeText: "සනාථ කරන්න",
 };
 surveyLocalization.locales[ENGLISH_LOCALE] = englishLocaleStrings;
 
 const surveyJson = {
   title: {
-    [ENGLISH_LOCALE]: "🪷 Saddharmadhara Attendance Confirmation",
-    [SINHALA_LOCALE]: "🪷 සද්ධර්මධාරා පැමිණීම තහවුරු කිරීම",
+    [ENGLISH_LOCALE]: "🪷 Saddharmadhara",
+    [SINHALA_LOCALE]: "🪷 සද්ධර්මධාරා",
   },
-  // showTOC: true,
   completedHtml: {
-    [ENGLISH_LOCALE]: "<h4>Thank you for applying to Saddharmadhara!</h4>",
-    [SINHALA_LOCALE]: "<h4>සද්ධර්මධාරා සඳහා අයදුම් කළ ඔබට ස්තුතියි!</h4>",
+    [ENGLISH_LOCALE]: "<h4>Thank you!</h4>",
+    [SINHALA_LOCALE]: "<h4>ස්තුතියි!</h4>",
   },
   pages: [],
+  showQuestionNumbers: false,
 };
 
 export default function Confirm({
   expressionOfInterestEvent,
   retreatObj,
+  teiName,
 }: {
   expressionOfInterestEvent: any;
   retreatObj: any;
+  teiName: string;
 }) {
   const survey = useMemo(
     () =>
       new Model({
         ...surveyJson,
-        pages: [...surveyJson.pages, attendance(retreatObj)],
+        pages: [...surveyJson.pages, attendance(retreatObj, teiName)],
       }),
     [expressionOfInterestEvent, retreatObj],
   );
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  const [attending, setAttending] = useState(false);
 
   useEffect(() => {
+    survey.setLoading = setLoading;
     let medium = retreatObj.attributes[DHIS2_RETREAT_ATTRIBUTE_MEDIUM];
     survey.locale = medium === "english" ? ENGLISH_LOCALE : SINHALA_LOCALE;
-    // attach setLoading as a property of survey
-    survey.setLoading = setLoading;
+    setLoading(false);
   }, [survey, retreatObj]);
+
+  const onValueChanged = (survey: SurveyModel, options) => {
+    if (survey.data && survey.data.RSVP) {
+      setAttending(survey.data.RSVP);
+    }
+  };
+
+  const onComplete = async (survey: SurveyModel, options) => {
+    try {
+      const saved = await confirmAttendance(
+        expressionOfInterestEvent,
+        attending,
+      );
+      if (!saved) {
+        options.showSaveError();
+      } else {
+        options.showSaveSuccess();
+      }
+    } catch (error) {
+      console.error("Error in saving", error);
+      options.showSaveError();
+    }
+  };
 
   return (
     <div className="App">
@@ -67,12 +88,7 @@ export default function Confirm({
       <Survey
         model={survey}
         onValueChanged={onValueChanged}
-        onUploadFiles={onUploadFiles}
         onComplete={onComplete}
-        onCurrentPageChanging={onCurrentPageChanging}
-        onPropertyChanged={onPropertyChanged}
-        onValidateQuestion={onValidateQuestion}
-        onTextMarkdown={onTextMarkdown}
       />
     </div>
   );

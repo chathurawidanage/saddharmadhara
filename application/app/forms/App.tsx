@@ -79,13 +79,17 @@ const surveyJson = {
 
 export default function Application() {
   const survey = useMemo(() => new Model(surveyJson), []);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [accepting, setAccepting] = useState(undefined);
 
   useEffect(() => {
-    isAcceptingApplications().then((accepting) => {
-      setAccepting(accepting);
-    });
+    isAcceptingApplications()
+      .then((accepting) => {
+        setAccepting(accepting);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, []);
 
   useEffect(() => {

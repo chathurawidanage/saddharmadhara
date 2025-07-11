@@ -1,19 +1,19 @@
 "use server";
 
-const dhis2Endpoint = process.env.DHIS2_ENDPOINT;
-const dhis2Token = "ApiToken " + process.env.DHIS2_TOKEN;
-
-const DHIS2_PROGRAM = "KdYt2OP9VjD";
-
-const DHIS2_RETREATS_OPTION_SET = "ys2Pv9hTS0O";
-const DHIS2_RETREATS_CODE_ATTRIBUTE = "lzIri3GkWM2";
-
-const DHIS2_RETREAT_DATE_ATTRIBUTE = "sCzsZZ7m37E";
-const DHIS2_RETREAT_DISABLED_ATTRIBUTE = "hp92k6RhLJS";
-
-const DHIS2_EXPRESSION_OF_INTEREST_PROGRAM_STAGE = "BLn1j2VgLZf";
-const DHIS2_PARTICIPATION_PROGRAM_STAGE = "NYxnKQd6goA";
-const DHIS2_RETREAT_DATA_ELEMENT = "rYqV3VQu7LS";
+import {
+  DHIS2_EXPRESSION_OF_INTEREST_PROGRAM_STAGE,
+  DHIS2_PARTICIPATION_PROGRAM_STAGE,
+  DHIS2_PROGRAM,
+  DHIS2_RETREAT_DATA_ELEMENT,
+  DHIS2_RETREAT_DATE_ATTRIBUTE,
+  DHIS2_RETREAT_DISABLED_ATTRIBUTE,
+  DHIS2_RETREAT_SELECTION_STATE_DATA_ELEMENT,
+  DHIS2_RETREATS_CODE_ATTRIBUTE,
+  DHIS2_RETREATS_OPTION_SET,
+  DHIS2_TEI_ATTRIBUTE_NAME,
+  dhis2Endpoint,
+  dhis2Token,
+} from "../dhis2Constants";
 
 const retreatCodeCache = new Map<string, any>();
 
@@ -58,8 +58,6 @@ export async function getExpressionOfInterestEvent(
   );
   trackedEntitiesUrl.searchParams.set("fields", "enrollments[events]");
 
-  console.log(trackedEntitiesUrl.toString());
-
   const trackedEntitiesResponse = await fetch(trackedEntitiesUrl, {
     method: "GET",
     headers: {
@@ -67,13 +65,19 @@ export async function getExpressionOfInterestEvent(
     },
   }).then((res) => res.json());
 
-  return trackedEntitiesResponse?.enrollments?.[0]?.events?.find(
-    (event) =>
-      event?.programStage === DHIS2_EXPRESSION_OF_INTEREST_PROGRAM_STAGE &&
-      event?.dataValues?.find(
-        (e) => e?.dataElement === DHIS2_RETREAT_DATA_ELEMENT,
-      )?.value === retreatCode,
-  );
+  for (const event of trackedEntitiesResponse.enrollments[0].events) {
+    if (event?.programStage === DHIS2_EXPRESSION_OF_INTEREST_PROGRAM_STAGE) {
+      for (const dataValue of event.dataValues) {
+        if (
+          dataValue?.dataElement === DHIS2_RETREAT_DATA_ELEMENT &&
+          dataValue?.value === retreatCode
+        ) {
+          return event;
+        }
+      }
+    }
+  }
+  return null;
 }
 
 export async function uploadFile(formData: FormData): Promise<string> {
@@ -236,6 +240,54 @@ export async function getExistingEnrollment(
   } else {
     return Promise.reject("No enrollment found for this attribute and value");
   }
+}
+
+export async function getTeiNameById(teiId) {
+  let url = new URL("tracker/trackedEntities/" + teiId, dhis2Endpoint);
+  url.searchParams.set("fields", "attributes");
+  let response = await fetch(url, {
+    method: "GET",
+    headers: {
+      Authorization: dhis2Token,
+    },
+  });
+  let responseJson = await response.json();
+  return responseJson.attributes?.find(
+    (att) => att.attribute === DHIS2_TEI_ATTRIBUTE_NAME,
+  )?.value;
+}
+
+export async function confirmAttendance(event: any, attending: boolean) {
+  let url = new URL("tracker", dhis2Endpoint);
+  url.searchParams.set("async", "false");
+  url.searchParams.set("importStrategy", "UPDATE");
+
+  const dataValues = event.dataValues.filter(
+    (dv) => dv.dataElement !== DHIS2_RETREAT_SELECTION_STATE_DATA_ELEMENT,
+  );
+
+  let response = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: dhis2Token,
+    },
+    body: JSON.stringify({
+      events: [
+        {
+          ...event,
+          dataValues: [
+            ...dataValues,
+            {
+              dataElement: DHIS2_RETREAT_SELECTION_STATE_DATA_ELEMENT,
+              value: attending ? "selected" : "unattending",
+            },
+          ],
+        },
+      ],
+    }),
+  });
+  return response.ok;
 }
 
 function flattenRetreatOption(option) {

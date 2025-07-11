@@ -1,14 +1,11 @@
 import { ENGLISH_LOCALE } from "../locale/english";
 import { SINHALA_LOCALE } from "../locale/sinhala";
-import { agreeDisagreeQuestion } from "./utils";
 import {
   DHIS2_RETREAT_ATTRIBUTE_DATE,
   DHIS2_RETREAT_ATTRIBUTE_DAYS,
-  DHIS2_RETREAT_ATTRIBUTE_MEDIUM,
 } from "../dhis2";
-import { getMediumText } from "../handlers/onPropertyChanged";
 
-const agreementPage = (retreatObj) => {
+const agreementPage = (retreatObj, teiName: string) => {
   let startDate = new Date(retreatObj.attributes[DHIS2_RETREAT_ATTRIBUTE_DATE]);
   let noOfDays = parseInt(retreatObj.attributes[DHIS2_RETREAT_ATTRIBUTE_DAYS]);
   let endDate = new Date(
@@ -22,11 +19,11 @@ const agreementPage = (retreatObj) => {
     },
     elements: [
       {
-        name: "rsvp",
+        name: "RSVP",
         type: "boolean",
         title: {
-          [ENGLISH_LOCALE]: `You have been selected to attend the ${noOfDays} days retreat from ${startDate.toLocaleDateString()} to ${endDate.toLocaleDateString()}. Please confirm you attendance below.`,
-          [SINHALA_LOCALE]: `ඔබ ${startDate.toLocaleDateString()} සිට ${endDate.toLocaleDateString()} දක්වා පැවැත්වෙන දින ${noOfDays} ක සද්ධර්මධාරා වැඩසටහනට සහභාගී වීමට තේරී ඇත. කරුණාකර ඔබගේ සහභාගිත්වය තහවුරු කරන්න.`,
+          [ENGLISH_LOCALE]: `You (${teiName}) have been selected to attend the ${noOfDays} days Saddharmadhara retreat from ${startDate.toLocaleDateString()} to ${endDate.toLocaleDateString()}. Please confirm you attendance below.`,
+          [SINHALA_LOCALE]: `ඔබ (${teiName}) ${startDate.toLocaleDateString()} සිට ${endDate.toLocaleDateString()} දක්වා දක්වා පැවැත්වෙන දින ${noOfDays}ක සද්ධර්මධාරා නේවාසික වැඩසටහන හා සම්බන්ධවීමට තේරී පත් ව ඇත. කරුණාකර ඔබගේ සහභාගිත්වය තහවුරු කරන්න.`,
         },
         isRequired: true,
         labelTrue: {

@@ -2,7 +2,29 @@ import Confirm from "../../../forms/Confirm";
 import {
   getExpressionOfInterestEvent,
   getRetreatByCode,
+  getTeiNameById,
 } from "../../../../backend/Dhis2Client";
+import ConfirmError from "../../../forms/ConfirmError";
+import { ENGLISH_LOCALE } from "../../../forms/locale/english";
+import { SINHALA_LOCALE } from "../../../forms/locale/sinhala";
+import { DHIS2_RETREAT_SELECTION_STATE_DATA_ELEMENT } from "../../../../dhis2Constants";
+import { DHIS2_RETREAT_ATTRIBUTE_MEDIUM } from "../../../forms/dhis2";
+
+const LinkError = ({ language }: { language?: string }) => {
+  return (
+    <ConfirmError
+      title={{
+        [ENGLISH_LOCALE]: "Error",
+        [SINHALA_LOCALE]: "දෝෂයක් ඇති විය.",
+      }}
+      error={{
+        [ENGLISH_LOCALE]: "There's an error in the link",
+        [SINHALA_LOCALE]: "සබැඳියෙහි දෝෂයක් තිබේ.",
+      }}
+      language={language}
+    />
+  );
+};
 
 export default async function Page(props: {
   params: Promise<{
@@ -13,15 +35,77 @@ export default async function Page(props: {
   const { teId, retreat } = await props.params;
 
   const retreatObj = await getRetreatByCode(retreat);
+
+  if (!retreatObj || !retreatObj.value) {
+    return <LinkError />;
+  }
+  const retreatLanguage = retreatObj.attributes[DHIS2_RETREAT_ATTRIBUTE_MEDIUM];
+
+  console.log(retreatLanguage);
+
   const expressionOfInterestEvent = await getExpressionOfInterestEvent(
     teId,
-    retreatObj.code,
+    retreatObj.value,
   );
+
+  if (!expressionOfInterestEvent) {
+    return <LinkError language={retreatLanguage}/>;
+  }
+
+  const teiName = await getTeiNameById(teId);
+
+  const currentConfirmationState = expressionOfInterestEvent.dataValues.find(
+    (e) => e.dataElement === DHIS2_RETREAT_SELECTION_STATE_DATA_ELEMENT,
+  )?.value;
+
+  if (!currentConfirmationState) {
+    return <LinkError language={retreatLanguage}/>;
+  }
+
+  if (currentConfirmationState !== "pending") {
+    let title = {
+      [ENGLISH_LOCALE]: "Link Expired",
+      [SINHALA_LOCALE]: "සබැඳිය කල් ඉකුත් වී ඇත",
+    };
+    let errorMessage = {
+      [ENGLISH_LOCALE]: `You (${teiName}) have already sent us you confirmation for this retreat as '${currentConfirmationState === "selected" ? "Attending" : "Not Attending"}'.`,
+      [SINHALA_LOCALE]: `මෙම වැඩසටහන සඳහා ඔබ ${teiName} දැනටමත් ඔබගේ තහවුරු කිරීම '${currentConfirmationState === "selected" ? "පැමිනේ" : "නොපැමිනේ"}' ලෙස අපට එවා ඇත.`,
+    };
+
+    if (
+      !(
+        currentConfirmationState === "selected" ||
+        currentConfirmationState === "unattending"
+      )
+    ) {
+      // empty for all other states
+      errorMessage = {
+        [ENGLISH_LOCALE]: ``,
+        [SINHALA_LOCALE]: ``,
+      };
+
+      title = {
+        [ENGLISH_LOCALE]: `Link Expired of Invalid`,
+        [SINHALA_LOCALE]: `කල් ඉකුත්වූ හෝ වලංගු නොවන සබැඳියකි`,
+      };
+    }
+
+    return (
+      <ConfirmError
+        title={title}
+        error={errorMessage}
+        language={retreatLanguage}
+      />
+    );
+  }
+
+  console.log(expressionOfInterestEvent);
 
   return (
     <Confirm
       expressionOfInterestEvent={expressionOfInterestEvent}
       retreatObj={retreatObj}
+      teiName={teiName}
     />
   );
 }
