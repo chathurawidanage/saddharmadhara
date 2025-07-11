@@ -13,6 +13,7 @@ import {
 import { observer } from "mobx-react";
 import React, { useEffect } from "react";
 import { useAlert, useDataEngine } from "@dhis2/app-runtime";
+import { DHIS2_TEI_ATTRIBUTE_MOBILE } from "../dhis2";
 
 const classes = {
   checkboxes: {
@@ -31,12 +32,48 @@ const tokenCreateMutation = {
   }),
 };
 
+async function sendSms(
+  teiId,
+  retreatCode,
+  retreatFrom,
+  retreatTo,
+  teiMobile,
+  token,
+) {
+  const response = await fetch(
+    `https://application.srisambuddhamission.org/api/sms`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `ApiToken ${token}`,
+      },
+      body: JSON.stringify({
+        msisdn: [teiMobile],
+        // todo send in English for english retreats
+        message: `ඔබ 11/08/2025 සිට 17/08/25 දක්වා පැවැත්වෙන සද්ධර්මධාරා
+නේවාසික වැඩසටහන හා සම්බන්ධවීමට තේරී පත් ව ඇත. පහත යොමුව මගින් ඔබගේ සහභාගි වීම/නොවීම තහවුරු කරන්න.
+
+https://application.srisambuddhamission.org/confirm/${retreatCode}/${teiId}
+
+එසේ අපහසු නම් පමණක් ඔබගේ සහභාගිත්වය පහත පරිදි 0743208734 අංකයට SMS හෝ Whatsapp පණිවිඩයක් මගින් තහවුරු කරන්න.
+වැඩසටහන් අංකය:
+නම:
+ජා.හැ.අ./ගමන් බ.ප.අ:
+පැමිණීම / නොපැමිණීම:`,
+      }),
+    },
+  );
+  return response.ok;
+}
+
 const RetreatInvitationModal = observer(({ store, retreat, onCancel }) => {
   const dataEngine = useDataEngine();
 
+  // uninvited, failed, sent
   const [check, setChecks] = React.useState([true, true, false]);
   const [confirmationDeadline, setConfirmationDeadline] = React.useState(
-    new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString()
+    new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
   );
 
   const [loading, setLoading] = React.useState(false);
@@ -96,6 +133,11 @@ const RetreatInvitationModal = observer(({ store, retreat, onCancel }) => {
   const onFinaliseClicked = async () => {
     setIsSending(true);
 
+    await store.metadata.setRetreatAttendanceConfirmationDate(
+      retreat,
+      new Date(confirmationDeadline),
+    );
+
     // create a temporary token
     const tokenResponse = await dataEngine.mutate(tokenCreateMutation, {
       variables: {
@@ -106,6 +148,23 @@ const RetreatInvitationModal = observer(({ store, retreat, onCancel }) => {
     const token = tokenResponse?.response.key;
     const tokenId = tokenResponse?.response.uid;
 
+    // send invites to yogis
+
+    if (check[0]) {
+      setTotalToSend(toSendYogis.length);
+      for (let i = 0; i < toSendYogis.length; i++) {
+        await sendSms(
+          toSendYogis[i].id,
+          retreat.code,
+          retreat.date,
+          retreat.endDate,
+          toSendYogis[i].attributes[DHIS2_TEI_ATTRIBUTE_MOBILE],
+          token,
+        );
+        setSentCount(i + 1);
+      }
+    }
+
     // delete the token
     await dataEngine.mutate({
       type: "delete",
@@ -113,7 +172,6 @@ const RetreatInvitationModal = observer(({ store, retreat, onCancel }) => {
       id: tokenId,
     });
 
-    // send invites
     setIsSending(false);
     show();
     onCancel();
@@ -151,14 +209,15 @@ const RetreatInvitationModal = observer(({ store, retreat, onCancel }) => {
               />
             </div>
           </ModalContent>
-          <ModalContent >
-            <h6 style={{marginTop: 20}}>Set the confirmation deadline</h6>
+          <ModalContent>
+            <h6 style={{ marginTop: 20 }}>Set the confirmation deadline</h6>
             <CalendarInput
               label="Confirmation Deadline"
               calendar="gregory"
               locale="en-LK"
               date={confirmationDeadline}
-              onDateSelect={(date)=>{
+              onDateSelect={(date) => {
+                console.log(date);
                 setConfirmationDeadline(date.calendarDateString);
               }}
             />

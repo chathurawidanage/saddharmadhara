@@ -1,5 +1,4 @@
 import CryptoJS from "crypto-js";
-import type { Metadata } from "next";
 
 // --- Environment Variable Checks ---
 const esmsEndpoint = process.env.ESMS_ENDPOINT;

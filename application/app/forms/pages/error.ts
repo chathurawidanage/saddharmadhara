@@ -1,3 +1,5 @@
+"use client";
+
 import { ENGLISH_LOCALE } from "../locale/english";
 import { SINHALA_LOCALE } from "../locale/sinhala";
 
@@ -34,4 +36,5 @@ const errorPage = (
     ],
   };
 };
+
 export default errorPage;
