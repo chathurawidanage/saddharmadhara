@@ -56,7 +56,7 @@ export default async function Page(props: {
   );
 
   if (!expressionOfInterestEvent) {
-    return <LinkError language={retreatLanguage}/>;
+    return <LinkError language={retreatLanguage} />;
   }
 
   const teiName = await getTeiNameById(teId);
@@ -66,7 +66,7 @@ export default async function Page(props: {
   )?.value;
 
   if (!currentConfirmationState) {
-    return <LinkError language={retreatLanguage}/>;
+    return <LinkError language={retreatLanguage} />;
   }
 
   if (currentConfirmationState !== "pending") {
@@ -76,7 +76,7 @@ export default async function Page(props: {
     };
     let errorMessage = {
       [ENGLISH_LOCALE]: `You (${teiName}) have already sent us you confirmation for this retreat as '${currentConfirmationState === "selected" ? "Attending" : "Not Attending"}'.`,
-      [SINHALA_LOCALE]: `මෙම වැඩසටහන සඳහා ඔබ ${teiName} දැනටමත් ඔබගේ තහවුරු කිරීම '${currentConfirmationState === "selected" ? "පැමිනේ" : "නොපැමිනේ"}' ලෙස අපට එවා ඇත.`,
+      [SINHALA_LOCALE]: `මෙම වැඩසටහන සඳහා ඔබ (${teiName}) දැනටමත් ඔබගේ තහවුරු කිරීම '${currentConfirmationState === "selected" ? "පැමිනේ" : "නොපැමිනේ"}' ලෙස අපට සනාථ කර ඇත.`,
     };
 
     if (

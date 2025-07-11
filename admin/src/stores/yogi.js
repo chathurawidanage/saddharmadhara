@@ -297,6 +297,29 @@ class YogiStore {
   };
 
   changeRetreatState = async (yogiId, retreatCode, newState) => {
+    const dataValues = [
+      {
+        dataElement: DHIS2_RETREAT_SELECTION_STATE_DATA_ELEMENT,
+        value: newState,
+      },
+      {
+        dataElement: DHIS2_RETREAT_DATA_ELEMENT,
+        value: retreatCode,
+      },
+    ];
+
+    if (
+      this.yogiIdToObjectMap[yogiId].expressionOfInterests[retreatCode]
+        .invitationSent
+    ) {
+      dataValues.push({
+        dataElement: DHIS2_RETREAT_INVITATION_SENT_DATA_ELEMENT,
+        value:
+          this.yogiIdToObjectMap[yogiId].expressionOfInterests[retreatCode]
+            .invitationSent,
+      });
+    }
+
     const mutation = {
       resource: "events",
       id: this.yogiIdToObjectMap[yogiId].expressionOfInterests[retreatCode]
@@ -305,16 +328,7 @@ class YogiStore {
         program: DHIS_PROGRAM,
         programStage: DHIS2_EXPRESSION_OF_INTEREST_PROGRAM_STAGE,
         status: "COMPLETED",
-        dataValues: [
-          {
-            dataElement: DHIS2_RETREAT_SELECTION_STATE_DATA_ELEMENT,
-            value: newState,
-          },
-          {
-            dataElement: DHIS2_RETREAT_DATA_ELEMENT,
-            value: retreatCode,
-          },
-        ],
+        dataValues,
       },
       type: "update",
     };
@@ -350,6 +364,16 @@ class YogiStore {
           {
             dataElement: DHIS2_RETREAT_INVITATION_SENT_DATA_ELEMENT,
             value: invitationState,
+          },
+          {
+            dataElement: DHIS2_RETREAT_DATA_ELEMENT,
+            value: retreatCode,
+          },
+          {
+            dataElement: DHIS2_RETREAT_SELECTION_STATE_DATA_ELEMENT,
+            value:
+              this.yogiIdToObjectMap[yogiId].expressionOfInterests[retreatCode]
+                .state,
           },
         ],
       },
