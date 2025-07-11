@@ -10,12 +10,6 @@ const esmsUsername = process.env.ESMS_USERNAME;
 const esmsPassword = process.env.ESMS_PASSWORD;
 const esmsPushNotificationUrl = process.env.ESMS_PUSH_NOTIFICATION_URL;
 
-export const metadata: Metadata = {
-  title: "Saddharmadhara Confirmation",
-  description:
-    "Confirmation for Saddharmadhara meditation programs by Ven. Bambalapitiya Gnanaloka Thero.",
-};
-
 if (
   !esmsEndpoint ||
   !esmsTokenEncryptionKey ||

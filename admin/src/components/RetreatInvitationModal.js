@@ -8,6 +8,7 @@ import {
   ModalActions,
   ModalContent,
   ModalTitle,
+  CalendarInput,
 } from "@dhis2/ui";
 import { observer } from "mobx-react";
 import React, { useEffect } from "react";
@@ -34,6 +35,9 @@ const RetreatInvitationModal = observer(({ store, retreat, onCancel }) => {
   const dataEngine = useDataEngine();
 
   const [check, setChecks] = React.useState([true, true, false]);
+  const [confirmationDeadline, setConfirmationDeadline] = React.useState(
+    new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString()
+  );
 
   const [loading, setLoading] = React.useState(false);
 
@@ -146,6 +150,18 @@ const RetreatInvitationModal = observer(({ store, retreat, onCancel }) => {
                 onChange={() => onCheckChange(2)}
               />
             </div>
+          </ModalContent>
+          <ModalContent >
+            <h6 style={{marginTop: 20}}>Set the confirmation deadline</h6>
+            <CalendarInput
+              label="Confirmation Deadline"
+              calendar="gregory"
+              locale="en-LK"
+              date={confirmationDeadline}
+              onDateSelect={(date)=>{
+                setConfirmationDeadline(date.calendarDateString);
+              }}
+            />
           </ModalContent>
           <ModalActions>
             <ButtonStrip>

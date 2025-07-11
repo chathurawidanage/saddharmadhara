@@ -9,6 +9,13 @@ import { ENGLISH_LOCALE } from "../../../forms/locale/english";
 import { SINHALA_LOCALE } from "../../../forms/locale/sinhala";
 import { DHIS2_RETREAT_SELECTION_STATE_DATA_ELEMENT } from "../../../../dhis2Constants";
 import { DHIS2_RETREAT_ATTRIBUTE_MEDIUM } from "../../../forms/dhis2";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Saddharmadhara Confirmation",
+  description:
+    "Confirmation for Saddharmadhara meditation programs by Ven. Bambalapitiya Gnanaloka Thero.",
+};
 
 const LinkError = ({ language }: { language?: string }) => {
   return (
