@@ -26,7 +26,7 @@ const LinkError = ({ language }: { language?: string }) => {
       }}
       error={{
         [ENGLISH_LOCALE]: "There's an error in the link",
-        [SINHALA_LOCALE]: "සබැඳියෙහි දෝෂයක් තිබේ.",
+        [SINHALA_LOCALE]: "ඔබ භාවිතා කළ සබැඳියෙහි දෝෂයක් තිබේ.",
       }}
       language={language}
     />
