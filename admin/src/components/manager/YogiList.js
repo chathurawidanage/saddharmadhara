@@ -676,9 +676,10 @@ const AttendanceButton = observer(({ yogi, retreat, store }) => {
 
 const InvitationIndicator = observer(({ yogi, retreat, store }) => {
   const [invitationSent, setInvitationSent] = useState(
-    yogi.expressionOfInterests[retreat.code]?.invitationSent || "yet to be sent",
+    yogi.expressionOfInterests[retreat.code]?.invitationSent ||
+      "yet to be sent",
   );
-  return <div>✉️ Invitation {invitationSent}</div>;
+  return <div style={{ marginTop: 20 }}>✉️ Invitation {invitationSent}</div>;
 });
 
 export default YogisList;

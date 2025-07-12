@@ -17,12 +17,7 @@ import {
   dhis2Token,
 } from "../dhis2Constants";
 
-const retreatCodeCache = new Map<string, any>();
-
 export async function getRetreatByCode(code: string) {
-  if (retreatCodeCache.has(code)) {
-    return retreatCodeCache.get(code);
-  }
   const optionsUrl = new URL(
     "optionSets/" + DHIS2_RETREATS_OPTION_SET,
     dhis2Endpoint,
@@ -43,9 +38,7 @@ export async function getRetreatByCode(code: string) {
   );
 
   if (foundRetreat) {
-    const flattenedRetreat = flattenRetreatOption(foundRetreat);
-    retreatCodeCache.set(code, flattenedRetreat);
-    return flattenedRetreat;
+    return flattenRetreatOption(foundRetreat);
   }
   return null;
 }

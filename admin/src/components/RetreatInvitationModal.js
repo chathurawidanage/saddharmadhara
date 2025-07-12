@@ -35,20 +35,33 @@ const tokenCreateMutation = {
   }),
 };
 
-function getMessage(teiId, teiFullName, retreatCode, retreatFrom, retreatTo) {
+function getMessage(
+  teiId,
+  teiFullName,
+  retreatCode,
+  retreatFrom,
+  retreatTo,
+  deadLine,
+) {
   // todo send in English for english retreats
   const plusDateTo = new Date(retreatTo);
   plusDateTo.setDate(plusDateTo.getDate() + 1);
-  return `ඔබ ${retreatFrom.toLocaleDateString("en-US", {
+  return `ඔබ ${retreatFrom.toLocaleDateString("si-LK", {
     year: "numeric",
     month: "short",
     day: "numeric",
-  })} සිට ${plusDateTo.toLocaleDateString("en-US", {
+  })} සිට ${plusDateTo.toLocaleDateString("si-LK", {
     year: "numeric",
     month: "short",
     day: "numeric",
   })} දක්වා පැවැත්වෙන සද්ධර්මධාරා
-නේවාසික වැඩසටහන හා සම්බන්ධවීමට තේරී පත් ව ඇත. පහත යොමුව මගින් ඔබගේ සහභාගි වීම/නොවීම තහවුරු කරන්න.
+නේවාසික වැඩසටහන හා සම්බන්ධවීමට තේරී පත් ව ඇත. ${new Date(
+    deadLine,
+  ).toLocaleDateString("si-LK", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  })} දිනට පෙර පහත යොමුව (Link එක) මගින් ඔබගේ සහභාගි වීම/නොවීම තහවුරු කරන්න.
 
 https://application.srisambuddhamission.org/confirm/${retreatCode}/${teiId}
 
@@ -62,20 +75,17 @@ https://application.srisambuddhamission.org/confirm/${retreatCode}/${teiId}
 
 async function sendSms(message, teiMobile, token) {
   let formattedTeiMobile = teiMobile.replace(/^\+94/, "0");
-  return await fetch(
-    `https://application.srisambuddhamission.org/api/sms`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `ApiToken ${token}`,
-      },
-      body: JSON.stringify({
-        to: [formattedTeiMobile],
-        message,
-      }),
+  return await fetch(`https://application.srisambuddhamission.org/api/sms`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `ApiToken ${token}`,
     },
-  );
+    body: JSON.stringify({
+      to: [formattedTeiMobile],
+      message,
+    }),
+  });
 }
 
 const RetreatInvitationModal = observer(({ store, retreat, onCancel }) => {
@@ -150,7 +160,7 @@ const RetreatInvitationModal = observer(({ store, retreat, onCancel }) => {
 
     await store.metadata.setRetreatAttendanceConfirmationDate(
       retreat,
-      new Date(confirmationDeadline),
+      confirmationDeadline,
     );
 
     // create a temporary token
@@ -179,9 +189,8 @@ const RetreatInvitationModal = observer(({ store, retreat, onCancel }) => {
       finalYogisList.push(...sentYogis);
     }
 
-    setIsSending(true);
-
     setTotalToSend(toSendYogis.length);
+    setIsSending(true);
 
     for (let i = 0; i < finalYogisList.length; i++) {
       let sentResponse = await sendSms(
@@ -191,6 +200,7 @@ const RetreatInvitationModal = observer(({ store, retreat, onCancel }) => {
           retreat.retreatCode,
           retreat.date,
           retreat.endDate,
+          confirmationDeadline,
         ),
         finalYogisList[i].attributes[DHIS2_TEI_ATTRIBUTE_MOBILE],
         token,
@@ -205,23 +215,22 @@ const RetreatInvitationModal = observer(({ store, retreat, onCancel }) => {
       );
 
       // set the campaign id into the datastore to handel delivery report
-      if(sent) {
+      if (sent) {
         const sentResponseJson = await sentResponse.json();
-        const expressionOInterestEvent = finalYogisList[i].expressionOfInterests[retreat.code];
+        const expressionOInterestEvent =
+          finalYogisList[i].expressionOfInterests[retreat.code];
         // write to datastore
         await dataEngine.mutate({
           type: "create",
-          resource: "dataStore/invitation-sms/"+sentResponseJson.campaignId,
+          resource: "dataStore/invitation-sms/" + sentResponseJson.campaignId,
           data: {
-            "eventId": expressionOInterestEvent.eventId
+            eventId: expressionOInterestEvent.eventId,
           },
         });
       }
 
       setSentCount(i + 1);
     }
-
-    setIsSending(false);
 
     // delete the token
     await dataEngine.mutate({
@@ -292,6 +301,7 @@ const RetreatInvitationModal = observer(({ store, retreat, onCancel }) => {
                 retreat.retreatCode,
                 retreat.date,
                 retreat.endDate,
+                confirmationDeadline,
               )}
             />
           </ModalContent>

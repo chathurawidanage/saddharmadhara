@@ -189,7 +189,7 @@ class MetadataStore {
     await this.updateRetreatAttribute(
       retreat,
       DHIS2_RETREAT_ATTENDANCE_CONFIRMATION_DATE_ATTRIBUTE,
-      date.toISOString().split("T")[0],
+      date,
     );
   };
 

@@ -7,6 +7,7 @@ import ConfirmError from "../../../forms/ConfirmError";
 import { ENGLISH_LOCALE } from "../../../forms/locale/english";
 import { SINHALA_LOCALE } from "../../../forms/locale/sinhala";
 import {
+  DHIS2_RETREAT_CONFIRMATION_DEADLINE_ATTRIBUTE,
   DHIS2_RETREAT_SELECTION_STATE_DATA_ELEMENT,
   DHIS2_TEI_ATTRIBUTE_NAME,
   dhis2Endpoint,
@@ -50,9 +51,8 @@ export default async function Page(props: {
   if (!retreatObj || !retreatObj.value) {
     return <LinkError />;
   }
-  const retreatLanguage = retreatObj.attributes[DHIS2_RETREAT_ATTRIBUTE_MEDIUM];
 
-  console.log(retreatLanguage);
+  const retreatLanguage = retreatObj.attributes[DHIS2_RETREAT_ATTRIBUTE_MEDIUM];
 
   const expressionOfInterestEvent = await getExpressionOfInterestEvent(
     teId,
@@ -105,6 +105,31 @@ export default async function Page(props: {
       <ConfirmError
         title={title}
         error={errorMessage}
+        language={retreatLanguage}
+      />
+    );
+  }
+
+  // check if confirmation deadline has passed
+  const confirmationDeadline: string =
+    retreatObj.attributes[DHIS2_RETREAT_CONFIRMATION_DEADLINE_ATTRIBUTE];
+
+  if (
+    confirmationDeadline &&
+    new Date(confirmationDeadline).getTime() < Date.now()
+  ) {
+    return (
+      <ConfirmError
+        title={{
+          [ENGLISH_LOCALE]: "Confirmation Deadline Passed",
+          [SINHALA_LOCALE]: "තහවුරු කිරීමේ කාලසීමාව අවසන්",
+        }}
+        error={{
+          [ENGLISH_LOCALE]:
+            "The confirmation deadline for this retreat has passed.",
+          [SINHALA_LOCALE]:
+            "මෙම වැඩසටහන සඳහා පැමිණීම තහවුරු කිරීමට ලබා දුන් කාලය අවසාන වී ඇත.",
+        }}
         language={retreatLanguage}
       />
     );
