@@ -13,8 +13,10 @@ import {
 import { observer } from "mobx-react";
 import React, { useEffect } from "react";
 import { useAlert, useDataEngine } from "@dhis2/app-runtime";
-import { DHIS2_TEI_ATTRIBUTE_MOBILE } from "../dhis2";
-import metadata from "../stores/metadata";
+import {
+  DHIS2_TEI_ATTRIBUTE_FULL_NAME,
+  DHIS2_TEI_ATTRIBUTE_MOBILE,
+} from "../dhis2";
 
 const classes = {
   checkboxes: {
@@ -35,6 +37,7 @@ const tokenCreateMutation = {
 
 async function sendSms(
   teiId,
+  teiFullName,
   retreatCode,
   retreatFrom,
   retreatTo,
@@ -49,8 +52,8 @@ async function sendSms(
 https://application.srisambuddhamission.org/confirm/${retreatCode}/${teiId}
 
 එසේ අපහසු නම් පමණක් ඔබගේ සහභාගිත්වය පහත පරිදි 0743208734 අංකයට SMS හෝ Whatsapp පණිවිඩයක් මගින් තහවුරු කරන්න.
-වැඩසටහන් අංකය:
-නම:
+වැඩසටහන් අංකය: ${retreatCode}
+නම: ${teiFullName}
 ජා.හැ.අ./ගමන් බ.ප.අ:
 පැමිණීම / නොපැමිණීම:`;
 
@@ -179,6 +182,7 @@ const RetreatInvitationModal = observer(({ store, retreat, onCancel }) => {
     for (let i = 0; i < finalYogisList.length; i++) {
       let sent = await sendSms(
         finalYogisList[i].id,
+        finalYogisList[i].attributes[DHIS2_TEI_ATTRIBUTE_FULL_NAME],
         retreat.retreatCode,
         retreat.date,
         retreat.endDate,
