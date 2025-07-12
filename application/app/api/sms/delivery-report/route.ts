@@ -29,10 +29,15 @@ export async function GET(request: Request) {
   const eventId = await getEventIdForSmsCampaignId(campaignId);
 
   if (eventId) {
-    await changeRetreatInvitationStatus(
-      eventId,
-      getDhis2InvitationStatus(status),
-    );
+    // since we don't have a way to atomically update the status adding a delay to avoid race conditions.
+    // why? the admin app set the state to sent and there's a slight chance of getting the delivery report before the status is updated by admin app leading to a race condition.
+
+    setTimeout(async () => {
+      await changeRetreatInvitationStatus(
+        eventId,
+        getDhis2InvitationStatus(status),
+      );
+    }, 30000);
   }
 
   return new Response("OK", {
