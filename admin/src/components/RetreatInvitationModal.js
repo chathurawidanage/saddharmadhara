@@ -306,6 +306,9 @@ const RetreatInvitationModal = observer(({ store, retreat, onCancel }) => {
             </div>
           </ModalContent>
           <ModalActions>
+            {isSending && totalToSend > 0 && (
+              <LinearLoader amount={(sentCount * 100) / totalToSend} />
+            )}
             <ButtonStrip>
               <Button onClick={onCancel}>Cancel</Button>
               <Button
@@ -316,12 +319,6 @@ const RetreatInvitationModal = observer(({ store, retreat, onCancel }) => {
                 Send
               </Button>
             </ButtonStrip>
-            {isSending && totalToSend > 0 && (
-              <LinearLoader
-                width="100%"
-                amount={(sentCount * 100) / totalToSend}
-              />
-            )}
           </ModalActions>
         </>
       )}
