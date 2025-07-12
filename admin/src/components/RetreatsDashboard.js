@@ -34,6 +34,9 @@ const styles = {
 const Retreat = ({ retreat }) => {
   const navigate = useNavigate();
 
+  const plusDateTo = new Date(retreat.endDate);
+  plusDateTo.setDate(plusDateTo.getDate() + 1);
+
   return (
     <Col md={3}>
       <Card style={styles.retreatCard}>
@@ -62,7 +65,7 @@ const Retreat = ({ retreat }) => {
                 day: "numeric",
               })}{" "}
               -{" "}
-              {retreat.endDate.toLocaleDateString("en-US", {
+              {plusDateTo.toLocaleDateString("en-US", {
                 year: "numeric",
                 month: "short",
                 day: "numeric",

@@ -46,7 +46,15 @@ async function sendSms(
 ) {
   const plusDateTo = new Date(retreatTo);
   plusDateTo.setDate(plusDateTo.getDate() + 1);
-  const message = `ඔබ ${retreatFrom.toISOString().split("T")[0]} සිට ${plusDateTo.toISOString().split("T")[0]} දක්වා පැවැත්වෙන සද්ධර්මධාරා
+  const message = `ඔබ ${retreatFrom.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  })} සිට ${plusDateTo.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  })} දක්වා පැවැත්වෙන සද්ධර්මධාරා
 නේවාසික වැඩසටහන හා සම්බන්ධවීමට තේරී පත් ව ඇත. පහත යොමුව මගින් ඔබගේ සහභාගි වීම/නොවීම තහවුරු කරන්න.
 
 https://application.srisambuddhamission.org/confirm/${retreatCode}/${teiId}
@@ -180,6 +188,8 @@ const RetreatInvitationModal = observer(({ store, retreat, onCancel }) => {
     setIsSending(true);
 
     setTotalToSend(toSendYogis.length);
+
+    console.log(JSON.stringify(retreat, null, 2));
 
     for (let i = 0; i < finalYogisList.length; i++) {
       let sent = await sendSms(

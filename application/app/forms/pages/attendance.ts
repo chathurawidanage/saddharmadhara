@@ -23,7 +23,15 @@ const agreementPage = (retreatObj, teiName: string) => {
         type: "boolean",
         title: {
           [ENGLISH_LOCALE]: `You (${teiName}) have been selected to attend the ${noOfDays} days Saddharmadhara retreat from ${startDate.toLocaleDateString()} to ${endDate.toLocaleDateString()}. Please confirm you attendance below.`,
-          [SINHALA_LOCALE]: `ඔබ (${teiName}) ${startDate.toLocaleDateString()} සිට ${endDate.toLocaleDateString()} දක්වා දක්වා පැවැත්වෙන දින ${noOfDays}ක සද්ධර්මධාරා නේවාසික වැඩසටහන හා සම්බන්ධවීමට තේරී පත් ව ඇත. කරුණාකර ඔබගේ සහභාගිත්වය තහවුරු කරන්න.`,
+          [SINHALA_LOCALE]: `ඔබ (${teiName}) ${startDate.toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+          })} සිට ${endDate.toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+          })} දක්වා දක්වා පැවැත්වෙන දින ${noOfDays}ක සද්ධර්මධාරා නේවාසික වැඩසටහන හා සම්බන්ධවීමට තේරී පත් ව ඇත. කරුණාකර ඔබගේ සහභාගිත්වය තහවුරු කරන්න.`,
         },
         isRequired: true,
         labelTrue: {

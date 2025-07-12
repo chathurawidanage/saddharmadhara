@@ -71,8 +71,8 @@ export default async function Page(props: {
 
   if (currentConfirmationState !== "pending") {
     let title = {
-      [ENGLISH_LOCALE]: "Link Expired",
-      [SINHALA_LOCALE]: "සබැඳිය කල් ඉකුත් වී ඇත",
+      [ENGLISH_LOCALE]: "We have already received your confirmation",
+      [SINHALA_LOCALE]: "ඔබගේ තහවුරු කිරීම අපට දැනටමත් ලැබී ඇත",
     };
     let errorMessage = {
       [ENGLISH_LOCALE]: `You (${teiName}) have already sent us you confirmation for this retreat as '${currentConfirmationState === "selected" ? "Attending" : "Not Attending"}'.`,
