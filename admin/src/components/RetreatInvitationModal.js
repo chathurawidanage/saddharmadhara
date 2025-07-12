@@ -15,7 +15,7 @@ import React, { useEffect } from "react";
 import { useAlert, useDataEngine } from "@dhis2/app-runtime";
 import {
   DHIS2_TEI_ATTRIBUTE_FULL_NAME,
-  DHIS2_TEI_ATTRIBUTE_MOBILE,
+  DHIS2_TEI_ATTRIBUTE_MOBILE
 } from "../dhis2";
 
 const classes = {
@@ -52,6 +52,7 @@ async function sendSms(
 https://application.srisambuddhamission.org/confirm/${retreatCode}/${teiId}
 
 එසේ අපහසු නම් පමණක් ඔබගේ සහභාගිත්වය පහත පරිදි 0743208734 අංකයට SMS හෝ Whatsapp පණිවිඩයක් මගින් තහවුරු කරන්න.
+
 වැඩසටහන් අංකය: ${retreatCode}
 නම: ${teiFullName}
 ජා.හැ.අ./ගමන් බ.ප.අ:
@@ -179,6 +180,7 @@ const RetreatInvitationModal = observer(({ store, retreat, onCancel }) => {
     setIsSending(true);
 
     setTotalToSend(toSendYogis.length);
+
     for (let i = 0; i < finalYogisList.length; i++) {
       let sent = await sendSms(
         finalYogisList[i].id,
