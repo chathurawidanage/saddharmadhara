@@ -20,13 +20,13 @@ export async function GET(request: Request) {
   if (status === "1") {
     // sent
     // ignore as we have handled that already during the send call
-    return;
+    return new Response("OK", {
+      status: 200,
+    });
   }
 
   // get event id from dhis2 datastore
   const eventId = await getEventIdForSmsCampaignId(campaignId);
-
-  console.log("Event Id:", eventId);
 
   if (eventId) {
     await changeRetreatInvitationStatus(

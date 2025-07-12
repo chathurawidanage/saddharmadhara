@@ -275,35 +275,35 @@ const RetreatInvitationModal = observer(({ store, retreat, onCancel }) => {
                 onChange={() => onCheckChange(2)}
               />
             </div>
-          </ModalContent>
-          <ModalContent>
-            <h6 style={{ marginTop: 20 }}>Set the confirmation deadline</h6>
-            <CalendarInput
-              label="Confirmation Deadline"
-              calendar="gregory"
-              locale="en-LK"
-              date={confirmationDeadline}
-              onDateSelect={(date) => {
-                setConfirmationDeadline(date.calendarDateString);
-              }}
-            />
-          </ModalContent>
-          <ModalContent>
-            <h6 style={{ marginTop: 20 }}>
-              Check the correctness of the message below
-            </h6>
-            <textarea
-              disabled={true}
-              style={{ width: "100%", height: 350 }}
-              value={getMessage(
-                "yogi-id",
-                "yogi-full-name",
-                retreat.retreatCode,
-                retreat.date,
-                retreat.endDate,
-                confirmationDeadline,
-              )}
-            />
+            <div>
+              <h6 style={{ marginTop: 20 }}>Set the confirmation deadline</h6>
+              <CalendarInput
+                label="Confirmation Deadline"
+                calendar="gregory"
+                locale="en-LK"
+                date={confirmationDeadline}
+                onDateSelect={(date) => {
+                  setConfirmationDeadline(date.calendarDateString);
+                }}
+              />
+            </div>
+            <div>
+              <h6 style={{ marginTop: 20 }}>
+                Check the correctness of the message below
+              </h6>
+              <textarea
+                disabled={true}
+                style={{ width: "100%", height: 350 }}
+                value={getMessage(
+                  "yogi-id",
+                  "yogi-full-name",
+                  retreat.retreatCode,
+                  retreat.date,
+                  retreat.endDate,
+                  confirmationDeadline,
+                )}
+              />
+            </div>
           </ModalContent>
           <ModalActions>
             <ButtonStrip>
