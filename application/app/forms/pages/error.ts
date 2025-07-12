@@ -2,14 +2,16 @@
 
 import { ENGLISH_LOCALE } from "../locale/english";
 import { SINHALA_LOCALE } from "../locale/sinhala";
+import React from "react";
 
 const errorPage = (
   title: {
-    [ENGLISH_LOCALE]: String;
-    [SINHALA_LOCALE]: String;
+    [ENGLISH_LOCALE]: string;
+    [SINHALA_LOCALE]: string;
   },
   error: {
-    [ENGLISH_LOCALE]: String;
+    [ENGLISH_LOCALE]: string | React.ReactNode;
+    [SINHALA_LOCALE]: string | React.ReactNode;
   },
 ) => {
   return {

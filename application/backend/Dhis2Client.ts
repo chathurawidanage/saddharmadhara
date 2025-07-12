@@ -1,5 +1,8 @@
 "use server";
 
+/**
+ * This file content can be publicly callable. Add only functions that needs to be called from the frontend. Don't expose any PII.
+ */
 import {
   DHIS2_EXPRESSION_OF_INTEREST_PROGRAM_STAGE,
   DHIS2_PARTICIPATION_PROGRAM_STAGE,
@@ -10,7 +13,6 @@ import {
   DHIS2_RETREAT_SELECTION_STATE_DATA_ELEMENT,
   DHIS2_RETREATS_CODE_ATTRIBUTE,
   DHIS2_RETREATS_OPTION_SET,
-  DHIS2_TEI_ATTRIBUTE_NAME,
   dhis2Endpoint,
   dhis2Token,
 } from "../dhis2Constants";
@@ -240,21 +242,6 @@ export async function getExistingEnrollment(
   } else {
     return Promise.reject("No enrollment found for this attribute and value");
   }
-}
-
-export async function getTeiNameById(teiId) {
-  let url = new URL("tracker/trackedEntities/" + teiId, dhis2Endpoint);
-  url.searchParams.set("fields", "attributes");
-  let response = await fetch(url, {
-    method: "GET",
-    headers: {
-      Authorization: dhis2Token,
-    },
-  });
-  let responseJson = await response.json();
-  return responseJson.attributes?.find(
-    (att) => att.attribute === DHIS2_TEI_ATTRIBUTE_NAME,
-  )?.value;
 }
 
 export async function confirmAttendance(event: any, attending: boolean) {

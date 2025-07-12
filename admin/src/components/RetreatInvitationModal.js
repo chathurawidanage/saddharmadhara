@@ -15,7 +15,7 @@ import React, { useEffect } from "react";
 import { useAlert, useDataEngine } from "@dhis2/app-runtime";
 import {
   DHIS2_TEI_ATTRIBUTE_FULL_NAME,
-  DHIS2_TEI_ATTRIBUTE_MOBILE
+  DHIS2_TEI_ATTRIBUTE_MOBILE,
 } from "../dhis2";
 
 const classes = {
@@ -35,18 +35,11 @@ const tokenCreateMutation = {
   }),
 };
 
-async function sendSms(
-  teiId,
-  teiFullName,
-  retreatCode,
-  retreatFrom,
-  retreatTo,
-  teiMobile,
-  token,
-) {
+function getMessage(teiId, teiFullName, retreatCode, retreatFrom, retreatTo) {
+  // todo send in English for english retreats
   const plusDateTo = new Date(retreatTo);
   plusDateTo.setDate(plusDateTo.getDate() + 1);
-  const message = `ඔබ ${retreatFrom.toLocaleDateString("en-US", {
+  return `ඔබ ${retreatFrom.toLocaleDateString("en-US", {
     year: "numeric",
     month: "short",
     day: "numeric",
@@ -65,8 +58,11 @@ https://application.srisambuddhamission.org/confirm/${retreatCode}/${teiId}
 නම: ${teiFullName}
 ජා.හැ.අ./ගමන් බ.ප.අ:
 පැමිණීම / නොපැමිණීම:`;
+}
 
-  const response = await fetch(
+async function sendSms(message, teiMobile, token) {
+  let formattedTeiMobile = teiMobile.replace(/^\+94/, "0");
+  return await fetch(
     `https://application.srisambuddhamission.org/api/sms`,
     {
       method: "POST",
@@ -75,13 +71,11 @@ https://application.srisambuddhamission.org/confirm/${retreatCode}/${teiId}
         Authorization: `ApiToken ${token}`,
       },
       body: JSON.stringify({
-        to: [teiMobile],
-        // todo send in English for english retreats
+        to: [formattedTeiMobile],
         message,
       }),
     },
   );
-  return response.ok;
 }
 
 const RetreatInvitationModal = observer(({ store, retreat, onCancel }) => {
@@ -189,23 +183,41 @@ const RetreatInvitationModal = observer(({ store, retreat, onCancel }) => {
 
     setTotalToSend(toSendYogis.length);
 
-    console.log(JSON.stringify(retreat, null, 2));
-
     for (let i = 0; i < finalYogisList.length; i++) {
-      let sent = await sendSms(
-        finalYogisList[i].id,
-        finalYogisList[i].attributes[DHIS2_TEI_ATTRIBUTE_FULL_NAME],
-        retreat.retreatCode,
-        retreat.date,
-        retreat.endDate,
+      let sentResponse = await sendSms(
+        getMessage(
+          finalYogisList[i].id,
+          finalYogisList[i].attributes[DHIS2_TEI_ATTRIBUTE_FULL_NAME],
+          retreat.retreatCode,
+          retreat.date,
+          retreat.endDate,
+        ),
         finalYogisList[i].attributes[DHIS2_TEI_ATTRIBUTE_MOBILE],
         token,
       );
+
+      let sent = sentResponse?.ok;
+
       await store.yogis.changeInvitationSentState(
         finalYogisList[i].id,
         retreat.code,
         sent ? "sent" : "failed",
       );
+
+      // set the campaign id into the datastore to handel delivery report
+      if(sent) {
+        const sentResponseJson = await sentResponse.json();
+        const expressionOInterestEvent = finalYogisList[i].expressionOfInterests[retreat.code];
+        // write to datastore
+        await dataEngine.mutate({
+          type: "create",
+          resource: "dataStore/invitation-sms/"+sentResponseJson.campaignId,
+          data: {
+            "eventId": expressionOInterestEvent.eventId
+          },
+        });
+      }
+
       setSentCount(i + 1);
     }
 
@@ -263,9 +275,24 @@ const RetreatInvitationModal = observer(({ store, retreat, onCancel }) => {
               locale="en-LK"
               date={confirmationDeadline}
               onDateSelect={(date) => {
-                console.log(date);
                 setConfirmationDeadline(date.calendarDateString);
               }}
+            />
+          </ModalContent>
+          <ModalContent>
+            <h6 style={{ marginTop: 20 }}>
+              Check the correctness of the message below
+            </h6>
+            <textarea
+              disabled={true}
+              style={{ width: "100%", height: 350 }}
+              value={getMessage(
+                "yogi-id",
+                "yogi-full-name",
+                retreat.retreatCode,
+                retreat.date,
+                retreat.endDate,
+              )}
             />
           </ModalContent>
           <ModalActions>

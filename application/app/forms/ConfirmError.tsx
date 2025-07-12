@@ -36,8 +36,8 @@ export default function ConfirmError({
     [ENGLISH_LOCALE]: string;
   };
   error: {
-    [SINHALA_LOCALE]: string;
-    [ENGLISH_LOCALE]: string;
+    [SINHALA_LOCALE]: string | React.ReactNode;
+    [ENGLISH_LOCALE]: string | React.ReactNode;
   };
   language?: string;
 }) {

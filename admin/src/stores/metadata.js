@@ -15,7 +15,8 @@ import {
   DHIS_RETREAT_TYPE_OPTION_SET_ID,
   DHIS2_RETREAT_MEDIUM_ATTRIBUTE,
   DHIS2_RETREAT_FINALIZED_ATTRIBUTE,
-  DHIS2_ATTENDANCE_OPTION_SET_ID, DHIS2_RETREAT_ATTENDANCE_CONFIRMATION_DATE_ATTRIBUTE,
+  DHIS2_ATTENDANCE_OPTION_SET_ID,
+  DHIS2_RETREAT_ATTENDANCE_CONFIRMATION_DATE_ATTRIBUTE,
 } from "../dhis2";
 
 // Retreats Transforming
@@ -170,15 +171,21 @@ class MetadataStore {
   }
 
   markRetreatAsFinalized = async (retreat) => {
-    await this.updateRetreatAttribute(
+    const finalized = await this.updateRetreatAttribute(
       retreat,
       DHIS2_RETREAT_FINALIZED_ATTRIBUTE,
       true,
     );
+
+    if (finalized) {
+      runInAction(() => {
+        const retreatIndex = this.retreats.indexOf(retreat);
+        this.retreats[retreatIndex].finalized = true;
+      });
+    }
   };
 
   setRetreatAttendanceConfirmationDate = async (retreat, date) => {
-    console.log("setRetreatAttendanceConfirmationDate", date);
     await this.updateRetreatAttribute(
       retreat,
       DHIS2_RETREAT_ATTENDANCE_CONFIRMATION_DATE_ATTRIBUTE,
@@ -197,17 +204,13 @@ class MetadataStore {
     });
 
     const existingRetreatOnServer = retreatObj.retreat;
-    const finalizedAttributeIndex =
+    const updatingAttributeIndex =
       existingRetreatOnServer.attributeValues.findIndex(
-        (attributeValue) =>
-          attributeValue.attribute.id === attributeId,
+        (attributeValue) => attributeValue.attribute.id === attributeId,
       );
-    if (finalizedAttributeIndex !== -1) {
+    if (updatingAttributeIndex !== -1) {
       // remove
-      existingRetreatOnServer.attributeValues.splice(
-        finalizedAttributeIndex,
-        1,
-      );
+      existingRetreatOnServer.attributeValues.splice(updatingAttributeIndex, 1);
     }
 
     const mutatedRetreat = {
@@ -223,7 +226,6 @@ class MetadataStore {
       ],
     };
 
-    const retreatIndex = this.retreats.indexOf(retreat);
     const mutation = {
       resource: "options",
       id: retreat.id,
@@ -232,11 +234,7 @@ class MetadataStore {
     };
     let response = await this.engine.mutate(mutation);
 
-    if (response.httpStatusCode === 200) {
-      runInAction(() => {
-        this.retreats[retreatIndex].finalized = true;
-      });
-    }
+    return response.httpStatusCode === 200;
   };
 
   init = async () => {

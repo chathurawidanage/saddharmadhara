@@ -2,12 +2,16 @@ import Confirm from "../../../forms/Confirm";
 import {
   getExpressionOfInterestEvent,
   getRetreatByCode,
-  getTeiNameById,
 } from "../../../../backend/Dhis2Client";
 import ConfirmError from "../../../forms/ConfirmError";
 import { ENGLISH_LOCALE } from "../../../forms/locale/english";
 import { SINHALA_LOCALE } from "../../../forms/locale/sinhala";
-import { DHIS2_RETREAT_SELECTION_STATE_DATA_ELEMENT } from "../../../../dhis2Constants";
+import {
+  DHIS2_RETREAT_SELECTION_STATE_DATA_ELEMENT,
+  DHIS2_TEI_ATTRIBUTE_NAME,
+  dhis2Endpoint,
+  dhis2Token,
+} from "../../../../dhis2Constants";
 import { DHIS2_RETREAT_ATTRIBUTE_MEDIUM } from "../../../forms/dhis2";
 import type { Metadata } from "next";
 
@@ -75,8 +79,8 @@ export default async function Page(props: {
       [SINHALA_LOCALE]: "ඔබගේ තහවුරු කිරීම අපට දැනටමත් ලැබී ඇත",
     };
     let errorMessage = {
-      [ENGLISH_LOCALE]: `You (${teiName}) have already sent us you confirmation for this retreat as '${currentConfirmationState === "selected" ? "Attending" : "Not Attending"}'.`,
-      [SINHALA_LOCALE]: `මෙම වැඩසටහන සඳහා ඔබ (${teiName}) දැනටමත් ඔබගේ තහවුරු කිරීම '${currentConfirmationState === "selected" ? "පැමිනේ" : "නොපැමිනේ"}' ලෙස අපට සනාථ කර ඇත.`,
+      [ENGLISH_LOCALE]: `You (${teiName}) have already sent us you confirmation for this retreat as <b>${currentConfirmationState === "selected" ? "Attending" : "Not Attending"}</b>.`,
+      [SINHALA_LOCALE]: `මෙම වැඩසටහන සඳහා ඔබ (${teiName}) දැනටමත් ඔබගේ තහවුරු කිරීම <b>${currentConfirmationState === "selected" ? "පැමිණේ" : "නොපැමිණේ"}</b> ලෙස අපට සනාථ කර ඇත.`,
     };
 
     if (
@@ -106,8 +110,6 @@ export default async function Page(props: {
     );
   }
 
-  console.log(expressionOfInterestEvent);
-
   return (
     <Confirm
       expressionOfInterestEvent={expressionOfInterestEvent}
@@ -115,4 +117,19 @@ export default async function Page(props: {
       teiName={teiName}
     />
   );
+}
+
+async function getTeiNameById(teiId: string) {
+  let url = new URL("tracker/trackedEntities/" + teiId, dhis2Endpoint);
+  url.searchParams.set("fields", "attributes");
+  let response = await fetch(url, {
+    method: "GET",
+    headers: {
+      Authorization: dhis2Token,
+    },
+  });
+  let responseJson = await response.json();
+  return responseJson.attributes?.find(
+    (att) => att.attribute === DHIS2_TEI_ATTRIBUTE_NAME,
+  )?.value;
 }
