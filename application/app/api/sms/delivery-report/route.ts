@@ -108,5 +108,5 @@ function getDhis2InvitationStatus(status: string) {
   } else if (status === "3") {
     return "delivered";
   }
-  return "sent";
+  throw new Error("unknown status");
 }
