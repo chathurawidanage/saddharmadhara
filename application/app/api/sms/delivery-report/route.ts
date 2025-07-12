@@ -85,6 +85,16 @@ async function changeRetreatInvitationStatus(eventId: string, status: string) {
       ],
     }),
   });
+
+  if (!response.ok) {
+    try {
+      const errorText = await response.text();
+      console.error("Failed to update retreat invitation status:", errorText);
+    } catch (e) {
+      console.error("Failed to get error text of failed sms state update", e);
+    }
+  }
+
   return response.ok;
 }
 
