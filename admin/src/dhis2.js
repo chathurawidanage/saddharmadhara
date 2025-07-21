@@ -60,26 +60,3 @@ export const DHIS2_TEI_ATTRIBUTE_HAS_STRESS = "dgky5acnvG3";
 export const DHIS2_TEI_ATTRIBUTE_HAS_STRESS_COMMENT = "p6LLGv4WOT";
 
 export const DHIS2_ATTENDANCE_OPTION_SET_ID = "MkNQNfdZzz3";
-
-export const getFinalExcelDownloadLink = (retreatCode, stage, filters = []) =>
-  [
-    `api/analytics/events/query/KdYt2OP9VjD.xls?dimension=pe:THIS_MONTH;LAST_12_MONTHS`,
-    `dimension=ou:${DHIS2_ROOT_ORG}`,
-    `dimension=${stage}.${DHIS2_RETREAT_DATA_ELEMENT}:EQ:${encodeURIComponent(retreatCode)}`,
-    `dimension=${stage}.${DHIS2_ROOM_ALLOCATION_DATA_ELEMENT}`,
-    `dimension=${stage}.${DHIS2_TEI_ATTRIBUTE_FULL_NAME}`,
-    `dimension=${stage}.${DHIS2_TEI_ATTRIBUTE_NIC}`,
-    `dimension=${stage}.${DHIS2_TEI_ATTRIBUTE_PASSPORT}`,
-    `dimension=${stage}.${DHIS2_TEI_ATTRIBUTE_MOBILE}`,
-    ...filters.map((f) => {
-      return `dimension=${stage}.${f.dataElement}:EQ:${encodeURIComponent(f.value)}`;
-    }),
-    `stage=${stage}`,
-    `displayProperty=NAME`,
-    `totalPages=false`,
-    `outputType=EVENT`,
-    `asc=eventdate`,
-    `pageSize=500`,
-    `page=1`,
-    `outputIdScheme=NAME`,
-  ].join("&");

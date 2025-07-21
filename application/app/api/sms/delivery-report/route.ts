@@ -56,6 +56,10 @@ async function changeRetreatInvitationStatus(eventId: string, status: string) {
   });
 
   if (!eventResponse.ok) {
+    console.error(
+      "Failed to get event for retreat invitation status update",
+      eventId,
+    );
     return false;
   }
 

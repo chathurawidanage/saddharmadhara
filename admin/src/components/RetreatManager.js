@@ -1,10 +1,10 @@
 import {
   Button,
-  IconArrowLeft16,
-  Tag,
   DropdownButton,
-  MenuItem,
   FlyoutMenu,
+  IconArrowLeft16,
+  MenuItem,
+  Tag,
 } from "@dhis2/ui";
 import { observer } from "mobx-react";
 import React from "react";
@@ -15,9 +15,8 @@ import RetreatLocation from "./RetreatLocation";
 import YogisList from "./manager/YogiList";
 import RetreatFinaliseModal from "./RetreatFinaliseModal";
 import {
-  DHIS2_EXPRESSION_OF_INTEREST_PROGRAM_STAGE,
-  DHIS2_RETREAT_SELECTION_STATE_DATA_ELEMENT,
-  getFinalExcelDownloadLink,
+  DHIS2_TEI_ATTRIBUTE_FULL_NAME,
+  DHIS2_TEI_ATTRIBUTE_GENDER,
 } from "../dhis2";
 import { useConfig } from "@dhis2/app-runtime";
 import RetreatInvitationModal from "./RetreatInvitationModal";
@@ -51,6 +50,18 @@ const styles = {
   },
 };
 
+function downloadTextFile(text, fileName) {
+  const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+
+  link.setAttribute("href", url);
+  link.setAttribute("download", `${fileName}.txt`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
 const RetreatManager = observer(({ store }) => {
   const { baseUrl } = useConfig();
   const params = useParams();
@@ -65,6 +76,24 @@ const RetreatManager = observer(({ store }) => {
     let tempElement = document.createElement("a");
     tempElement.href = baseUrl;
     window.open(new URL(url, tempElement.href), "_blank");
+  };
+
+  const downloadYogiList = async (retreatCode, gender, selectionState) => {
+    const yogis = await store.yogis.fetchExpressionOfInterests(retreatCode);
+    const yogiNames = [];
+    let index = 0;
+    for (const yogiId of yogis) {
+      const yogi = store.yogis.yogiIdToObjectMap[yogiId];
+      if (
+        yogi.attributes[DHIS2_TEI_ATTRIBUTE_GENDER] === gender &&
+        yogi.expressionOfInterests[retreatCode].state === selectionState
+      ) {
+        yogiNames.push(
+          `${(++index).toString().padStart(2, "0")} ${yogi.attributes[DHIS2_TEI_ATTRIBUTE_FULL_NAME].trim()}`,
+        );
+      }
+    }
+    downloadTextFile(yogiNames.join("\n"), `${retreatCode}_${gender}`);
   };
 
   return (
@@ -108,60 +137,48 @@ const RetreatManager = observer(({ store }) => {
                 <DropdownButton
                   component={
                     <FlyoutMenu>
-                      <MenuItem
-                        label="Applied"
-                        onClick={() => {
-                          openDownloadLink(
-                            getFinalExcelDownloadLink(
-                              retreat.code,
-                              DHIS2_EXPRESSION_OF_INTEREST_PROGRAM_STAGE,
-                              [
-                                {
-                                  dataElement:
-                                    DHIS2_RETREAT_SELECTION_STATE_DATA_ELEMENT,
-                                  value: "applied",
-                                },
-                              ],
-                            ),
-                          );
-                        }}
-                      />
-                      <MenuItem
-                        label="Pending Confirmation"
-                        onClick={() => {
-                          openDownloadLink(
-                            getFinalExcelDownloadLink(
-                              retreat.code,
-                              DHIS2_EXPRESSION_OF_INTEREST_PROGRAM_STAGE,
-                              [
-                                {
-                                  dataElement:
-                                    DHIS2_RETREAT_SELECTION_STATE_DATA_ELEMENT,
-                                  value: "pending",
-                                },
-                              ],
-                            ),
-                          );
-                        }}
-                      />
-                      <MenuItem
-                        label="Selected"
-                        onClick={() => {
-                          openDownloadLink(
-                            getFinalExcelDownloadLink(
-                              retreat.code,
-                              DHIS2_EXPRESSION_OF_INTEREST_PROGRAM_STAGE,
-                              [
-                                {
-                                  dataElement:
-                                    DHIS2_RETREAT_SELECTION_STATE_DATA_ELEMENT,
-                                  value: "selected",
-                                },
-                              ],
-                            ),
-                          );
-                        }}
-                      />
+                      <MenuItem label="Applied">
+                        {["Male", "Female"].map((gender) => (
+                          <MenuItem
+                            onClick={() => {
+                              downloadYogiList(
+                                retreat.code,
+                                gender.toLowerCase(),
+                                "applied",
+                              );
+                            }}
+                            label={gender}
+                          />
+                        ))}
+                      </MenuItem>
+                      <MenuItem label="Pending Confirmation">
+                        {["Male", "Female"].map((gender) => (
+                          <MenuItem
+                            onClick={() => {
+                              downloadYogiList(
+                                retreat.code,
+                                gender.toLowerCase(),
+                                "pending",
+                              );
+                            }}
+                            label={gender}
+                          />
+                        ))}
+                      </MenuItem>
+                      <MenuItem label="Selected">
+                        {["Male", "Female"].map((gender) => (
+                          <MenuItem
+                            onClick={() => {
+                              downloadYogiList(
+                                retreat.code,
+                                gender.toLowerCase(),
+                                "selected",
+                              );
+                            }}
+                            label={gender}
+                          />
+                        ))}
+                      </MenuItem>
                     </FlyoutMenu>
                   }
                 >
