@@ -7,12 +7,15 @@ import {
   DHIS2_EXPRESSION_OF_INTEREST_PROGRAM_STAGE,
   DHIS2_PARTICIPATION_PROGRAM_STAGE,
   DHIS2_PROGRAM,
+  DHIS2_RETREAT_CLERGY_ONLY_ATTRIBUTE,
   DHIS2_RETREAT_DATA_ELEMENT,
   DHIS2_RETREAT_DATE_ATTRIBUTE,
   DHIS2_RETREAT_DISABLED_ATTRIBUTE,
   DHIS2_RETREAT_SELECTION_STATE_DATA_ELEMENT,
   DHIS2_RETREATS_CODE_ATTRIBUTE,
   DHIS2_RETREATS_OPTION_SET,
+  DHIS2_TEI_ATTRIBUTE_MARITAL_STATE,
+  DHIS2_TEI_ATTRIBUTE_MARITAL_STATE_REVEREND,
   dhis2Endpoint,
   dhis2Token,
 } from "../dhis2Constants";
@@ -181,6 +184,10 @@ export async function getEligibleRetreats(enrollment?: string) {
   }).then((res) => res.json());
 
   let retreatEngagement = await getRetreatEngagement(enrollment);
+  let maritalState = await getAttributeValue(
+    DHIS2_TEI_ATTRIBUTE_MARITAL_STATE,
+    enrollment,
+  );
 
   return optionsResponse?.options
     ?.map((option) => {
@@ -201,6 +208,20 @@ export async function getEligibleRetreats(enrollment?: string) {
         ) &&
         !retreatEngagement[DHIS2_PARTICIPATION_PROGRAM_STAGE].has(option.code)
       );
+    })
+    .filter((option) => {
+      return (
+        maritalState === null ||
+        option.attributes[DHIS2_RETREAT_CLERGY_ONLY_ATTRIBUTE] === undefined ||
+        option.attributes[DHIS2_RETREAT_CLERGY_ONLY_ATTRIBUTE] === "false" ||
+        (option.attributes[DHIS2_RETREAT_CLERGY_ONLY_ATTRIBUTE] === "true" &&
+          maritalState === DHIS2_TEI_ATTRIBUTE_MARITAL_STATE_REVEREND)
+      );
+    })
+    .sort((a, b) => {
+      let aDate = new Date(a.attributes[DHIS2_RETREAT_DATE_ATTRIBUTE]);
+      let bDate = new Date(b.attributes[DHIS2_RETREAT_DATE_ATTRIBUTE]);
+      return aDate.getTime() - bDate.getTime();
     });
 }
 
@@ -268,6 +289,35 @@ export async function confirmAttendance(event: any, attending: boolean) {
     }),
   });
   return response.ok;
+}
+
+async function getAttributeValue(attributeId: string, enrollment?: string) {
+  if (!enrollment) {
+    return null;
+  }
+
+  let url = new URL(
+    "tracker/enrollments/" + enrollment + ".json",
+    dhis2Endpoint,
+  );
+  url.searchParams.set("fields", "attributes");
+
+  let enrollmentResponse = await fetch(url, {
+    method: "GET",
+    headers: {
+      Authorization: dhis2Token,
+    },
+  });
+
+  const enrollmentResponseJson = await enrollmentResponse.json();
+  const attributeObject = enrollmentResponseJson.attributes?.find(
+    (a) => a.attribute === attributeId,
+  );
+
+  if (attributeObject) {
+    return attributeObject.value;
+  }
+  return null;
 }
 
 function flattenRetreatOption(option) {

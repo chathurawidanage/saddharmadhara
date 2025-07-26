@@ -10,12 +10,21 @@ import {
 } from "../properties";
 import { getEligibleRetreats } from "../../../backend/Dhis2Client";
 import { SurveyModel } from "survey-core";
+import { DHIS2_RETREAT_CLERGY_ONLY_ATTRIBUTE } from "../../../dhis2Constants";
+import { ENGLISH_LOCALE } from "../locale/english";
 
 export const getMediumText = (mediumCode: "sinhala" | "english") => {
   if (mediumCode && mediumCode === "english") {
     return "English Medium(ඉංග්‍රීසි මාධ්‍ය)";
   }
   return "සිංහල මාධ්‍ය";
+};
+
+const getOnlyForClergyText = (locale: string) => {
+  if (locale === ENGLISH_LOCALE) {
+    return "Only for Reverends";
+  }
+  return "මහා සංඝරත්නය සඳහා පමණි";
 };
 
 const onPropertyChanged = (survey: SurveyModel, options) => {
@@ -35,11 +44,14 @@ const onPropertyChanged = (survey: SurveyModel, options) => {
           let endDate = new Date(
             startDate.getTime() + (noOfDays + 1) * 24 * 60 * 60 * 1000,
           );
+          let onlyForClergy =
+            choice.attributes[DHIS2_RETREAT_CLERGY_ONLY_ATTRIBUTE] === "true";
           return {
             value: choice.value,
             text: `<div class="retreat-checkbox-item">
               <h4>${choice.text}</h4>
               <div class="retreat-checkbox-item-details">
+                ${onlyForClergy ? `<div>🛡️ ${getOnlyForClergyText(survey.locale)}</div>` : ""}
                 <div>📅 ${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()}</div>
                 <div>⏲️ ${noOfDays} Days</div>
                 <div>🌐 ${getMediumText(medium)}</div>

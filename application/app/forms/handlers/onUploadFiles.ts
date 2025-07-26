@@ -16,7 +16,6 @@ const onUploadFiles = (survey: SurveyModel, options) => {
 
   uploadFile(formData)
     .then((fileId) => {
-      console.log("File uploaded: ", fileId);
       options.callback(
         options.files.map((file) => {
           return {
