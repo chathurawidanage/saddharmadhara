@@ -48,7 +48,7 @@ const onPropertyChanged = (survey: SurveyModel, options) => {
             choice.attributes[DHIS2_RETREAT_CLERGY_ONLY_ATTRIBUTE] === "true";
           return {
             value: choice.value,
-            text: `<div class="retreat-checkbox-item">
+            text: `<div class="retreat-checkbox-item ${onlyForClergy ? "retreat-checkbox-item-only-for-clergy" : ""}">
               <h4>${choice.text}</h4>
               <div class="retreat-checkbox-item-details">
                 ${onlyForClergy ? `<div>🛡️ ${getOnlyForClergyText(survey.locale)}</div>` : ""}
