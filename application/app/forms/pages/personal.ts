@@ -103,7 +103,7 @@ const personalPage = (isRequired) => {
             value: "divorced",
             text: {
               [ENGLISH_LOCALE]: "Divorced",
-              [SINHALA_LOCALE]: "දික්කසා​ද",
+              [SINHALA_LOCALE]: "දික්කසාද",
             },
           },
         ],
