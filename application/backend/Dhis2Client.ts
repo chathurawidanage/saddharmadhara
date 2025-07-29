@@ -184,10 +184,6 @@ export async function getEligibleRetreats(enrollment?: string) {
   }).then((res) => res.json());
 
   let retreatEngagement = await getRetreatEngagement(enrollment);
-  let maritalState = await getAttributeValue(
-    DHIS2_TEI_ATTRIBUTE_MARITAL_STATE,
-    enrollment,
-  );
 
   return optionsResponse?.options
     ?.map((option) => {
@@ -207,15 +203,6 @@ export async function getEligibleRetreats(enrollment?: string) {
           option.value,
         ) &&
         !retreatEngagement[DHIS2_PARTICIPATION_PROGRAM_STAGE].has(option.code)
-      );
-    })
-    .filter((option) => {
-      return (
-        maritalState === null ||
-        option.attributes[DHIS2_RETREAT_CLERGY_ONLY_ATTRIBUTE] === undefined ||
-        option.attributes[DHIS2_RETREAT_CLERGY_ONLY_ATTRIBUTE] === "false" ||
-        (option.attributes[DHIS2_RETREAT_CLERGY_ONLY_ATTRIBUTE] === "true" &&
-          maritalState === DHIS2_TEI_ATTRIBUTE_MARITAL_STATE_REVEREND)
       );
     })
     .sort((a, b) => {
@@ -291,34 +278,6 @@ export async function confirmAttendance(event: any, attending: boolean) {
   return response.ok;
 }
 
-async function getAttributeValue(attributeId: string, enrollment?: string) {
-  if (!enrollment) {
-    return null;
-  }
-
-  let url = new URL(
-    "tracker/enrollments/" + enrollment + ".json",
-    dhis2Endpoint,
-  );
-  url.searchParams.set("fields", "attributes");
-
-  let enrollmentResponse = await fetch(url, {
-    method: "GET",
-    headers: {
-      Authorization: dhis2Token,
-    },
-  });
-
-  const enrollmentResponseJson = await enrollmentResponse.json();
-  const attributeObject = enrollmentResponseJson.attributes?.find(
-    (a) => a.attribute === attributeId,
-  );
-
-  if (attributeObject) {
-    return attributeObject.value;
-  }
-  return null;
-}
 
 function flattenRetreatOption(option) {
   return {
