@@ -51,7 +51,8 @@ const styles = {
 };
 
 function downloadTextFile(text, fileName) {
-  const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+  const BOM = "\uFEFF"; // UTF-8 BOM
+  const blob = new Blob([BOM + text], { type: "text/plain;charset=utf-8" });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
 
