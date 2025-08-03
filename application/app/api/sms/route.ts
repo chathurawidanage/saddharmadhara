@@ -65,7 +65,7 @@ async function saveTokenToDhis2(token: string, expiresAt: number) {
   });
 
   if (!deleteResponse.ok) {
-    console.log("Failed to delete existing token");
+    console.log("Failed to delete existing token", deleteResponse.status);
   }
 
   const response = await fetch(smsTokenStoreUrl, {
@@ -79,7 +79,7 @@ async function saveTokenToDhis2(token: string, expiresAt: number) {
 
   if (!response.ok) {
     const errorText = await response.text();
-    console.error("Failed to save token to DHIS2:", errorText);
+    console.error("Failed to save token to DHIS2:", errorText, deleteResponse.status);
     throw new Error(`Failed to save token to DHIS2: ${errorText}`);
   }
 }
