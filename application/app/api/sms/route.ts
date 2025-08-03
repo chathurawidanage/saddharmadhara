@@ -119,18 +119,12 @@ async function sendSms(
       message,
       transaction_id: Date.now(),
       push_notification_url: esmsPushNotificationUrl,
+      sourceAddress: "SADDHARMA"
     }),
   });
 }
 
 // --- API Route Handler ---
-
-function extractBearerToken(authHeader?: string): string | null {
-  if (!authHeader) return null;
-
-  const match = authHeader.match(/^Bearer (.+)$/i);
-  return match ? match[1] : null;
-}
 
 export async function POST(request: Request) {
   try {
