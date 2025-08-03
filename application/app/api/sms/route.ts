@@ -56,6 +56,18 @@ async function saveTokenToDhis2(token: string, expiresAt: number) {
     esmsTokenEncryptionKey,
   ).toString();
 
+  // delete existing token
+  const deleteResponse = await fetch(smsTokenStoreUrl, {
+    method: "DELETE",
+    headers: {
+      Authorization: dhis2AuthHeader,
+    },
+  });
+
+  if (!deleteResponse.ok) {
+    console.log("Failed to delete existing token");
+  }
+
   const response = await fetch(smsTokenStoreUrl, {
     method: "PUT",
     headers: {
@@ -119,7 +131,7 @@ async function sendSms(
       message,
       transaction_id: Date.now(),
       push_notification_url: esmsPushNotificationUrl,
-      sourceAddress: "SADDHARMA"
+      sourceAddress: "SADDHARMA",
     }),
   });
 }
