@@ -17,6 +17,9 @@ import RetreatFinaliseModal from "./RetreatFinaliseModal";
 import {
   DHIS2_TEI_ATTRIBUTE_FULL_NAME,
   DHIS2_TEI_ATTRIBUTE_GENDER,
+  DHIS2_TEI_ATTRIBUTE_MOBILE,
+  DHIS2_TEI_ATTRIBUTE_NIC,
+  DHIS2_TEI_ATTRIBUTE_PASSPORT,
 } from "../dhis2";
 import { useConfig } from "@dhis2/app-runtime";
 import RetreatInvitationModal from "./RetreatInvitationModal";
@@ -50,14 +53,14 @@ const styles = {
   },
 };
 
-function downloadTextFile(text, fileName) {
+function downloadTextFile(text, fileName, extension = "txt") {
   const BOM = "\uFEFF"; // UTF-8 BOM
   const blob = new Blob([BOM + text], { type: "text/plain;charset=utf-8" });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
 
   link.setAttribute("href", url);
-  link.setAttribute("download", `${fileName}.txt`);
+  link.setAttribute("download", `${fileName}.${extension}`);
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
@@ -82,6 +85,13 @@ const RetreatManager = observer(({ store }) => {
   const downloadYogiList = async (retreatCode, gender, selectionState) => {
     const yogis = await store.yogis.fetchExpressionOfInterests(retreatCode);
     const yogiNames = [];
+
+    if (selectionState === "selected") {
+      yogiNames.push(
+        ["", "Name", "NIC", "Passport", "Phone", "Room"].join(","),
+      );
+    }
+
     let index = 0;
     for (const yogiId of yogis) {
       const yogi = store.yogis.yogiIdToObjectMap[yogiId];
@@ -89,12 +99,32 @@ const RetreatManager = observer(({ store }) => {
         yogi.attributes[DHIS2_TEI_ATTRIBUTE_GENDER] === gender &&
         yogi.expressionOfInterests[retreatCode].state === selectionState
       ) {
-        yogiNames.push(
-          `${(++index).toString().padStart(2, "0")} ${yogi.attributes[DHIS2_TEI_ATTRIBUTE_FULL_NAME].trim()}`,
-        );
+        if (selectionState === "selected") {
+          const room =
+            store.yogis.yogiIdToObjectMap[yogiId]?.participation[retreat.code]
+              ?.room || "N/A";
+          yogiNames.push(
+            [
+              (++index).toString().padStart(2, "0"),
+              yogi.attributes[DHIS2_TEI_ATTRIBUTE_FULL_NAME].trim(),
+              yogi.attributes[DHIS2_TEI_ATTRIBUTE_NIC]?.trim() || "",
+              yogi.attributes[DHIS2_TEI_ATTRIBUTE_PASSPORT]?.trim() || "",
+              yogi.attributes[DHIS2_TEI_ATTRIBUTE_MOBILE]?.trim() || "",
+              room,
+            ].join(","),
+          );
+        } else {
+          yogiNames.push(
+            `${(++index).toString().padStart(2, "0")} ${yogi.attributes[DHIS2_TEI_ATTRIBUTE_FULL_NAME].trim()}`,
+          );
+        }
       }
     }
-    downloadTextFile(yogiNames.join("\n"), `${retreatCode}_${gender}`);
+    downloadTextFile(
+      yogiNames.join("\n"),
+      `${retreatCode}_${gender}`,
+      selectionState === "selected" ? "csv" : "txt",
+    );
   };
 
   return (
