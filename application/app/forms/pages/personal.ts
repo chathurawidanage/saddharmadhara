@@ -211,6 +211,7 @@ const personalPage = (isRequired) => {
         name: "Profession",
         title: { [ENGLISH_LOCALE]: "Profession", [SINHALA_LOCALE]: "රැකියාව" },
         type: "text",
+        visibleIf: "({MaritalStatus} <> 'reverend')",
       },
       {
         name: "Photo",
@@ -218,6 +219,7 @@ const personalPage = (isRequired) => {
           [ENGLISH_LOCALE]: "Photo",
           [SINHALA_LOCALE]: "ඡායාරූපය",
         },
+        visibleIf: "({MaritalStatus} <> 'reverend')",
         type: "file",
         maxSize: 1024000 * 5, // 5MB
         acceptedTypes: "image/*",

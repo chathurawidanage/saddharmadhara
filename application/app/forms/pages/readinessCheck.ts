@@ -1,6 +1,6 @@
 import { ENGLISH_LOCALE } from "../locale/english";
 import { SINHALA_LOCALE } from "../locale/sinhala";
-import { yesNoQuestionWithComment } from "./utils";
+import { defaultCommentTitle, yesNoQuestionWithComment } from "./utils";
 
 const readinessCheckPage = (isRequired: boolean) => {
   return {
@@ -42,7 +42,6 @@ const readinessCheckPage = (isRequired: boolean) => {
           [SINHALA_LOCALE]:
             "ඔවුන්ගේ වයස් කාණ්ඩ පිළිබඳව විස්තර සදහන් කරන්න. භාවනා වැඩසටහන් කාලය තුළ ඔවුන්ගේ රැකවරණය සදහා විධිමත් ක්‍රියාමාර්ග ගෙන තිබේද?",
         },
-
         "!({MaritalStatus} = 'reverend')",
       ),
       ...yesNoQuestionWithComment(
@@ -66,6 +65,8 @@ const readinessCheckPage = (isRequired: boolean) => {
         },
         isRequired,
         true,
+        defaultCommentTitle,
+        "({MaritalStatus} <> 'reverend')",
       ),
       ...yesNoQuestionWithComment(
         "Stress",

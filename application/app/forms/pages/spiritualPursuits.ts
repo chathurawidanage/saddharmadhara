@@ -18,6 +18,7 @@ const spiritualPursuitsPage = (isRequired: boolean) => {
           [SINHALA_LOCALE]:
             "ආධ්‍යාත්මික ජීවිතයට (පැවිදිවීම) කැපවීමට ඔබට කිසියම් අදහසක් තිබේද?",
         },
+        visibleIf: "({MaritalStatus} <> 'reverend')",
         isRequired: isRequired,
       },
       {
@@ -29,6 +30,7 @@ const spiritualPursuitsPage = (isRequired: boolean) => {
           [SINHALA_LOCALE]:
             "භාවනා වැඩසටහනට සම්බන්ධ වීමේ අරමුණ කෙටියෙන් සඳහන් කරන්න.",
         },
+        visibleIf: "({MaritalStatus} <> 'reverend')",
         isRequired: isRequired,
       },
       {

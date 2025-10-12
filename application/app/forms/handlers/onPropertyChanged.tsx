@@ -10,7 +10,10 @@ import {
 } from "../properties";
 import { getEligibleRetreats } from "../../../backend/Dhis2Client";
 import { SurveyModel } from "survey-core";
-import { DHIS2_RETREAT_CLERGY_ONLY_ATTRIBUTE } from "../../../dhis2Constants";
+import {
+  DHIS2_RETREAT_CLERGY_ONLY_ATTRIBUTE,
+  DHIS2_RETREAT_TYPE_ATTRIBUTE,
+} from "../../../dhis2Constants";
 import { ENGLISH_LOCALE } from "../locale/english";
 
 export const getMediumText = (mediumCode: "sinhala" | "english") => {
@@ -25,6 +28,13 @@ const getOnlyForClergyText = (locale: string) => {
     return "Only for Reverends";
   }
   return "මහා සංඝරත්නය සඳහා පමණි";
+};
+
+const getSilentRetreatText = (locale: string) => {
+  if (locale === ENGLISH_LOCALE) {
+    return "Exclusively for past participants";
+  }
+  return "පසුගිය වැඩසටහන් සඳහා සහභාගී වූවන්ට පමණි";
 };
 
 const onPropertyChanged = (survey: SurveyModel, options) => {
@@ -46,12 +56,15 @@ const onPropertyChanged = (survey: SurveyModel, options) => {
           );
           let onlyForClergy =
             choice.attributes[DHIS2_RETREAT_CLERGY_ONLY_ATTRIBUTE] === "true";
+          let isSilentRetreat =
+            choice.attributes[DHIS2_RETREAT_TYPE_ATTRIBUTE] === "silent";
           return {
             value: choice.value,
             text: `<div class="retreat-checkbox-item ${onlyForClergy ? "retreat-checkbox-item-only-for-clergy" : ""}">
               <h4>${choice.text}</h4>
               <div class="retreat-checkbox-item-details">
                 ${onlyForClergy ? `<div>🛡️ ${getOnlyForClergyText(survey.locale)}</div>` : ""}
+                ${isSilentRetreat ? `<div>⚠️ ${getSilentRetreatText(survey.locale)}</div>` : ""}
                 <div>📅 ${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()}</div>
                 <div>⏲️ ${noOfDays} Days</div>
                 <div>🌐 ${getMediumText(medium)}</div>
