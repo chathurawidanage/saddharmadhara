@@ -30,11 +30,25 @@ const getOnlyForClergyText = (locale: string) => {
   return "මහා සංඝරත්නය සඳහා පමණි";
 };
 
-const getSilentRetreatText = (locale: string) => {
+const getSilentRetreatTitleText = (locale: string) => {
+  if (locale === ENGLISH_LOCALE) {
+    return "(Silent Retreat)";
+  }
+  return "(ස්වයං භාවනා වැඩසටහන)";
+};
+
+const getSilentRetreatOnlyForPastParticipantsText = (locale: string) => {
   if (locale === ENGLISH_LOCALE) {
     return "Exclusively for past participants";
   }
   return "පසුගිය වැඩසටහන් සඳහා සහභාගී වූවන්ට පමණි";
+};
+
+const getSilentRetreatSelfPracticeText = (locale: string) => {
+  if (locale === ENGLISH_LOCALE) {
+    return "The Venerable Monk is not involved in this self-meditation program, and you will have the opportunity to practice in solitude.";
+  }
+  return "ස්වාමීන් වහන්සේ මෙම ස්වයං භාවනා වැඩසටහන් සඳහා සම්බන්ධ නොවන අතර හුදෙකලාව බවුන් වැඩීමට ඔබට අවස්ථාව හිමිවෙයි.";
 };
 
 const onPropertyChanged = (survey: SurveyModel, options) => {
@@ -61,10 +75,11 @@ const onPropertyChanged = (survey: SurveyModel, options) => {
           return {
             value: choice.value,
             text: `<div class="retreat-checkbox-item ${onlyForClergy ? "retreat-checkbox-item-only-for-clergy" : ""}">
-              <h4>${choice.text}</h4>
+              <h4>${choice.text} ${isSilentRetreat ? getSilentRetreatTitleText(survey.locale) : ""}</h4>
               <div class="retreat-checkbox-item-details">
                 ${onlyForClergy ? `<div>🛡️ ${getOnlyForClergyText(survey.locale)}</div>` : ""}
-                ${isSilentRetreat ? `<div>⚠️ ${getSilentRetreatText(survey.locale)}</div>` : ""}
+                ${isSilentRetreat ? `<div>⚠️ ${getSilentRetreatOnlyForPastParticipantsText(survey.locale)}</div>` : ""}
+                ${isSilentRetreat ? `<div class="text-bold">⚠️ ${getSilentRetreatSelfPracticeText(survey.locale)}</div>` : ""}
                 <div>📅 ${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()}</div>
                 <div>⏲️ ${noOfDays} Days</div>
                 <div>🌐 ${getMediumText(medium)}</div>

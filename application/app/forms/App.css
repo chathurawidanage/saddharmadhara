@@ -51,3 +51,7 @@
     background-color: #FFF9C4;
     border-radius: 5px;
 }
+
+.text-bold {
+    font-weight: bold;
+}
