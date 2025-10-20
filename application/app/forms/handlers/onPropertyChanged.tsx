@@ -37,13 +37,6 @@ const getSilentRetreatTitleText = (locale: string) => {
   return "(ස්වයං භාවනා වැඩසටහන)";
 };
 
-const getSilentRetreatOnlyForPastParticipantsText = (locale: string) => {
-  if (locale === ENGLISH_LOCALE) {
-    return "Exclusively for past participants";
-  }
-  return "පසුගිය වැඩසටහන් සඳහා සහභාගී වූවන්ට පමණි";
-};
-
 const getSilentRetreatSelfPracticeText = (locale: string) => {
   if (locale === ENGLISH_LOCALE) {
     return "The Venerable Monk is not involved in this self-meditation program, and you will have the opportunity to practice in solitude.";
@@ -78,7 +71,6 @@ const onPropertyChanged = (survey: SurveyModel, options) => {
               <h4>${choice.text} ${isSilentRetreat ? getSilentRetreatTitleText(survey.locale) : ""}</h4>
               <div class="retreat-checkbox-item-details">
                 ${onlyForClergy ? `<div>🛡️ ${getOnlyForClergyText(survey.locale)}</div>` : ""}
-                ${isSilentRetreat ? `<div>⚠️ ${getSilentRetreatOnlyForPastParticipantsText(survey.locale)}</div>` : ""}
                 ${isSilentRetreat ? `<div class="text-bold">⚠️ ${getSilentRetreatSelfPracticeText(survey.locale)}</div>` : ""}
                 <div>📅 ${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()}</div>
                 <div>⏲️ ${noOfDays} Days</div>
