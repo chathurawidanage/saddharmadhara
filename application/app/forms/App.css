@@ -43,12 +43,22 @@
     min-height: 100vh;
 }
 
-.sd-selectbase__label{
+.sd-selectbase__label {
     width: 100%;
 }
 
-.retreat-checkbox-item-only-for-clergy{
+.retreat-checkbox-item-only-for-clergy {
     background-color: #FFF9C4;
+    border-radius: 5px;
+}
+
+.retreat-checkbox-item-silent-retreat {
+    background-color: #ECEFF1;
+    border-radius: 5px;
+}
+
+.retreat-checkbox-item-general-retreat {
+    background-color: #E1F5FE;
     border-radius: 5px;
 }
 

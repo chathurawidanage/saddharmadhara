@@ -67,7 +67,7 @@ const onPropertyChanged = (survey: SurveyModel, options) => {
             choice.attributes[DHIS2_RETREAT_TYPE_ATTRIBUTE] === "silent";
           return {
             value: choice.value,
-            text: `<div class="retreat-checkbox-item ${onlyForClergy ? "retreat-checkbox-item-only-for-clergy" : ""}">
+            text: `<div class="retreat-checkbox-item ${onlyForClergy ? "retreat-checkbox-item-only-for-clergy" : ""} ${isSilentRetreat ? "retreat-checkbox-item-silent-retreat" : ""} ${!onlyForClergy && !isSilentRetreat? "retreat-checkbox-item-general-retreat":""}">
               <h4>${choice.text} ${isSilentRetreat ? getSilentRetreatTitleText(survey.locale) : ""}</h4>
               <div class="retreat-checkbox-item-details">
                 ${onlyForClergy ? `<div>🛡️ ${getOnlyForClergyText(survey.locale)}</div>` : ""}
