@@ -1,16 +1,19 @@
 import { ENGLISH_LOCALE } from "../locale/english";
 import { SINHALA_LOCALE } from "../locale/sinhala";
 import {
+  DHIS2_RETREAT_ATTRIBUTE_ACCOMMODATION_OPTIONAL,
   DHIS2_RETREAT_ATTRIBUTE_DATE,
   DHIS2_RETREAT_ATTRIBUTE_DAYS,
 } from "../dhis2";
 
-const agreementPage = (retreatObj, teiName: string) => {
+const attendancePage = (retreatObj, teiName: string) => {
   let startDate = new Date(retreatObj.attributes[DHIS2_RETREAT_ATTRIBUTE_DATE]);
   let noOfDays = parseInt(retreatObj.attributes[DHIS2_RETREAT_ATTRIBUTE_DAYS]);
   let endDate = new Date(
     startDate.getTime() + (noOfDays + 1) * 24 * 60 * 60 * 1000,
   );
+  let accommodationOptional =
+    retreatObj.attributes[DHIS2_RETREAT_ATTRIBUTE_ACCOMMODATION_OPTIONAL];
   return {
     name: "Attendance",
     title: {
@@ -23,11 +26,14 @@ const agreementPage = (retreatObj, teiName: string) => {
         type: "boolean",
         title: {
           [ENGLISH_LOCALE]: `You (${teiName}) have been selected to attend the ${noOfDays} days Saddharmadhara retreat from ${startDate.toLocaleDateString()} to ${endDate.toLocaleDateString()}. Please confirm you attendance below.`,
-          [SINHALA_LOCALE]: `ඔබ (${teiName}) ${startDate.toLocaleDateString("en-US", {
-            year: "numeric",
-            month: "short",
-            day: "numeric",
-          })} සිට ${endDate.toLocaleDateString("en-US", {
+          [SINHALA_LOCALE]: `ඔබ (${teiName}) ${startDate.toLocaleDateString(
+            "en-US",
+            {
+              year: "numeric",
+              month: "short",
+              day: "numeric",
+            },
+          )} සිට ${endDate.toLocaleDateString("en-US", {
             year: "numeric",
             month: "short",
             day: "numeric",
@@ -43,7 +49,27 @@ const agreementPage = (retreatObj, teiName: string) => {
           [SINHALA_LOCALE]: "නොපැමිණේ",
         },
       },
+      {
+        name: "AccommodationDenied",
+        type: "boolean",
+        title: {
+          [ENGLISH_LOCALE]: `For this program, you...`,
+          [SINHALA_LOCALE]: `මෙම වැඩසටහන සඳහා ඔබ,`,
+        },
+        isRequired: true,
+        visibleIf: "{RSVP}",
+        visible: accommodationOptional === "true",
+        labelTrue: {
+          [ENGLISH_LOCALE]: "Commute daily from home",
+          [SINHALA_LOCALE]: "නිවසේ සිට දිනපතා පැමිණෙයි.",
+        },
+        labelFalse: {
+          [ENGLISH_LOCALE]: "Stay on-site during the program",
+          [SINHALA_LOCALE]:
+            "වැඩසටහන පවතින කාලය තුළ පූර්ණ නේවාසිකව රැඳී සිටීයි.",
+        },
+      },
     ],
   };
 };
-export default agreementPage;
+export default attendancePage;

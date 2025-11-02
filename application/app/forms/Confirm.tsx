@@ -51,6 +51,7 @@ export default function Confirm({
   const [loading, setLoading] = useState(true);
 
   const [attending, setAttending] = useState(false);
+  const [accommodationDenied, setAccommodationDenied] = useState(false);
 
   useEffect(() => {
     survey.setLoading = setLoading;
@@ -60,8 +61,15 @@ export default function Confirm({
   }, [survey, retreatObj]);
 
   const onValueChanged = (survey: SurveyModel, options) => {
-    if (survey.data && survey.data.RSVP) {
-      setAttending(survey.data.RSVP);
+    console.log(survey.data);
+    if (survey.data) {
+      if (survey.data.RSVP) {
+        setAttending(survey.data.RSVP);
+      }
+
+      if (survey.data.AccommodationDenied) {
+        setAccommodationDenied(survey.data.AccommodationDenied);
+      }
     }
   };
 

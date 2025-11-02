@@ -12,7 +12,7 @@ import { Col, Container, Row } from "react-bootstrap";
 import { useParams } from "react-router";
 import { useNavigate } from "react-router-dom";
 import RetreatLocation from "./RetreatLocation";
-import YogisList from "./manager/YogiList";
+import YogisList, { sortYogiList } from "./manager/YogiList";
 import RetreatFinaliseModal from "./RetreatFinaliseModal";
 import {
   DHIS2_TEI_ATTRIBUTE_FULL_NAME,
@@ -93,16 +93,18 @@ const RetreatManager = observer(({ store }) => {
     }
 
     let index = 0;
-    for (const yogiId of yogis) {
-      const yogi = store.yogis.yogiIdToObjectMap[yogiId];
+    const yogiObj = yogis.map(
+      (yogiId) => store.yogis.yogiIdToObjectMap[yogiId],
+    );
+    sortYogiList(yogiObj, retreat);
+
+    for (const yogi of yogiObj) {
       if (
         yogi.attributes[DHIS2_TEI_ATTRIBUTE_GENDER] === gender &&
         yogi.expressionOfInterests[retreatCode].state === selectionState
       ) {
         if (selectionState === "selected") {
-          const room =
-            store.yogis.yogiIdToObjectMap[yogiId]?.participation[retreat.code]
-              ?.room || "N/A";
+          const room = yogi.participation[retreat.code]?.room || "N/A";
           yogiNames.push(
             [
               (++index).toString().padStart(2, "0"),

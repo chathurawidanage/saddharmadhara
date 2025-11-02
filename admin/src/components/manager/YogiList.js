@@ -63,6 +63,52 @@ const getYogiSortScore = (yogiObj) => {
   return score;
 };
 
+const selectionPrioritySorter = (y1, y2, retreat) => {
+  let y1Score = getYogiSortScore(y1);
+  let y2Score = getYogiSortScore(y2);
+
+  if (y1Score === y2Score) {
+    // finally sort by applied date, lowest date comes first
+    let y1RegisteredDate = new Date(
+      y1.expressionOfInterests[retreat.code].occurredAt,
+    );
+    let y2RegisteredDate = new Date(
+      y2.expressionOfInterests[retreat.code].occurredAt,
+    );
+    return y1RegisteredDate.getTime() - y2RegisteredDate.getTime();
+  }
+
+  // highest score comes first
+  return y2Score - y1Score;
+};
+
+const ageSorter = (y1, y2) => {
+  let dobY1 = new Date(y1.attributes[DHIS2_TEI_ATTRIBUTE_DOB]);
+  let dobY2 = new Date(y2.attributes[DHIS2_TEI_ATTRIBUTE_DOB]);
+
+  let diff = dobY1.getTime() - dobY2.getTime();
+
+  if (diff === 0) {
+    return selectionPrioritySorter(y1, y2);
+  } else {
+    return diff;
+  }
+};
+
+export const sortYogiList = (
+  yogiList,
+  retreat,
+  sortBy = SELECTION_PRIORITY_SORT,
+) => {
+  if (sortBy === SELECTION_PRIORITY_SORT) {
+    yogiList.sort((a, b) => {
+      return selectionPrioritySorter(a, b, retreat);
+    });
+  } else if (sortBy === AGE_SORT) {
+    yogiList.sort(ageSorter);
+  }
+};
+
 const YogisList = observer(({ retreat, store }) => {
   const [selectionState, setSelectionState] = useState(
     store.metadata.selectionStates[0].code,
@@ -82,46 +128,6 @@ const YogisList = observer(({ retreat, store }) => {
 
   const [sortBy, setSortBy] = useState(SELECTION_PRIORITY_SORT);
 
-  const selectionPrioritySorter = (y1, y2) => {
-    let y1Score = getYogiSortScore(y1);
-    let y2Score = getYogiSortScore(y2);
-
-    if (y1Score === y2Score) {
-      // finally sort by applied date, lowest date comes first
-      let y1RegisteredDate = new Date(
-        y1.expressionOfInterests[retreat.code].occurredAt,
-      );
-      let y2RegisteredDate = new Date(
-        y2.expressionOfInterests[retreat.code].occurredAt,
-      );
-      return y1RegisteredDate.getTime() - y2RegisteredDate.getTime();
-    }
-
-    // higest score comes first
-    return y2Score - y1Score;
-  };
-
-  const ageSorter = (y1, y2) => {
-    let dobY1 = new Date(y1.attributes[DHIS2_TEI_ATTRIBUTE_DOB]);
-    let dobY2 = new Date(y2.attributes[DHIS2_TEI_ATTRIBUTE_DOB]);
-
-    let diff = dobY1.getTime() - dobY2.getTime();
-
-    if (diff === 0) {
-      return selectionPrioritySorter(y1, y2);
-    } else {
-      return diff;
-    }
-  };
-
-  const sortYogiList = (yogiList) => {
-    if (sortBy === SELECTION_PRIORITY_SORT) {
-      yogiList.sort(selectionPrioritySorter);
-    } else if (sortBy === AGE_SORT) {
-      yogiList.sort(ageSorter);
-    }
-  };
-
   const countByState = computed(() => {
     let stateMap = {};
     yogiList.forEach((yogi) => {
@@ -140,7 +146,7 @@ const YogisList = observer(({ retreat, store }) => {
 
   useEffect(() => {
     let yogiListCopy = [...yogiList];
-    sortYogiList(yogiListCopy);
+    sortYogiList(yogiListCopy, retreat);
     setYogiList(yogiListCopy);
   }, [sortBy]);
 
@@ -166,7 +172,7 @@ const YogisList = observer(({ retreat, store }) => {
           let yogiList = yogiIdList.map(
             (yogiId) => store.yogis.yogiIdToObjectMap[yogiId],
           );
-          sortYogiList(yogiList, sortBy);
+          sortYogiList(yogiList, retreat, sortBy);
 
           setYogiList(yogiList);
           setYogisFetched(true);
