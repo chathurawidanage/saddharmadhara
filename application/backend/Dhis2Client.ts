@@ -7,15 +7,13 @@ import {
   DHIS2_EXPRESSION_OF_INTEREST_PROGRAM_STAGE,
   DHIS2_PARTICIPATION_PROGRAM_STAGE,
   DHIS2_PROGRAM,
-  DHIS2_RETREAT_CLERGY_ONLY_ATTRIBUTE,
+  DHIS2_RETREAT_ACCOMMODATION_DENIED_DATA_ELEMENT,
   DHIS2_RETREAT_DATA_ELEMENT,
   DHIS2_RETREAT_DATE_ATTRIBUTE,
   DHIS2_RETREAT_DISABLED_ATTRIBUTE,
   DHIS2_RETREAT_SELECTION_STATE_DATA_ELEMENT,
   DHIS2_RETREATS_CODE_ATTRIBUTE,
   DHIS2_RETREATS_OPTION_SET,
-  DHIS2_TEI_ATTRIBUTE_MARITAL_STATE,
-  DHIS2_TEI_ATTRIBUTE_MARITAL_STATE_REVEREND,
   dhis2Endpoint,
   dhis2Token,
 } from "../dhis2Constants";
@@ -245,7 +243,11 @@ export async function getExistingEnrollment(
   }
 }
 
-export async function confirmAttendance(event: any, attending: boolean) {
+export async function confirmAttendance(
+  event: any,
+  attending: boolean,
+  accommodationDenied: boolean,
+) {
   let url = new URL("tracker", dhis2Endpoint);
   url.searchParams.set("async", "false");
   url.searchParams.set("importStrategy", "UPDATE");
@@ -270,6 +272,10 @@ export async function confirmAttendance(event: any, attending: boolean) {
               dataElement: DHIS2_RETREAT_SELECTION_STATE_DATA_ELEMENT,
               value: attending ? "selected" : "unattending",
             },
+            {
+              dataElement: DHIS2_RETREAT_ACCOMMODATION_DENIED_DATA_ELEMENT,
+              value: accommodationDenied ? "true" : "false",
+            },
           ],
         },
       ],
@@ -277,7 +283,6 @@ export async function confirmAttendance(event: any, attending: boolean) {
   });
   return response.ok;
 }
-
 
 function flattenRetreatOption(option) {
   return {

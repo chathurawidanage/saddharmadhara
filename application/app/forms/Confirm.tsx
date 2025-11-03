@@ -61,7 +61,6 @@ export default function Confirm({
   }, [survey, retreatObj]);
 
   const onValueChanged = (survey: SurveyModel, options) => {
-    console.log(survey.data);
     if (survey.data) {
       if (survey.data.RSVP) {
         setAttending(survey.data.RSVP);
@@ -78,6 +77,7 @@ export default function Confirm({
       const saved = await confirmAttendance(
         expressionOfInterestEvent,
         attending,
+        accommodationDenied,
       );
       if (!saved) {
         options.showSaveError();
@@ -93,11 +93,13 @@ export default function Confirm({
   return (
     <div className="App">
       <Loader visible={loading} />
-      <Survey
-        model={survey}
-        onValueChanged={onValueChanged}
-        onComplete={onComplete}
-      />
+      {!loading && (
+        <Survey
+          model={survey}
+          onValueChanged={onValueChanged}
+          onComplete={onComplete}
+        />
+      )}
     </div>
   );
 }
