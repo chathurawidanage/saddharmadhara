@@ -82,14 +82,14 @@ const selectionPrioritySorter = (y1, y2, retreat) => {
   return y2Score - y1Score;
 };
 
-const ageSorter = (y1, y2) => {
+const ageSorter = (y1, y2, retreat) => {
   let dobY1 = new Date(y1.attributes[DHIS2_TEI_ATTRIBUTE_DOB]);
   let dobY2 = new Date(y2.attributes[DHIS2_TEI_ATTRIBUTE_DOB]);
 
   let diff = dobY1.getTime() - dobY2.getTime();
 
   if (diff === 0) {
-    return selectionPrioritySorter(y1, y2);
+    return selectionPrioritySorter(y1, y2, retreat);
   } else {
     return diff;
   }
@@ -105,7 +105,9 @@ export const sortYogiList = (
       return selectionPrioritySorter(a, b, retreat);
     });
   } else if (sortBy === AGE_SORT) {
-    yogiList.sort(ageSorter);
+    yogiList.sort((a, b) => {
+      return ageSorter(a, b, retreat);
+    });
   }
 };
 
@@ -146,9 +148,9 @@ const YogisList = observer(({ retreat, store }) => {
 
   useEffect(() => {
     let yogiListCopy = [...yogiList];
-    sortYogiList(yogiListCopy, retreat);
+    sortYogiList(yogiListCopy, retreat, sortBy);
     setYogiList(yogiListCopy);
-  }, [sortBy]);
+  }, [retreat, sortBy]);
 
   useEffect(() => {
     (async () => {

@@ -4,7 +4,6 @@ import "./ApplicationIndicator.css";
 import COMMENT from "./img/comment.png";
 
 const ParticipationIndicator = observer(({ trackedEntity, store }) => {
-  console.log(JSON.stringify(trackedEntity.participation));
   return (
     <div className="yogi-applications">
       {Object.keys(trackedEntity.participation)
