@@ -77,7 +77,11 @@ const surveyJson = {
   ],
 };
 
-export default function Application() {
+interface ApplicationProps {
+  retreat?: string;
+}
+
+export default function Application({ retreat }: ApplicationProps) {
   const survey = useMemo(() => new Model(surveyJson), []);
   const [loading, setLoading] = useState(true);
   const [accepting, setAccepting] = useState(undefined);
