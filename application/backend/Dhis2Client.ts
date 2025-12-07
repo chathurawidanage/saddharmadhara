@@ -7,23 +7,24 @@ import {
   DHIS2_EXPRESSION_OF_INTEREST_PROGRAM_STAGE,
   DHIS2_PARTICIPATION_PROGRAM_STAGE,
   DHIS2_PROGRAM,
-  DHIS2_RETREAT_ACCOMMODATION_DENIED_DATA_ELEMENT,
+  DHIS2_RETREAT_DATA_ELEMENT_ACCOMMODATION_DENIED,
   DHIS2_RETREAT_DATA_ELEMENT,
-  DHIS2_RETREAT_DATE_ATTRIBUTE,
-  DHIS2_RETREAT_DISABLED_ATTRIBUTE,
+  DHIS2_RETREAT_ATTRIBUTE_DATE,
+  DHIS2_RETREAT_ATTRIBUTE_DISABLED,
+  DHIS2_RETREAT_ATTRIBUTE_PRIVATE,
   DHIS2_RETREAT_SELECTION_STATE_DATA_ELEMENT,
-  DHIS2_RETREATS_CODE_ATTRIBUTE,
+  DHIS2_RETREAT_ATTRIBUTE_CODE,
   DHIS2_RETREATS_OPTION_SET,
   dhis2Endpoint,
   dhis2Token,
-} from "../dhis2Constants";
+} from "../app/forms/dhis2";
 
 export async function getRetreatByCode(code: string) {
   const optionsUrl = new URL(
     "optionSets/" + DHIS2_RETREATS_OPTION_SET,
     dhis2Endpoint,
   );
-  optionsUrl.searchParams.set("fields", "options[code,attributeValues]");
+  optionsUrl.searchParams.set("fields", "options[code,name,attributeValues]");
   const optionsResponse = await fetch(optionsUrl, {
     method: "GET",
     headers: {
@@ -34,7 +35,7 @@ export async function getRetreatByCode(code: string) {
   const foundRetreat = optionsResponse?.options?.find(
     (option) =>
       option?.attributeValues?.find(
-        (attr) => attr?.attribute?.id === DHIS2_RETREATS_CODE_ATTRIBUTE,
+        (attr) => attr?.attribute?.id === DHIS2_RETREAT_ATTRIBUTE_CODE,
       )?.value === code,
   );
 
@@ -168,7 +169,12 @@ export async function isAcceptingApplications() {
   }
 }
 
-export async function getEligibleRetreats(enrollment?: string) {
+/**
+ * If an enrollment is specified, this function looks up for previous retreat engagement and filters out the engaged retreats.
+ * If a specific retreat is specified, this function looks up for the specific retreat just return that if the yogi is elligible.
+ */
+export async function getEligibleRetreats(enrollment?: string, specificRetreat?: string) {
+  console.log("Specific retreat", specificRetreat);
   let optionSetUrl = new URL(
     "optionSets/" + DHIS2_RETREATS_OPTION_SET,
     dhis2Endpoint,
@@ -187,25 +193,37 @@ export async function getEligibleRetreats(enrollment?: string) {
     ?.map((option) => {
       return flattenRetreatOption(option);
     })
+    // if a specific retreat is specified, return only that
     .filter((option) => {
-      let retreatDisabled = option.attributes[DHIS2_RETREAT_DISABLED_ATTRIBUTE];
+      return specificRetreat ? option.value === specificRetreat : true;
+    })
+    .filter((option) => {
+      let retreatPrivate = option.attributes[DHIS2_RETREAT_ATTRIBUTE_PRIVATE];
+      // if a retreat is private and it is not the specific retreat, return false
+      return retreatPrivate !== "true" || specificRetreat === option.value;
+    })
+    .filter((option) => {
+      let retreatDisabled = option.attributes[DHIS2_RETREAT_ATTRIBUTE_DISABLED];
+      // if a retreat is disabled, return false
       return retreatDisabled !== "true";
     })
     .filter((option) => {
-      let retreatDate = option.attributes[DHIS2_RETREAT_DATE_ATTRIBUTE];
+      let retreatDate = option.attributes[DHIS2_RETREAT_ATTRIBUTE_DATE];
+      // if a retreat date is in the past, return false
       return retreatDate && new Date(retreatDate).getTime() > Date.now();
     })
     .filter((option) => {
+      // if a retreat is already engaged, return false
       return (
         !retreatEngagement[DHIS2_EXPRESSION_OF_INTEREST_PROGRAM_STAGE].has(
           option.value,
         ) &&
-        !retreatEngagement[DHIS2_PARTICIPATION_PROGRAM_STAGE].has(option.code)
+        !retreatEngagement[DHIS2_PARTICIPATION_PROGRAM_STAGE].has(option.value)
       );
     })
     .sort((a, b) => {
-      let aDate = new Date(a.attributes[DHIS2_RETREAT_DATE_ATTRIBUTE]);
-      let bDate = new Date(b.attributes[DHIS2_RETREAT_DATE_ATTRIBUTE]);
+      let aDate = new Date(a.attributes[DHIS2_RETREAT_ATTRIBUTE_DATE]);
+      let bDate = new Date(b.attributes[DHIS2_RETREAT_ATTRIBUTE_DATE]);
       return aDate.getTime() - bDate.getTime();
     });
 }
@@ -273,7 +291,7 @@ export async function confirmAttendance(
               value: attending ? "selected" : "unattending",
             },
             {
-              dataElement: DHIS2_RETREAT_ACCOMMODATION_DENIED_DATA_ELEMENT,
+              dataElement: DHIS2_RETREAT_DATA_ELEMENT_ACCOMMODATION_DENIED,
               value: accommodationDenied ? "true" : "false",
             },
           ],

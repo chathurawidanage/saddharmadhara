@@ -1,8 +1,8 @@
 import {
-  DHIS2_RETREAT_INVITATION_SENT_DATA_ELEMENT,
+  DHIS2_RETREAT_DATA_ELEMENT_INVITATION_SENT,
   dhis2Endpoint,
   dhis2Token,
-} from "../../../../dhis2Constants";
+} from "../../../forms/dhis2";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -66,7 +66,7 @@ async function changeRetreatInvitationStatus(eventId: string, status: string) {
   const eventJson = await eventResponse.json();
 
   const dataValues = eventJson.dataValues.filter(
-    (dv) => dv.dataElement !== DHIS2_RETREAT_INVITATION_SENT_DATA_ELEMENT,
+    (dv) => dv.dataElement !== DHIS2_RETREAT_DATA_ELEMENT_INVITATION_SENT,
   );
 
   const url = new URL("events/" + eventId, dhis2Endpoint);
@@ -83,7 +83,7 @@ async function changeRetreatInvitationStatus(eventId: string, status: string) {
       dataValues: [
         ...dataValues,
         {
-          dataElement: DHIS2_RETREAT_INVITATION_SENT_DATA_ELEMENT,
+          dataElement: DHIS2_RETREAT_DATA_ELEMENT_INVITATION_SENT,
           value: status,
         },
       ],

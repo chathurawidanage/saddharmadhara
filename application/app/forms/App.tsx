@@ -4,6 +4,24 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Model, surveyLocalization } from "survey-core";
 import "survey-core/defaultV2.min.css";
 import { ReactElementFactory, Survey } from "survey-react-ui";
+import {
+  getRetreatByCode,
+  isAcceptingApplications
+} from "../../backend/Dhis2Client";
+import "./App.css";
+import Loader from "./components/Loader";
+import { registerPhoneNumberTextBox } from "./components/PhoneNumberTextBox";
+import RetreatCheckboxItem, {
+  RETREAT_CHECKBOX_ITEM_NAME,
+} from "./components/RetreatCheckboxItem";
+import ProgramClosed from "./components/ProgramClosed";
+import onComplete from "./handlers/onComplete";
+import onCurrentPageChanging from "./handlers/onCurrentPageChanging";
+import onPropertyChanged from "./handlers/onPropertyChanged";
+import onTextMarkdown from "./handlers/onTextMarkdown";
+import onUploadFiles from "./handlers/onUploadFiles";
+import onValidateQuestion from "./handlers/onValidateQuestion";
+import onValueChanged from "./handlers/onValueChanged";
 import englishLocaleStrings, { ENGLISH_LOCALE } from "./locale/english";
 import sinhalaLocaleStrings, { SINHALA_LOCALE } from "./locale/sinhala";
 import agreementPage from "./pages/agreement";
@@ -12,27 +30,15 @@ import identificationPage from "./pages/identification";
 import instructionsPage from "./pages/instructions";
 import languagePage from "./pages/language";
 import personalPage from "./pages/personal";
-import specialCommentsPage from "./pages/specialComments";
-import spiritualPursuitsPage from "./pages/spiritualPursuits";
 import preparationsPage from "./pages/preparations";
 import readinessCheckPage from "./pages/readinessCheck";
-import onValueChanged from "./handlers/onValueChanged";
-import onUploadFiles from "./handlers/onUploadFiles";
-import onComplete from "./handlers/onComplete";
-import Loader from "./components/Loader";
-import onCurrentPageChanging from "./handlers/onCurrentPageChanging";
-import onPropertyChanged from "./handlers/onPropertyChanged";
 import retreatsPage from "./pages/retreats";
-import RetreatCheckboxItem, {
-  RETREAT_CHECKBOX_ITEM_NAME,
-} from "./components/RetreatCheckboxItem";
-import { SURVEY_TIME_LIMIT_SECONDS } from "./properties";
-import { registerPhoneNumberTextBox } from "./components/PhoneNumberTextBox";
-import onValidateQuestion from "./handlers/onValidateQuestion";
-import onTextMarkdown from "./handlers/onTextMarkdown";
-import { isAcceptingApplications } from "../../backend/Dhis2Client";
-import "./App.css";
-import Image from "next/image";
+import specialCommentsPage from "./pages/specialComments";
+import spiritualPursuitsPage from "./pages/spiritualPursuits";
+import { SPECIF_RETREAT_REQUESTED, SURVEY_TIME_LIMIT_SECONDS } from "./properties";
+import { DHIS2_RETREAT_ATTRIBUTE_DATE, DHIS2_RETREAT_ATTRIBUTE_DISABLED } from "./dhis2";
+import ErrorComponent, { ErrorComponentProps } from "./components/ErrorComponent";
+import { DHIS2_RETREAT_ATTRIBUTE_MEDIUM } from "./dhis2";
 
 registerPhoneNumberTextBox();
 
@@ -85,6 +91,8 @@ export default function Application({ retreat }: ApplicationProps) {
   const survey = useMemo(() => new Model(surveyJson), []);
   const [loading, setLoading] = useState(true);
   const [accepting, setAccepting] = useState(undefined);
+  const [requestedRetreatError, setRequestedRetreatError] = useState<ErrorComponentProps>(undefined);
+  const [validatingRetreat, setValidatingRetreat] = useState(!!retreat);
 
   useEffect(() => {
     isAcceptingApplications()
@@ -97,15 +105,67 @@ export default function Application({ retreat }: ApplicationProps) {
   }, []);
 
   useEffect(() => {
-    survey.locale = SINHALA_LOCALE;
-    // attach setLoading as a property of survey
-    survey.setLoading = setLoading;
-  }, [survey]);
+    (async () => {
+      survey.locale = SINHALA_LOCALE;
+
+      if (retreat) {
+        try {
+          const retreatObject = await getRetreatByCode(retreat);
+          if (retreatObject) {
+            const retreatDisabled = retreatObject.attributes[DHIS2_RETREAT_ATTRIBUTE_DISABLED];
+            const retreatDate = retreatObject.attributes[DHIS2_RETREAT_ATTRIBUTE_DATE];
+            const retreatLanguage = retreatObject.attributes[DHIS2_RETREAT_ATTRIBUTE_MEDIUM];
+
+            if (retreatDisabled === "true" || new Date(retreatDate).getTime() < Date.now()) {
+              setRequestedRetreatError({
+                title: {
+                  [ENGLISH_LOCALE]: "Applications Disabled",
+                  [SINHALA_LOCALE]: "අයදුම්පත් භාරගැනීම නවත්වා ඇත",
+                },
+                error: {
+                  [ENGLISH_LOCALE]: `${retreatObject.text} retreat has been disabled and is not accepting applications anymore.`,
+                  [SINHALA_LOCALE]: `${retreatObject.text} වැඩසටහන සඳහා අයදුම්පත් භාරගැනීම නවත්වා ඇත.`,
+                },
+                language: retreatLanguage,
+              });
+            } else {
+              survey.setPropertyValue(SPECIF_RETREAT_REQUESTED, retreatObject.value);
+            }
+          } else {
+            setRequestedRetreatError({
+              title: {
+                [ENGLISH_LOCALE]: "Invalid Link",
+                [SINHALA_LOCALE]: "වලංගු නොවන සබැඳියකි",
+              },
+              error: {
+                [ENGLISH_LOCALE]: "The link you clicked is invalid or expired.",
+                [SINHALA_LOCALE]: "කල් ඉකුත්වූ හෝ වලංගු නොවන සබැඳියකි.",
+              },
+            });
+          }
+        } catch (e) {
+          console.error("Error validating retreat", e);
+        } finally {
+          setValidatingRetreat(false);
+        }
+      }
+
+      // attach setLoading as a property of survey
+      survey.setLoading = setLoading;
+    })();
+  }, [survey, retreat]);
 
   return (
     <div className="App">
-      <Loader visible={loading || accepting === undefined} />
-      {accepting === true && (
+      <Loader visible={loading || validatingRetreat || accepting === undefined} />
+      {requestedRetreatError && (
+        <ErrorComponent
+          title={requestedRetreatError.title}
+          error={requestedRetreatError.error}
+          language={requestedRetreatError.language}
+        />
+      )}
+      {!requestedRetreatError && accepting === true && !loading && !validatingRetreat && (
         <Survey
           model={survey}
           onValueChanged={onValueChanged}
@@ -117,52 +177,7 @@ export default function Application({ retreat }: ApplicationProps) {
           onTextMarkdown={onTextMarkdown}
         />
       )}
-      {accepting === false && (
-        <div className="program-closed">
-          <div>
-            <Image src="/favicon.png" alt="logo" width={100} />
-            <h1>සද්ධර්මධාරා - Saddharmadhara</h1>
-            <h2>
-              සැලසුම් කළ සද්ධර්මධාරා භාවනා වැඩසටහන් අවසන් වූ බැවින් ඒ සදහා
-              ලියාපදිංචි වීම තාවකාලිකව නවතා ඇත.
-            </h2>
-            <h2>
-              Registration for the planned Saddharmadhara meditation programs
-              has been temporarily paused for the current season, as the
-              programs have now concluded.
-            </h2>
-          </div>
-          <div>
-            <p>
-              මෙතෙක් පැවති වැඩසටහන් නැරඹීමට අපගේ Youtube නාලිකාව හා සම්බන්ධ
-              වන්න.
-            </p>
-            <p>Join our YouTube channel to watch the previous programs</p>
-            <a
-              href="https://www.youtube.com/channel/UCXFiIVHYqQmgpmIi7KChMkQ"
-              target="_blank"
-              className="youtube-btn"
-            >
-              Youtube
-            </a>
-          </div>
-          <div>
-            <p>
-              ඉදරි වැඩසටහන් පිළිබඳව දැනුවත් වීමට අපගේ Whatsapp සමූහයට එක් වන්න.
-            </p>
-            <p>
-              Join our Whatsapp group to stay informed about upcoming programs
-            </p>
-            <a
-              href="https://srisambuddhamission.org/whatsapp"
-              target="_blank"
-              className="whatsapp-btn"
-            >
-              Whatsapp
-            </a>
-          </div>
-        </div>
-      )}
+      {!requestedRetreatError && accepting === false && <ProgramClosed />}
     </div>
   );
 }

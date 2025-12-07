@@ -1,20 +1,20 @@
-import Confirm from "../../../forms/Confirm";
+import type { Metadata } from "next";
 import {
   getExpressionOfInterestEvent,
   getRetreatByCode,
 } from "../../../../backend/Dhis2Client";
-import ConfirmError from "../../../forms/ConfirmError";
-import { ENGLISH_LOCALE } from "../../../forms/locale/english";
-import { SINHALA_LOCALE } from "../../../forms/locale/sinhala";
 import {
-  DHIS2_RETREAT_CONFIRMATION_DEADLINE_ATTRIBUTE,
+  DHIS2_RETREAT_ATTRIBUTE_CONFIRMATION_DEADLINE,
   DHIS2_RETREAT_SELECTION_STATE_DATA_ELEMENT,
   DHIS2_TEI_ATTRIBUTE_NAME,
   dhis2Endpoint,
   dhis2Token,
-} from "../../../../dhis2Constants";
+} from "../../../forms/dhis2";
+import Confirm from "../../../forms/Confirm";
 import { DHIS2_RETREAT_ATTRIBUTE_MEDIUM } from "../../../forms/dhis2";
-import type { Metadata } from "next";
+import ErrorComponent from "../../../forms/components/ErrorComponent";
+import { ENGLISH_LOCALE } from "../../../forms/locale/english";
+import { SINHALA_LOCALE } from "../../../forms/locale/sinhala";
 
 export const metadata: Metadata = {
   title: "Saddharmadhara Confirmation",
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
 
 const LinkError = ({ language }: { language?: string }) => {
   return (
-    <ConfirmError
+    <ErrorComponent
       title={{
         [ENGLISH_LOCALE]: "Error",
         [SINHALA_LOCALE]: "දෝෂයක් ඇති විය.",
@@ -102,7 +102,7 @@ export default async function Page(props: {
     }
 
     return (
-      <ConfirmError
+      <ErrorComponent
         title={title}
         error={errorMessage}
         language={retreatLanguage}
@@ -112,14 +112,14 @@ export default async function Page(props: {
 
   // check if confirmation deadline has passed
   const confirmationDeadline: string =
-    retreatObj.attributes[DHIS2_RETREAT_CONFIRMATION_DEADLINE_ATTRIBUTE];
+    retreatObj.attributes[DHIS2_RETREAT_ATTRIBUTE_CONFIRMATION_DEADLINE];
 
   if (
     confirmationDeadline &&
     new Date(confirmationDeadline).getTime() < Date.now()
   ) {
     return (
-      <ConfirmError
+      <ErrorComponent
         title={{
           [ENGLISH_LOCALE]: "Confirmation Deadline Passed",
           [SINHALA_LOCALE]: "තහවුරු කිරීමේ කාලසීමාව අවසන්",

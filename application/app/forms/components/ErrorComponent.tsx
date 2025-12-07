@@ -4,11 +4,11 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Model, surveyLocalization } from "survey-core";
 import "survey-core/defaultV2.min.css";
 import { Survey } from "survey-react-ui";
-import englishLocaleStrings, { ENGLISH_LOCALE } from "./locale/english";
-import sinhalaLocaleStrings, { SINHALA_LOCALE } from "./locale/sinhala";
-import Loader from "./components/Loader";
-import "./App.css";
-import errorPage from "./pages/error";
+import englishLocaleStrings, { ENGLISH_LOCALE } from "../locale/english";
+import sinhalaLocaleStrings, { SINHALA_LOCALE } from "../locale/sinhala";
+import Loader from "./Loader";
+import "../App.css";
+import errorPage from "../pages/error";
 
 surveyLocalization.locales[SINHALA_LOCALE] = {
   ...sinhalaLocaleStrings,
@@ -26,11 +26,7 @@ const surveyJson = {
   showNavigationButtons: false,
 };
 
-export default function ConfirmError({
-  title,
-  error,
-  language,
-}: {
+export interface ErrorComponentProps {
   title: {
     [SINHALA_LOCALE]: string;
     [ENGLISH_LOCALE]: string;
@@ -40,7 +36,13 @@ export default function ConfirmError({
     [ENGLISH_LOCALE]: string | React.ReactNode;
   };
   language?: string;
-}) {
+}
+
+export default function ErrorComponent({
+  title,
+  error,
+  language,
+}: ErrorComponentProps) {
   const [loading, setLoading] = useState(false);
   const survey = useMemo(
     () =>
