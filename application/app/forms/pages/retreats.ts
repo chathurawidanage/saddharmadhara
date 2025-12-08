@@ -1,6 +1,7 @@
 import { RETREAT_CHECKBOX_ITEM_NAME } from "../components/RetreatCheckboxItem";
 import { ENGLISH_LOCALE } from "../locale/english";
 import { SINHALA_LOCALE } from "../locale/sinhala";
+import { RETREATS_AVAILABLE_PROPERTY } from "../properties";
 
 export const RETREATS_QUESTION_NAME = "Retreats";
 
@@ -12,8 +13,18 @@ const retreatsPage = {
   },
   elements: [
     {
+      type: "html",
+      name: "noRetreatsAvailable",
+      visibleIf: `{${RETREATS_AVAILABLE_PROPERTY}} = false`,
+      html: {
+        [ENGLISH_LOCALE]: `No retreats are currently open for registration. You may still submit this form, and we will store your information for future registrations so you won't need to fill it out again.`,
+        [SINHALA_LOCALE]: `ලියාපදිංචිය සඳහා දැනට කිසිදු වැඩසටහනක් විවෘත නැත. ඔබට තවමත් මෙම පෝරමය ඉදිරියට යා හැකි අතර, අනාගත ලියාපදිංචි කිරීම් සඳහා අපි ඔබේ තොරතුරු ගබඩා කරන්නෙමු, එබැවින් ඔබට එය නැවත පිරවීමට අවශ්‍ය නොවනු ඇත.`,
+      },
+    },
+    {
       type: "checkbox",
       name: RETREATS_QUESTION_NAME,
+      visibleIf: `{${RETREATS_AVAILABLE_PROPERTY}} = true`,
       title: {
         [ENGLISH_LOCALE]: "Choose the retreat(s) you wish to join.",
         [SINHALA_LOCALE]:

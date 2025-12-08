@@ -8,6 +8,7 @@ import { RETREATS_QUESTION_NAME } from "../pages/retreats";
 import {
   EXISTING_YOGI_CHECK_DONE,
   EXISTING_YOGI_ENROLLMENT_ID_PROPERTY,
+  RETREATS_AVAILABLE_PROPERTY,
   SPECIF_RETREAT_REQUESTED,
 } from "../properties";
 import { getEligibleRetreats } from "../../../backend/Dhis2Client";
@@ -56,6 +57,7 @@ const onPropertyChanged = (survey: SurveyModel, options) => {
       survey.getPropertyValue(EXISTING_YOGI_ENROLLMENT_ID_PROPERTY),
       survey.getPropertyValue(SPECIF_RETREAT_REQUESTED)
     ).then((retreats) => {
+      survey.setVariable(RETREATS_AVAILABLE_PROPERTY, retreats && retreats.length > 0);
       survey.getQuestionByName(RETREATS_QUESTION_NAME).choices = retreats?.map(
         (choice) => {
           let startDate = new Date(
