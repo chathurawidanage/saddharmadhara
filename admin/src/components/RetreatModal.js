@@ -17,6 +17,9 @@ import {
 } from "@dhis2/ui";
 import React from "react";
 import {
+  DHIS2_RETREAT_ATTRIBUTE_ACCOMMODATION_NOT_PROVIDED,
+  DHIS2_RETREAT_ATTRIBUTE_ACCOMMODATION_OPTIONAL,
+  DHIS2_RETREAT_ATTRIBUTE_PRIVATE,
   DHIS2_RETREAT_CLERGY_ONLY_ATTRIBUTE,
   DHIS2_RETREAT_CODE_ATTRIBUTE,
   DHIS2_RETREAT_DATE_ATTRIBUTE,
@@ -98,6 +101,24 @@ const RetreatModel = ({ store, onCancel }) => {
               id: DHIS2_RETREAT_CLERGY_ONLY_ATTRIBUTE,
             },
             value: values.clergyOnly,
+          },
+          {
+            attribute: {
+              id: DHIS2_RETREAT_ATTRIBUTE_PRIVATE,
+            },
+            value: values.privateRetreat,
+          },
+          {
+            attribute: {
+              id: DHIS2_RETREAT_ATTRIBUTE_ACCOMMODATION_NOT_PROVIDED,
+            },
+            value: values.accomodationNotProvided,
+          },
+          {
+            attribute: {
+              id: DHIS2_RETREAT_ATTRIBUTE_ACCOMMODATION_OPTIONAL,
+            },
+            value: values.accomodationOptional,
           },
         ];
 
@@ -224,6 +245,49 @@ const RetreatModel = ({ store, onCancel }) => {
                   label="Only for Clergy"
                   defaultValue={false}
                   component={SwitchFieldFF}
+                />
+              </div>
+              <div style={styles.fieldRow}>
+                <Field
+                  type="checkbox"
+                  name="privateRetreat"
+                  label="Private Retreat"
+                  defaultValue={false}
+                  component={SwitchFieldFF}
+                />
+              </div>
+              <div style={styles.fieldRow}>
+                <Field
+                  type="checkbox"
+                  name="accomodationNotProvided"
+                  label="Accommodation Not Provided (Travel from home)"
+                  defaultValue={false}
+                >
+                  {({ input, meta }) => (
+                    <SwitchFieldFF
+                      input={{
+                        ...input,
+                        onChange: (e) => {
+                          input.onChange(e);
+                          if (e.target.checked) {
+                            form.change("accomodationOptional", false);
+                          }
+                        },
+                      }}
+                      meta={meta}
+                      label="Accommodation Not Provided (Travel from home)"
+                    />
+                  )}
+                </Field>
+              </div>
+              <div style={styles.fieldRow}>
+                <Field
+                  type="checkbox"
+                  name="accomodationOptional"
+                  label="Accommodation Optional (Yogi can choose to stay or not)"
+                  defaultValue={false}
+                  component={SwitchFieldFF}
+                  disabled={values.accomodationNotProvided}
                 />
               </div>
               <div style={styles.fieldRow}>
