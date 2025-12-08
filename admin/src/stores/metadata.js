@@ -261,8 +261,8 @@ class MetadataStore {
       this.rooms = transformRooms(response.rooms);
       this.languages = transformLanguages(response.languages);
       this.attendance = transformAttendance(response.attendance);
+      this.fetchSmsCredits();
     });
-    this.fetchSmsCredits();
   };
 }
 
