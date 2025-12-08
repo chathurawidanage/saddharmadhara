@@ -33,7 +33,7 @@ const Retreat = ({ retreat }) => {
   plusDateTo.setDate(plusDateTo.getDate() + 1);
 
   return (
-    <Col xs={12} sm={6} md={3} lg={2}>
+    <Col xs={12} lg={6} xxl={4}>
       <Card
         style={{
           background: `linear-gradient(90deg, ${getTypeColor(retreat.retreatType)}33 0%, #ffffff 3%)`
@@ -132,8 +132,8 @@ const RetreatsDashboard = observer(({ store }) => {
         </div>
       </div>
 
-      <Row className="mb-4">
-        <Col md={3}>
+      <Row className="mb-4 g-4">
+        <Col xs={12} sm={6} lg={3}>
           <Card className="stat-card retreat-card">
             <Card.Body className="position-relative overflow-hidden">
               <div className="stat-title">SMS Credits</div>
@@ -146,7 +146,7 @@ const RetreatsDashboard = observer(({ store }) => {
             </Card.Body>
           </Card>
         </Col>
-        <Col md={3}>
+        <Col xs={12} sm={6} lg={3}>
           <Card className="stat-card retreat-card">
             <Card.Body className="position-relative overflow-hidden">
               <div className="stat-title">Active Retreats</div>
@@ -157,7 +157,7 @@ const RetreatsDashboard = observer(({ store }) => {
             </Card.Body>
           </Card>
         </Col>
-        <Col md={3}>
+        <Col xs={12} sm={6} lg={3}>
           <Card className="stat-card retreat-card">
             <Card.Body className="position-relative overflow-hidden">
               <div className="stat-title">Total Retreats</div>
@@ -168,7 +168,7 @@ const RetreatsDashboard = observer(({ store }) => {
             </Card.Body>
           </Card>
         </Col>
-        <Col md={3}>
+        <Col xs={12} sm={6} lg={3}>
           <Card
             className="stat-card retreat-card bg-danger-light"
           >
