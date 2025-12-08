@@ -12,10 +12,15 @@ import {
   OrganisationUnitTree,
   ReactFinalForm,
   SingleSelectFieldFF,
-  hasValue
+  hasValue,
+  SwitchFieldFF,
 } from "@dhis2/ui";
 import React from "react";
 import {
+  DHIS2_RETREAT_ATTRIBUTE_ACCOMMODATION_NOT_PROVIDED,
+  DHIS2_RETREAT_ATTRIBUTE_ACCOMMODATION_OPTIONAL,
+  DHIS2_RETREAT_ATTRIBUTE_PRIVATE,
+  DHIS2_RETREAT_CLERGY_ONLY_ATTRIBUTE,
   DHIS2_RETREAT_CODE_ATTRIBUTE,
   DHIS2_RETREAT_DATE_ATTRIBUTE,
   DHIS2_RETREAT_DISABLED_ATTRIBUTE,
@@ -25,7 +30,7 @@ import {
   DHIS2_RETREAT_TOTAL_YOGIS_ATTRIBUTE,
   DHIS2_RETREAT_TYPE_ATTRIBUTE,
   DHIS2_ROOT_ORG,
-  DHIS_RETREATS_OPTION_SET_ID
+  DHIS_RETREATS_OPTION_SET_ID,
 } from "../dhis2";
 
 const { Form, Field } = ReactFinalForm;
@@ -33,7 +38,7 @@ const { Form, Field } = ReactFinalForm;
 const styles = {
   fieldRow: {
     marginBottom: 10,
-  }
+  },
 };
 
 const optionMutation = {
@@ -52,7 +57,7 @@ const RetreatModel = ({ store, onCancel }) => {
     onComplete: () => {
       onCancel();
       store.metadata.loadRetreats();
-    }
+    },
   });
 
   return (
@@ -89,8 +94,32 @@ const RetreatModel = ({ store, onCancel }) => {
           },
           {
             attribute: { id: DHIS2_RETREAT_MEDIUM_ATTRIBUTE },
-            value: values.medium
-          }
+            value: values.medium,
+          },
+          {
+            attribute: {
+              id: DHIS2_RETREAT_CLERGY_ONLY_ATTRIBUTE,
+            },
+            value: values.clergyOnly,
+          },
+          {
+            attribute: {
+              id: DHIS2_RETREAT_ATTRIBUTE_PRIVATE,
+            },
+            value: values.privateRetreat,
+          },
+          {
+            attribute: {
+              id: DHIS2_RETREAT_ATTRIBUTE_ACCOMMODATION_NOT_PROVIDED,
+            },
+            value: values.accomodationNotProvided,
+          },
+          {
+            attribute: {
+              id: DHIS2_RETREAT_ATTRIBUTE_ACCOMMODATION_OPTIONAL,
+            },
+            value: values.accomodationOptional,
+          },
         ];
 
         let code = `${new Date(values.date)
@@ -122,10 +151,8 @@ const RetreatModel = ({ store, onCancel }) => {
                   type="text"
                   validate={hasValue}
                 />
-
               </div>
               <div style={styles.fieldRow}>
-
                 <Field
                   required
                   name="date"
@@ -134,10 +161,8 @@ const RetreatModel = ({ store, onCancel }) => {
                   type="date"
                   validate={hasValue}
                 />
-
               </div>
               <div style={styles.fieldRow}>
-
                 <Field
                   required
                   name="noOfDays"
@@ -146,10 +171,8 @@ const RetreatModel = ({ store, onCancel }) => {
                   type="number"
                   validate={hasValue}
                 />
-
               </div>
               <div style={styles.fieldRow}>
-
                 <Field
                   name="location"
                   label="Location"
@@ -172,10 +195,8 @@ const RetreatModel = ({ store, onCancel }) => {
                     </div>
                   )}
                 </Field>
-
               </div>
               <div style={styles.fieldRow}>
-
                 <Field
                   required
                   name="noOfYogis"
@@ -184,7 +205,6 @@ const RetreatModel = ({ store, onCancel }) => {
                   type="number"
                   validate={hasValue}
                 />
-
               </div>
               <div style={styles.fieldRow}>
                 <Field
@@ -199,12 +219,11 @@ const RetreatModel = ({ store, onCancel }) => {
                     return {
                       label: option.name,
                       value: option.code,
-                    }
+                    };
                   })}
                 />
               </div>
               <div style={styles.fieldRow}>
-
                 <Field
                   required
                   name="retreatType"
@@ -218,14 +237,67 @@ const RetreatModel = ({ store, onCancel }) => {
                     };
                   })}
                 />
-
               </div>
               <div style={styles.fieldRow}>
-                {error &&
+                <Field
+                  type="checkbox"
+                  name="clergyOnly"
+                  label="Only for Clergy"
+                  defaultValue={false}
+                  component={SwitchFieldFF}
+                />
+              </div>
+              <div style={styles.fieldRow}>
+                <Field
+                  type="checkbox"
+                  name="privateRetreat"
+                  label="Private Retreat"
+                  defaultValue={false}
+                  component={SwitchFieldFF}
+                />
+              </div>
+              <div style={styles.fieldRow}>
+                <Field
+                  type="checkbox"
+                  name="accomodationNotProvided"
+                  label="Accommodation Not Provided (Travel from home)"
+                  defaultValue={false}
+                >
+                  {({ input, meta }) => (
+                    <SwitchFieldFF
+                      input={{
+                        ...input,
+                        onChange: (e) => {
+                          input.onChange(e);
+                          if (e.target.checked) {
+                            form.change("accomodationOptional", false);
+                          }
+                        },
+                      }}
+                      meta={meta}
+                      label="Accommodation Not Provided (Travel from home)"
+                    />
+                  )}
+                </Field>
+              </div>
+              <div style={styles.fieldRow}>
+                <Field
+                  type="checkbox"
+                  name="accomodationOptional"
+                  label="Accommodation Optional (Yogi can choose to stay or not)"
+                  defaultValue={false}
+                  component={SwitchFieldFF}
+                  disabled={values.accomodationNotProvided}
+                />
+              </div>
+              <div style={styles.fieldRow}>
+                {error && (
                   <NoticeBox error title="Retreat creation failed">
-                    {error?.details?.response?.errorReports?.map(report => report.message).join(",")}
+                    {error?.details?.response?.errorReports
+                      ?.map((report) => report.message)
+                      .join(",")}
                   </NoticeBox>
-                }
+                )}
               </div>
             </ModalContent>
             <ModalActions>

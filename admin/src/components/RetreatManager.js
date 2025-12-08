@@ -1,7 +1,10 @@
 import {
   Button,
+  DropdownButton,
+  FlyoutMenu,
   IconArrowLeft16,
-  Tag
+  MenuItem,
+  Tag,
 } from "@dhis2/ui";
 import { observer } from "mobx-react";
 import React from "react";
@@ -9,10 +12,17 @@ import { Col, Container, Row } from "react-bootstrap";
 import { useParams } from "react-router";
 import { useNavigate } from "react-router-dom";
 import RetreatLocation from "./RetreatLocation";
-import YogisList from "./manager/YogiList";
+import YogisList, { sortYogiList } from "./manager/YogiList";
 import RetreatFinaliseModal from "./RetreatFinaliseModal";
-import { getFinalExcelDownloadLink } from "../dhis2";
+import {
+  DHIS2_TEI_ATTRIBUTE_FULL_NAME,
+  DHIS2_TEI_ATTRIBUTE_GENDER,
+  DHIS2_TEI_ATTRIBUTE_MOBILE,
+  DHIS2_TEI_ATTRIBUTE_NIC,
+  DHIS2_TEI_ATTRIBUTE_PASSPORT,
+} from "../dhis2";
 import { useConfig } from "@dhis2/app-runtime";
+import RetreatInvitationModal from "./RetreatInvitationModal";
 
 const styles = {
   container: {
@@ -22,7 +32,7 @@ const styles = {
     marginBottom: 10,
   },
   mediumText: {
-    textTransform: "capitalize"
+    textTransform: "capitalize",
   },
   retreatHeader: {
     display: "flex",
@@ -33,16 +43,28 @@ const styles = {
   retreatHeaderButtons: {
     display: "flex",
     flexDirection: "row",
-    columnGap: 10
+    columnGap: 10,
   },
   retreatHeaderTitle: {
     display: "flex",
     flexDirection: "row",
     columnGap: 10,
-    alignItems: "center"
-  }
+    alignItems: "center",
+  },
 };
 
+function downloadTextFile(text, fileName, extension = "txt") {
+  const BOM = "\uFEFF"; // UTF-8 BOM
+  const blob = new Blob([BOM + text], { type: "text/plain;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+
+  link.setAttribute("href", url);
+  link.setAttribute("download", `${fileName}.${extension}`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
 
 const RetreatManager = observer(({ store }) => {
   const { baseUrl } = useConfig();
@@ -50,8 +72,63 @@ const RetreatManager = observer(({ store }) => {
   const navigate = useNavigate();
 
   const [showFinaliseModel, setShowFinaliseModel] = React.useState(false);
+  const [showInvitationModel, setShowInvitationModel] = React.useState(false);
 
   const retreat = store.metadata.retreatsMapWithIdKey[params.retreatId];
+
+  const openDownloadLink = (url) => {
+    let tempElement = document.createElement("a");
+    tempElement.href = baseUrl;
+    window.open(new URL(url, tempElement.href), "_blank");
+  };
+
+  const downloadYogiList = async (retreatCode, gender, selectionState) => {
+    const yogis = await store.yogis.fetchExpressionOfInterests(retreatCode);
+    const yogiNames = [];
+
+    if (selectionState === "selected") {
+      yogiNames.push(
+        ["", "Name", "NIC", "Passport", "Phone", "Room"].join(","),
+      );
+    }
+
+    let index = 0;
+    const yogiObj = yogis.map(
+      (yogiId) => store.yogis.yogiIdToObjectMap[yogiId],
+    );
+    sortYogiList(yogiObj, retreat);
+
+    for (const yogi of yogiObj) {
+      if (
+        yogi.attributes[DHIS2_TEI_ATTRIBUTE_GENDER] === gender &&
+        yogi.expressionOfInterests[retreatCode].state === selectionState
+      ) {
+        if (selectionState === "selected") {
+          const room = yogi.participation[retreat.code]?.room || "N/A";
+          yogiNames.push(
+            [
+              (++index).toString().padStart(2, "0"),
+              yogi.attributes[DHIS2_TEI_ATTRIBUTE_FULL_NAME].trim(),
+              yogi.attributes[DHIS2_TEI_ATTRIBUTE_NIC]?.trim() || "",
+              yogi.attributes[DHIS2_TEI_ATTRIBUTE_PASSPORT]?.trim() || "",
+              yogi.attributes[DHIS2_TEI_ATTRIBUTE_MOBILE]?.trim() || "",
+              room,
+            ].join(","),
+          );
+        } else {
+          yogiNames.push(
+            `${(++index).toString().padStart(2, "0")} ${yogi.attributes[DHIS2_TEI_ATTRIBUTE_FULL_NAME].trim()}`,
+          );
+        }
+      }
+    }
+    downloadTextFile(
+      yogiNames.join("\n"),
+      `${retreatCode}_${gender}`,
+      selectionState === "selected" ? "csv" : "txt",
+    );
+  };
+
   return (
     <Container style={styles.container}>
       <div>
@@ -73,22 +150,91 @@ const RetreatManager = observer(({ store }) => {
             <Col style={styles.retreatHeader}>
               <div style={styles.retreatHeaderTitle}>
                 <h3 style={{ padding: 0, margin: 0 }}>{retreat.name} </h3>
-                {retreat.finalized ? <Tag positive bold>Finalized</Tag> : null}
+                {retreat.finalized ? (
+                  <Tag positive bold>
+                    Finalized
+                  </Tag>
+                ) : null}
               </div>
               <div style={styles.retreatHeaderButtons}>
-                <Button onClick={() => {
-                  let tempElement = document.createElement("a");
-                  tempElement.href = baseUrl;
-                  window.open(
-                    new URL(
-                      getFinalExcelDownloadLink(retreat.code),
-                      tempElement.href
-                    ),
-                    "_blank"
-                  );
-                }}>Download Selected</Button>
-                <Button primary disabled={(Date.now() - retreat.date.getTime()) < retreat.noOfDays * 24 * 60 * 60 * 1000 || retreat.finalized} onClick={() => setShowFinaliseModel(true)}>Finalise Retreat</Button>
-                {showFinaliseModel && <RetreatFinaliseModal retreat={retreat} store={store} onCancel={() => setShowFinaliseModel(false)} />}
+                <Button onClick={() => setShowInvitationModel(true)}>
+                  Send Invitations
+                </Button>
+                {showInvitationModel && (
+                  <RetreatInvitationModal
+                    retreat={retreat}
+                    store={store}
+                    onCancel={() => setShowInvitationModel(false)}
+                  />
+                )}
+                <DropdownButton
+                  component={
+                    <FlyoutMenu>
+                      <MenuItem label="Applied">
+                        {["Male", "Female"].map((gender) => (
+                          <MenuItem
+                            onClick={() => {
+                              downloadYogiList(
+                                retreat.code,
+                                gender.toLowerCase(),
+                                "applied",
+                              );
+                            }}
+                            label={gender}
+                          />
+                        ))}
+                      </MenuItem>
+                      <MenuItem label="Pending Confirmation">
+                        {["Male", "Female"].map((gender) => (
+                          <MenuItem
+                            onClick={() => {
+                              downloadYogiList(
+                                retreat.code,
+                                gender.toLowerCase(),
+                                "pending",
+                              );
+                            }}
+                            label={gender}
+                          />
+                        ))}
+                      </MenuItem>
+                      <MenuItem label="Selected">
+                        {["Male", "Female"].map((gender) => (
+                          <MenuItem
+                            onClick={() => {
+                              downloadYogiList(
+                                retreat.code,
+                                gender.toLowerCase(),
+                                "selected",
+                              );
+                            }}
+                            label={gender}
+                          />
+                        ))}
+                      </MenuItem>
+                    </FlyoutMenu>
+                  }
+                >
+                  Download
+                </DropdownButton>
+                <Button
+                  primary
+                  disabled={
+                    Date.now() - retreat.date.getTime() <
+                      retreat.noOfDays * 24 * 60 * 60 * 1000 ||
+                    retreat.finalized
+                  }
+                  onClick={() => setShowFinaliseModel(true)}
+                >
+                  Finalise Retreat
+                </Button>
+                {showFinaliseModel && (
+                  <RetreatFinaliseModal
+                    retreat={retreat}
+                    store={store}
+                    onCancel={() => setShowFinaliseModel(false)}
+                  />
+                )}
               </div>
             </Col>
           </Row>
@@ -111,10 +257,7 @@ const RetreatManager = observer(({ store }) => {
           </Row>
         </div>
         <div>
-          <YogisList
-            retreat={retreat}
-            store={store}
-          />
+          <YogisList retreat={retreat} store={store} />
         </div>
       </div>
     </Container>

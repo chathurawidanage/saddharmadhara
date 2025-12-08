@@ -1,7 +1,0 @@
-{
-  "port": 5000,
-  "fileSizeLimit": "5mb",
-  "dhis2": {
-    "endpoint": "http://localhost:8080/api/"
-  }
-}
