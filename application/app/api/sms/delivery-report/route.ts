@@ -1,0 +1,126 @@
+import {
+  DHIS2_RETREAT_DATA_ELEMENT_INVITATION_SENT,
+  dhis2Endpoint,
+  dhis2Token,
+} from "../../../forms/dhis2";
+
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+
+  const campaignId = searchParams.get("campaignId");
+  const msisdn = searchParams.get("msisdn");
+  const status = searchParams.get("status");
+
+  console.log("Delivery Report Received:", {
+    campaignId,
+    msisdn,
+    status,
+  });
+
+  if (status === "1") {
+    // sent
+    // ignore as we have handled that already during the send call
+    return new Response("OK", {
+      status: 200,
+    });
+  }
+
+  // get event id from dhis2 datastore
+  const eventId = await getEventIdForSmsCampaignId(campaignId);
+
+  if (eventId) {
+    // since we don't have a way to atomically update the status adding a delay to avoid race conditions.
+    // why? the admin app set the state to sent and there's a slight chance of getting the delivery report before the status is updated by admin app leading to a race condition.
+
+    setTimeout(async () => {
+      await changeRetreatInvitationStatus(
+        eventId,
+        getDhis2InvitationStatus(status),
+      );
+    }, 30000);
+  }
+
+  return new Response("OK", {
+    status: 200,
+  });
+}
+
+async function changeRetreatInvitationStatus(eventId: string, status: string) {
+  console.log("changing status of", eventId, "to", status);
+  const getEventUrl = new URL("tracker/events/" + eventId, dhis2Endpoint);
+  let eventResponse = await fetch(getEventUrl, {
+    method: "GET",
+    headers: {
+      Authorization: dhis2Token,
+    },
+  });
+
+  if (!eventResponse.ok) {
+    console.error(
+      "Failed to get event for retreat invitation status update",
+      eventId,
+    );
+    return false;
+  }
+
+  const eventJson = await eventResponse.json();
+
+  const dataValues = eventJson.dataValues.filter(
+    (dv) => dv.dataElement !== DHIS2_RETREAT_DATA_ELEMENT_INVITATION_SENT,
+  );
+
+  const url = new URL("events/" + eventId, dhis2Endpoint);
+  let response = await fetch(url, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: dhis2Token,
+    },
+    body: JSON.stringify({
+      program: eventJson.program,
+      programStage: eventJson.programStage,
+      status: "COMPLETED",
+      dataValues: [
+        ...dataValues,
+        {
+          dataElement: DHIS2_RETREAT_DATA_ELEMENT_INVITATION_SENT,
+          value: status,
+        },
+      ],
+    }),
+  });
+
+  if (!response.ok) {
+    try {
+      const errorText = await response.text();
+      console.error("Failed to update retreat invitation status:", errorText);
+    } catch (e) {
+      console.error("Failed to get error text of failed sms state update", e);
+    }
+  }
+
+  return response.ok;
+}
+
+async function getEventIdForSmsCampaignId(smsCampaignId: string) {
+  const url = new URL(
+    "dataStore/invitation-sms/" + smsCampaignId,
+    dhis2Endpoint,
+  );
+  let response = await fetch(url, {
+    method: "GET",
+    headers: {
+      Authorization: dhis2Token,
+    },
+  }).then((res) => res.json());
+  return response.eventId;
+}
+
+function getDhis2InvitationStatus(status: string) {
+  if (status === "2" || status === "4") {
+    return "failed";
+  } else if (status === "3") {
+    return "delivered";
+  }
+  throw new Error("unknown status");
+}

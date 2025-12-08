@@ -40,13 +40,13 @@ const RetreatFinaliseModal = observer(({ store, retreat, onCancel }) => {
             setLoading(true);
             let yogiList = await store.yogis.fetchExpressionOfInterests(retreat.code);
 
-            const yogiFetchPromoises = yogiList.map(yogiId => {
+            const yogiFetchPromises = yogiList.map(yogiId => {
                 return store.yogis.fetchYogi(yogiId);
             });
 
             let alreadyMarkedCount = 0;
 
-            await Promise.all(yogiFetchPromoises).then((yogis) => {
+            await Promise.all(yogiFetchPromises).then((yogis) => {
                 const selectedYogis = yogis.filter(yogi => {
                     if (yogi.participation[retreat.code]?.attendance) {
                         alreadyMarkedCount++;

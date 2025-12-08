@@ -11,3 +11,13 @@ lanka-nic-2019@^1.0.3:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/lanka-nic-2019/-/lanka-nic-2019-1.0.3.tgz#1b4c7f3c9f6a91bff72ba8283339941e30404e4b"
   integrity sha512-FC2dZuDqi8T+Z6wJ9l48714EYAXkiAtsgf7PGYCDrUasIIEDanYWOBghcVV1i1Q+EeUdyehbG/w34hWHyqnNTw==
+
+momen@^0.0.1-security:
+  version "0.0.1-security"
+  resolved "https://registry.yarnpkg.com/momen/-/momen-0.0.1-security.tgz#42673ef848a18c66d4640f1d9be3b7728f347580"
+  integrity sha512-pFEyYVJ8FmAj6+WfCRZGVJKFI9I7XHS8jy2LdTuOPR8Qiq72rXGajxToS9E62DuJ3v4sFwcv2GnOVlhDWoCjVg==
+
+moment@^2.30.1:
+  version "2.30.1"
+  resolved "https://registry.yarnpkg.com/moment/-/moment-2.30.1.tgz#f8c91c07b7a786e30c59926df530b4eac96974ae"
+  integrity sha512-uEmtNhbDOrWPFS+hdjFCBfy9f2YoyzRpwcl+DqpC6taX21FzsTLQVbMV/W7PzNSX6x/bhC1zA3c2UQ5NzH6how==
