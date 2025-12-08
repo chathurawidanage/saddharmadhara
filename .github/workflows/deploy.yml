@@ -23,6 +23,6 @@ jobs:
       - name: Build
         run: yarn build
       - name: Deploy
-        run: yarn deploy --username ${{ secrets.DHIS2_USERNAME }} ${{ secrets.DHIS2_BASE_URL }}
+        run: yarn deploy ${{ secrets.DHIS2_BASE_URL }} --username ${{ secrets.DHIS2_USERNAME }} 
         env:
-          d2_password: ${{ secrets.DHIS2_PASSWORD }}
+          D2_PASSWORD: ${{ secrets.DHIS2_PASSWORD }}
