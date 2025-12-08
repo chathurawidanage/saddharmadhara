@@ -140,6 +140,7 @@ class MetadataStore {
   rooms;
   languages;
   attendance;
+  smsCredits = null;
 
   constructor(engine) {
     this.engine = engine;
@@ -237,6 +238,20 @@ class MetadataStore {
     return response.httpStatusCode === 200;
   };
 
+  fetchSmsCredits = async () => {
+    try {
+      const response = await fetch("https://application.srisambuddhamission.org/api/sms/balance");
+      if (response.ok) {
+        const data = await response.json();
+        runInAction(() => {
+          this.smsCredits = data;
+        });
+      }
+    } catch (error) {
+      console.error("Failed to fetch SMS credits", error);
+    }
+  };
+
   init = async () => {
     let response = await this.engine.query(metadataQuery);
     runInAction(() => {
@@ -247,6 +262,7 @@ class MetadataStore {
       this.languages = transformLanguages(response.languages);
       this.attendance = transformAttendance(response.attendance);
     });
+    this.fetchSmsCredits();
   };
 }
 
