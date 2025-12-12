@@ -55,7 +55,7 @@ function getMessage(
     month: "short",
     day: "numeric",
   })} දක්වා පැවැත්වෙන සද්ධර්මධාරා
-නේවාසික වැඩසටහන හා සම්බන්ධවීමට තේරී පත් ව ඇත. ${new Date(
+භාවනා වැඩසටහන හා සම්බන්ධවීමට තේරී පත් ව ඇත. ${new Date(
     deadLine,
   ).toLocaleDateString("si-LK", {
     year: "numeric",
