@@ -1,4 +1,3 @@
-import { useConfig } from "@dhis2/app-runtime";
 import {
   Button,
   DropdownButton,
