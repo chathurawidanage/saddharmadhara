@@ -1,3 +1,4 @@
+import { useConfig } from "@dhis2/app-runtime";
 import {
   Button,
   DropdownButton,
@@ -11,9 +12,6 @@ import React from "react";
 import { Col, Container, Row } from "react-bootstrap";
 import { useParams } from "react-router";
 import { useNavigate } from "react-router-dom";
-import RetreatLocation from "./RetreatLocation";
-import YogisList, { sortYogiList } from "./manager/YogiList";
-import RetreatFinaliseModal from "./RetreatFinaliseModal";
 import {
   DHIS2_TEI_ATTRIBUTE_FULL_NAME,
   DHIS2_TEI_ATTRIBUTE_GENDER,
@@ -21,8 +19,10 @@ import {
   DHIS2_TEI_ATTRIBUTE_NIC,
   DHIS2_TEI_ATTRIBUTE_PASSPORT,
 } from "../dhis2";
-import { useConfig } from "@dhis2/app-runtime";
+import YogisList, { sortYogiList } from "./manager/YogiList";
+import RetreatFinaliseModal from "./RetreatFinaliseModal";
 import RetreatInvitationModal from "./RetreatInvitationModal";
+import RetreatLocation from "./RetreatLocation";
 
 const styles = {
   container: {
@@ -67,7 +67,6 @@ function downloadTextFile(text, fileName, extension = "txt") {
 }
 
 const RetreatManager = observer(({ store }) => {
-  const { baseUrl } = useConfig();
   const params = useParams();
   const navigate = useNavigate();
 
@@ -76,17 +75,16 @@ const RetreatManager = observer(({ store }) => {
 
   const retreat = store.metadata.retreatsMapWithIdKey[params.retreatId];
 
-  const openDownloadLink = (url) => {
-    let tempElement = document.createElement("a");
-    tempElement.href = baseUrl;
-    window.open(new URL(url, tempElement.href), "_blank");
-  };
-
-  const downloadYogiList = async (retreatCode, gender, selectionState) => {
+  const downloadYogiList = async (
+    retreatCode,
+    gender,
+    selectionState,
+    format,
+  ) => {
     const yogis = await store.yogis.fetchExpressionOfInterests(retreatCode);
     const yogiNames = [];
 
-    if (selectionState === "selected") {
+    if (format === "csv") {
       yogiNames.push(
         ["", "Name", "NIC", "Passport", "Phone", "Room"].join(","),
       );
@@ -103,7 +101,7 @@ const RetreatManager = observer(({ store }) => {
         yogi.attributes[DHIS2_TEI_ATTRIBUTE_GENDER] === gender &&
         yogi.expressionOfInterests[retreatCode].state === selectionState
       ) {
-        if (selectionState === "selected") {
+        if (format === "csv") {
           const room = yogi.participation[retreat.code]?.room || "N/A";
           yogiNames.push(
             [
@@ -124,8 +122,8 @@ const RetreatManager = observer(({ store }) => {
     }
     downloadTextFile(
       yogiNames.join("\n"),
-      `${retreatCode}_${gender}`,
-      selectionState === "selected" ? "csv" : "txt",
+      `${retreatCode}_${gender}_${selectionState}`,
+      format,
     );
   };
 
@@ -172,44 +170,86 @@ const RetreatManager = observer(({ store }) => {
                     <FlyoutMenu>
                       <MenuItem label="Applied">
                         {["Male", "Female"].map((gender) => (
-                          <MenuItem
-                            onClick={() => {
-                              downloadYogiList(
-                                retreat.code,
-                                gender.toLowerCase(),
-                                "applied",
-                              );
-                            }}
-                            label={gender}
-                          />
+                          <MenuItem label={gender}>
+                            <MenuItem
+                              label="Name List (Only)"
+                              onClick={() => {
+                                downloadYogiList(
+                                  retreat.code,
+                                  gender.toLowerCase(),
+                                  "applied",
+                                  "txt",
+                                );
+                              }}
+                            />
+                            <MenuItem
+                              label="Name with details (CSV)"
+                              onClick={() => {
+                                downloadYogiList(
+                                  retreat.code,
+                                  gender.toLowerCase(),
+                                  "applied",
+                                  "csv",
+                                );
+                              }}
+                            />
+                          </MenuItem>
                         ))}
                       </MenuItem>
                       <MenuItem label="Pending Confirmation">
                         {["Male", "Female"].map((gender) => (
-                          <MenuItem
-                            onClick={() => {
-                              downloadYogiList(
-                                retreat.code,
-                                gender.toLowerCase(),
-                                "pending",
-                              );
-                            }}
-                            label={gender}
-                          />
+                          <MenuItem label={gender}>
+                            <MenuItem
+                              label="Name List (Only)"
+                              onClick={() => {
+                                downloadYogiList(
+                                  retreat.code,
+                                  gender.toLowerCase(),
+                                  "pending",
+                                  "txt",
+                                );
+                              }}
+                            />
+                            <MenuItem
+                              label="Name with details (CSV)"
+                              onClick={() => {
+                                downloadYogiList(
+                                  retreat.code,
+                                  gender.toLowerCase(),
+                                  "pending",
+                                  "csv",
+                                );
+                              }}
+                            />
+                          </MenuItem>
                         ))}
                       </MenuItem>
                       <MenuItem label="Selected">
                         {["Male", "Female"].map((gender) => (
-                          <MenuItem
-                            onClick={() => {
-                              downloadYogiList(
-                                retreat.code,
-                                gender.toLowerCase(),
-                                "selected",
-                              );
-                            }}
-                            label={gender}
-                          />
+                          <MenuItem label={gender}>
+                            <MenuItem
+                              label="Name List (Only)"
+                              onClick={() => {
+                                downloadYogiList(
+                                  retreat.code,
+                                  gender.toLowerCase(),
+                                  "selected",
+                                  "txt",
+                                );
+                              }}
+                            />
+                            <MenuItem
+                              label="Name with details (CSV)"
+                              onClick={() => {
+                                downloadYogiList(
+                                  retreat.code,
+                                  gender.toLowerCase(),
+                                  "selected",
+                                  "csv",
+                                );
+                              }}
+                            />
+                          </MenuItem>
                         ))}
                       </MenuItem>
                     </FlyoutMenu>
@@ -221,7 +261,7 @@ const RetreatManager = observer(({ store }) => {
                   primary
                   disabled={
                     Date.now() - retreat.date.getTime() <
-                      retreat.noOfDays * 24 * 60 * 60 * 1000 ||
+                    retreat.noOfDays * 24 * 60 * 60 * 1000 ||
                     retreat.finalized
                   }
                   onClick={() => setShowFinaliseModel(true)}
