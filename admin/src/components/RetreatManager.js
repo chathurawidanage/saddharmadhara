@@ -172,7 +172,7 @@ const RetreatManager = observer(({ store }) => {
                         {["Male", "Female"].map((gender) => (
                           <MenuItem label={gender}>
                             <MenuItem
-                              label="Name List (Only)"
+                              label="Name List (Text)"
                               onClick={() => {
                                 downloadYogiList(
                                   retreat.code,
@@ -183,7 +183,7 @@ const RetreatManager = observer(({ store }) => {
                               }}
                             />
                             <MenuItem
-                              label="Name with details (CSV)"
+                              label="Name with details (Excel)"
                               onClick={() => {
                                 downloadYogiList(
                                   retreat.code,
@@ -200,7 +200,7 @@ const RetreatManager = observer(({ store }) => {
                         {["Male", "Female"].map((gender) => (
                           <MenuItem label={gender}>
                             <MenuItem
-                              label="Name List (Only)"
+                              label="Name List (Text)"
                               onClick={() => {
                                 downloadYogiList(
                                   retreat.code,
@@ -211,7 +211,7 @@ const RetreatManager = observer(({ store }) => {
                               }}
                             />
                             <MenuItem
-                              label="Name with details (CSV)"
+                              label="Name with details (Excel)"
                               onClick={() => {
                                 downloadYogiList(
                                   retreat.code,
@@ -228,7 +228,7 @@ const RetreatManager = observer(({ store }) => {
                         {["Male", "Female"].map((gender) => (
                           <MenuItem label={gender}>
                             <MenuItem
-                              label="Name List (Only)"
+                              label="Name List (Text)"
                               onClick={() => {
                                 downloadYogiList(
                                   retreat.code,
@@ -239,7 +239,7 @@ const RetreatManager = observer(({ store }) => {
                               }}
                             />
                             <MenuItem
-                              label="Name with details (CSV)"
+                              label="Name with details (Excel)"
                               onClick={() => {
                                 downloadYogiList(
                                   retreat.code,
