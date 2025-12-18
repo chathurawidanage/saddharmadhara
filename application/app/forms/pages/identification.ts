@@ -23,7 +23,7 @@ const identificationPage = {
         [ENGLISH_LOCALE]: "Please select all that apply.",
         [SINHALA_LOCALE]: "කරුණාකර අදාළ සියල්ල තෝරන්න."
       },
-      type: "tagbox",
+      type: "dropdown",
       choices: [{
         value: "NIC",
         text: {
