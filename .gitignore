@@ -7,3 +7,5 @@ junk
 .idea
 
 .yarn
+
+.env
