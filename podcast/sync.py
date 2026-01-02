@@ -1,6 +1,7 @@
 import yt_dlp
 import boto3
 import os
+import requests
 import json
 import xml.etree.ElementTree as ET
 from dotenv import load_dotenv
@@ -28,7 +29,6 @@ PODCAST_CATEGORY = os.getenv("PODCAST_CATEGORY")
 PODCAST_SUBCATEGORY = os.getenv("PODCAST_SUBCATEGORY")
 PODCAST_IMAGE_URL = os.getenv("PODCAST_IMAGE_URL")
 PODCAST_EXPLICIT = os.getenv("PODCAST_EXPLICIT")
-PODCAST_EPISODE_DESCRIPTION = os.getenv("PODCAST_EPISODE_DESCRIPTION")
 PODCAST_EMAIL = os.getenv("PODCAST_EMAIL")
 
 required_podcast_vars = [
@@ -41,7 +41,6 @@ required_podcast_vars = [
     ("PODCAST_SUBCATEGORY", PODCAST_SUBCATEGORY),
     ("PODCAST_IMAGE_URL", PODCAST_IMAGE_URL),
     ("PODCAST_EXPLICIT", PODCAST_EXPLICIT),
-    ("PODCAST_EPISODE_DESCRIPTION", PODCAST_EPISODE_DESCRIPTION),
     ("PODCAST_EMAIL", PODCAST_EMAIL),
 ]
 
@@ -96,7 +95,7 @@ def download_and_upload(video_url):
             filename = f"{video_id}.mp3"
             metadata_filename = f"{video_id}.json"
             title = info.get("title", "No Title")
-            description = PODCAST_EPISODE_DESCRIPTION
+            description = ""
             upload_date_str = info.get("upload_date", "")
             duration = info.get("duration", 0)
 
@@ -109,6 +108,9 @@ def download_and_upload(video_url):
                     pub_date = email.utils.formatdate(usegmt=True)
             else:
                 pub_date = email.utils.formatdate(usegmt=True)
+
+            # Thumbnail extraction
+            thumbnail_url = info.get("thumbnail")
 
         if filename and os.path.exists(filename):
             # Get file size
@@ -124,6 +126,33 @@ def download_and_upload(video_url):
             base_url = f"{S3_ENDPOINT_URL}/{S3_BUCKET}"
             s3_url = f"{base_url}/{filename}"
 
+            # 3.5 Process Thumbnail
+            s3_image_url = None
+            image_filename = f"{video_id}.jpg"  # Assume jpg for simplicity or converted
+            if thumbnail_url:
+                try:
+                    print(f"Downloading thumbnail from {thumbnail_url}...")
+                    img_resp = requests.get(thumbnail_url, stream=True)
+                    if img_resp.status_code == 200:
+                        with open(image_filename, "wb") as f:
+                            for chunk in img_resp.iter_content(1024):
+                                f.write(chunk)
+
+                        print(f"Uploading {image_filename} to S3...")
+                        s3_client.upload_file(
+                            image_filename,
+                            S3_BUCKET,
+                            image_filename,
+                            ExtraArgs={"ContentType": "image/jpeg"},
+                        )
+                        s3_image_url = f"{base_url}/{image_filename}"
+                    else:
+                        print(
+                            f"Failed to download thumbnail: Status {img_resp.status_code}"
+                        )
+                except Exception as e:
+                    print(f"Error processing thumbnail: {e}")
+
             # 4. Upload Metadata to S3
             metadata = {
                 "id": video_id,
@@ -131,6 +160,7 @@ def download_and_upload(video_url):
                 "description": description,
                 "original_url": video_url,
                 "s3_audio_url": s3_url,
+                "s3_image_url": s3_image_url,
                 "upload_date": upload_date_str,
                 "duration": duration,
                 "pub_date": pub_date,
@@ -151,6 +181,7 @@ def download_and_upload(video_url):
             return {
                 "title": title,
                 "url": s3_url,
+                "image_url": s3_image_url,
                 "description": description,
                 "duration": duration,
                 "length_bytes": file_size,
@@ -175,6 +206,15 @@ def download_and_upload(video_url):
                 print(f"Deleted local file: {metadata_filename}")
             except OSError as e:
                 print(f"Error removing {metadata_filename}: {e}")
+
+        # Cleanup image
+        image_filename_cleanup = f"{video_id}.jpg" if "video_id" in locals() else None
+        if image_filename_cleanup and os.path.exists(image_filename_cleanup):
+            try:
+                os.remove(image_filename_cleanup)
+                print(f"Deleted local file: {image_filename_cleanup}")
+            except OSError as e:
+                print(f"Error removing {image_filename_cleanup}: {e}")
 
 
 def format_duration(seconds):
@@ -315,6 +355,13 @@ def generate_rss(items):
             rss_item, "{http://www.itunes.com/dtds/podcast-1.0.dtd}explicit"
         ).text = "no"
 
+        # Item Image
+        if item.get("image_url"):
+            img = ET.SubElement(
+                rss_item, "{http://www.itunes.com/dtds/podcast-1.0.dtd}image"
+            )
+            img.set("href", item["image_url"])
+
         # Insert at the calculated index and increment to maintain order of new batch
         channel.insert(insert_index, rss_item)
         insert_index += 1
@@ -434,7 +481,7 @@ def run_sync_workflow():
         result = process_video_task(item)
         if result:
             processed_items.append(result)
-            if len(processed_items) >= 1:
+            if len(processed_items) >= 10:
                 break
 
     # 3. Update Feed
