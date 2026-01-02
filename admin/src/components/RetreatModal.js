@@ -15,7 +15,6 @@ import {
   hasValue,
   SwitchFieldFF,
 } from "@dhis2/ui";
-import React from "react";
 import {
   DHIS2_RETREAT_ATTRIBUTE_ACCOMMODATION_NOT_PROVIDED,
   DHIS2_RETREAT_ATTRIBUTE_ACCOMMODATION_OPTIONAL,

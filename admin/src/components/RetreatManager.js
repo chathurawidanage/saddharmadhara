@@ -251,6 +251,34 @@ const RetreatManager = observer(({ store }) => {
                           </MenuItem>
                         ))}
                       </MenuItem>
+                      <MenuItem label="Waiting">
+                        {["Male", "Female"].map((gender) => (
+                          <MenuItem label={gender}>
+                            <MenuItem
+                              label="Name List (Text)"
+                              onClick={() => {
+                                downloadYogiList(
+                                  retreat.code,
+                                  gender.toLowerCase(),
+                                  "waiting",
+                                  "txt",
+                                );
+                              }}
+                            />
+                            <MenuItem
+                              label="Name with details (Excel)"
+                              onClick={() => {
+                                downloadYogiList(
+                                  retreat.code,
+                                  gender.toLowerCase(),
+                                  "waiting",
+                                  "csv",
+                                );
+                              }}
+                            />
+                          </MenuItem>
+                        ))}
+                      </MenuItem>
                     </FlyoutMenu>
                   }
                 >
