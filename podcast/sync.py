@@ -19,7 +19,6 @@ AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
 
 # Podcast Metadata
-# Podcast Metadata
 PODCAST_TITLE = os.getenv("PODCAST_TITLE")
 PODCAST_DESCRIPTION = os.getenv("PODCAST_DESCRIPTION")
 PODCAST_LINK = os.getenv("PODCAST_LINK")
