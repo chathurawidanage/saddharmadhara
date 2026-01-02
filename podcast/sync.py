@@ -480,7 +480,7 @@ def run_sync_workflow():
         result = process_video_task(item)
         if result:
             processed_items.append(result)
-            if len(processed_items) >= 10:
+            if len(processed_items) >= 2:
                 break
 
     # 3. Update Feed
