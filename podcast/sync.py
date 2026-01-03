@@ -178,6 +178,7 @@ def download_and_upload(video_url):
             )
 
             return {
+                "id": video_id,
                 "title": title,
                 "url": s3_url,
                 "image_url": s3_image_url,
@@ -329,7 +330,8 @@ def generate_rss(items):
 
     # 3. Add new items
     for item in items:
-        if item["url"] in existing_guids:
+        # Check against both ID and URL to handle potential legacy cases or mixed usage
+        if item.get("id") in existing_guids or item["url"] in existing_guids:
             print(f"Item already in RSS, skipping: {item['title']}")
             continue
 
@@ -343,7 +345,11 @@ def generate_rss(items):
         enclosure.set("type", "audio/mpeg")
         enclosure.set("length", str(item.get("length_bytes", 0)))
 
-        ET.SubElement(rss_item, "guid").text = item["url"]
+        guid = ET.SubElement(rss_item, "guid")
+        guid.text = item.get(
+            "id", item["url"]
+        )  # Fallback to URL if ID missing (shouldn't happen)
+        guid.set("isPermaLink", "false")
 
         # Spotify/iTunes Tags
         ET.SubElement(rss_item, "pubDate").text = item.get("pub_date", "")
