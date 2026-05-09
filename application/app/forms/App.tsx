@@ -15,6 +15,7 @@ import RetreatCheckboxItem, {
   RETREAT_CHECKBOX_ITEM_NAME,
 } from "./components/RetreatCheckboxItem";
 import ProgramClosed from "./components/ProgramClosed";
+import MaintenanceMode from "./components/MaintenanceMode";
 import onComplete from "./handlers/onComplete";
 import onCurrentPageChanging from "./handlers/onCurrentPageChanging";
 import onPropertyChanged from "./handlers/onPropertyChanged";
@@ -88,6 +89,7 @@ interface ApplicationProps {
 }
 
 export default function Application({ retreat }: ApplicationProps) {
+  const isMaintenanceMode = process.env.NEXT_PUBLIC_MAINTENANCE_MODE === "true";
   const survey = useMemo(() => new Model(surveyJson), []);
   const [loading, setLoading] = useState(true);
   const [accepting, setAccepting] = useState(undefined);
@@ -157,7 +159,11 @@ export default function Application({ retreat }: ApplicationProps) {
 
   return (
     <div className="App">
-      <Loader visible={loading || validatingRetreat || accepting === undefined} />
+      {isMaintenanceMode ? (
+        <MaintenanceMode />
+      ) : (
+        <>
+          <Loader visible={loading || validatingRetreat || accepting === undefined} />
       {requestedRetreatError && (
         <ErrorComponent
           title={requestedRetreatError.title}
@@ -178,6 +184,8 @@ export default function Application({ retreat }: ApplicationProps) {
         />
       )}
       {!requestedRetreatError && accepting === false && <ProgramClosed />}
+        </>
+      )}
     </div>
   );
 }
