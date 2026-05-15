@@ -3,7 +3,11 @@ import { observer } from "mobx-react";
 import "./ApplicationIndicator.css";
 import COMMENT from "./img/comment.png";
 
-const ParticipationIndicator = observer(({ trackedEntity, store }) => {
+import { useStore } from "../../stores/StoreProvider";
+
+const ParticipationIndicator = observer(({ trackedEntity }) => {
+  const store = useStore();
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
       {Object.entries(

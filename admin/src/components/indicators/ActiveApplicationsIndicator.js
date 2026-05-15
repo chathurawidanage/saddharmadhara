@@ -2,8 +2,12 @@ import { Tooltip } from "@dhis2/ui";
 import { observer } from "mobx-react";
 import "./ApplicationIndicator.css";
 
+import { useStore } from "../../stores/StoreProvider";
+
 const ActiveApplicationIndicator = observer(
-  ({ currentRetreat, trackedEntity, store }) => {
+  ({ currentRetreat, trackedEntity }) => {
+    const store = useStore();
+
     const currentRetreats = store.metadata.currentRetreats;
 
     return (

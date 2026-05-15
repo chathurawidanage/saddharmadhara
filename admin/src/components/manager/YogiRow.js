@@ -55,8 +55,7 @@ const styles = {
   },
 };
 
-const YogiRow = observer(
-  ({ trackedEntity, currentRetreat, actions, store }) => {
+const YogiRow = observer(({ trackedEntity, currentRetreat, actions }) => {
     const { baseUrl } = useConfig();
 
     const rowClassNames = [];
@@ -158,11 +157,10 @@ const YogiRow = observer(
           <ActiveApplicationIndicator
             currentRetreat={currentRetreat}
             trackedEntity={trackedEntity}
-            store={store}
           />
         </TableCell>
         <TableCell className="yogi-row-td">
-          <ParticipationIndicator trackedEntity={trackedEntity} store={store} />
+          <ParticipationIndicator trackedEntity={trackedEntity} />
         </TableCell>
         {!currentRetreat.finalized && (
           <TableCell className="yogi-row-td">

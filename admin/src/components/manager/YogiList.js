@@ -12,6 +12,7 @@ import {
   ModalActions,
   ModalContent,
   ModalTitle,
+  NoticeBox,
   Pagination,
   SingleSelectField,
   SingleSelectOption,
@@ -42,6 +43,7 @@ import {
 } from "../../dhis2";
 import GenderIndicator from "../indicators/GenderIndicator";
 import ReverendIndicator from "../indicators/ReverendIndicator";
+import { useStore } from "../../stores/StoreProvider";
 import "./YogiList.css";
 import YogiRow from "./YogiRow";
 
@@ -120,7 +122,8 @@ export const sortYogiList = (
   }
 };
 
-const YogisList = observer(({ retreat, store }) => {
+const YogisList = observer(({ retreat }) => {
+  const store = useStore();
   const [selectionState, setSelectionState] = useState(
     store.metadata.selectionStates[0].code,
   );
@@ -166,34 +169,17 @@ const YogisList = observer(({ retreat, store }) => {
     (async () => {
       setYogisFetched(false);
       setLoadProgress(0);
-
-      const yogiIdList = await store.yogis.fetchExpressionOfInterests(
+      const loadedYogis = await store.yogis.fetchYogiBatch(
         retreat.code,
         retreat.name,
+        ({ completed, total }) => {
+          setLoadProgress(total === 0 ? 100 : (completed * 100) / total);
+        },
       );
 
-      let completion = 0;
-
-      let yogiFetchPromoises = yogiIdList.map((yogiId) => {
-        return store.yogis.fetchYogi(yogiId).then(() => {
-          completion++;
-          setLoadProgress((completion * 100) / yogiIdList.length);
-        });
-      });
-
-      Promise.all(yogiFetchPromoises)
-        .then(() => {
-          let yogiList = yogiIdList.map(
-            (yogiId) => store.yogis.yogiIdToObjectMap[yogiId],
-          );
-          sortYogiList(yogiList, retreat, sortByRef.current);
-
-          setYogiList(yogiList);
-          setYogisFetched(true);
-        })
-        .catch((err) => {
-          console.error("Error in fetching yogis", err);
-        });
+      sortYogiList(loadedYogis, retreat, sortByRef.current);
+      setYogiList(loadedYogis);
+      setYogisFetched(true);
     })();
   }, [retreat, store.yogis]);
 
@@ -258,6 +244,20 @@ const YogisList = observer(({ retreat, store }) => {
 
   return (
     <div>
+      {store.metadata.requestStates.supportingError && (
+        <div style={{ marginBottom: 16 }}>
+          <NoticeBox error title="Supporting metadata unavailable">
+            {store.metadata.requestStates.supportingError}
+          </NoticeBox>
+        </div>
+      )}
+      {store.yogis.requestStates.batchErrors[retreat.code] && (
+        <div style={{ marginBottom: 16 }}>
+          <NoticeBox error title="Some yogi records could not be loaded">
+            {store.yogis.requestStates.batchErrors[retreat.code]}
+          </NoticeBox>
+        </div>
+      )}
       <div className="yogi-list-top-bar">
         <YogiFilter filters={filters} setFilters={setFilters} />
 
@@ -340,11 +340,9 @@ const YogisList = observer(({ retreat, store }) => {
                       trackedEntity={yogi}
                       key={yogi.id}
                       currentRetreat={retreat}
-                      store={store}
                       actions={
                         <>
                           <StateChangeButton
-                            store={store}
                             yogi={yogi}
                             currentState={selectionState}
                             retreat={retreat}
@@ -352,7 +350,6 @@ const YogisList = observer(({ retreat, store }) => {
                           {selectionState ===
                           DHIS2_RETREAT_SELECTION_STATE_SELECTED_CODE ? (
                             <RoomSelect
-                              store={store}
                               retreat={retreat}
                               yogi={yogi}
                               allYogis={yogiList}
@@ -360,16 +357,11 @@ const YogisList = observer(({ retreat, store }) => {
                           ) : null}
                           {selectionState ===
                           DHIS2_RETREAT_SELECTION_STATE_SELECTED_CODE ? (
-                            <AttendanceButton
-                              store={store}
-                              retreat={retreat}
-                              yogi={yogi}
-                            />
+                            <AttendanceButton retreat={retreat} yogi={yogi} />
                           ) : null}
                           {selectionState ===
                           DHIS2_RETREAT_SELECTION_STATE_PENDING_CONFIRMATION_CODE ? (
                             <InvitationIndicator
-                              store={store}
                               retreat={retreat}
                               yogi={yogi}
                             />
@@ -435,7 +427,8 @@ const YogiFilter = ({ filters, setFilters }) => {
   );
 };
 
-const StateChangeButton = ({ currentState, yogi, retreat, store }) => {
+const StateChangeButton = ({ currentState, yogi, retreat }) => {
+  const store = useStore();
   const { show: alertStateChangeStatus } = useAlert(
     ({ yogiName, toState, success }) =>
       success
@@ -528,7 +521,8 @@ const StateChangeButton = ({ currentState, yogi, retreat, store }) => {
   );
 };
 
-const RoomSelect = observer(({ yogi, retreat, allYogis, store }) => {
+const RoomSelect = observer(({ yogi, retreat, allYogis }) => {
+  const store = useStore();
   let roomsAssignedToOthers = new Set(
     allYogis
       .filter((y) => y.id !== yogi.id)
@@ -584,7 +578,8 @@ const RoomSelect = observer(({ yogi, retreat, allYogis, store }) => {
   );
 });
 
-const AttendanceButton = observer(({ yogi, retreat, store }) => {
+const AttendanceButton = observer(({ yogi, retreat }) => {
+  const store = useStore();
   const [showModal, setShowModal] = useState(false);
   const [status, setStatus] = useState(
     yogi.participation[retreat.code]?.attendance,
@@ -662,5 +657,6 @@ const InvitationIndicator = observer(({ yogi, retreat }) => {
     </div>
   );
 });
+
 
 export default YogisList;

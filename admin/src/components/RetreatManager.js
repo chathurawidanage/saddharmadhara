@@ -6,6 +6,7 @@ import {
   IconMore16,
   MenuItem,
   Tag,
+  CircularLoader,
 } from "@dhis2/ui";
 import { observer } from "mobx-react";
 import React from "react";
@@ -24,6 +25,7 @@ import RetreatFinaliseModal from "./RetreatFinaliseModal";
 import RetreatInvitationModal from "./RetreatInvitationModal";
 import RetreatLocation from "./RetreatLocation";
 import RetreatModel from "./RetreatModal";
+import { useStore } from "../stores/StoreProvider";
 
 const styles = {
   container: {
@@ -79,8 +81,8 @@ const styles = {
   },
 };
 
-
-const RetreatManager = observer(({ store }) => {
+const RetreatManager = observer(() => {
+  const store = useStore();
   const params = useParams();
   const navigate = useNavigate();
 
@@ -89,6 +91,20 @@ const RetreatManager = observer(({ store }) => {
   const [showEditRetreatModel, setShowEditRetreatModel] = React.useState(false);
 
   const retreat = store.metadata.retreatsMapWithIdKey[params.retreatId];
+
+  if (!retreat) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          padding: "100px",
+        }}
+      >
+        <CircularLoader />
+      </div>
+    );
+  }
 
   const downloadYogiList = async (
     retreatCode,
@@ -156,7 +172,6 @@ const RetreatManager = observer(({ store }) => {
             {showInvitationModel && (
               <RetreatInvitationModal
                 retreat={retreat}
-                store={store}
                 onCancel={() => setShowInvitationModel(false)}
               />
             )}
@@ -202,7 +217,6 @@ const RetreatManager = observer(({ store }) => {
             {showFinaliseModel && (
               <RetreatFinaliseModal
                 retreat={retreat}
-                store={store}
                 onCancel={() => setShowFinaliseModel(false)}
               />
             )}
@@ -222,7 +236,6 @@ const RetreatManager = observer(({ store }) => {
             {showEditRetreatModel && (
               <RetreatModel
                 retreat={retreat}
-                store={store}
                 onCancel={() => setShowEditRetreatModel(false)}
               />
             )}
@@ -248,7 +261,7 @@ const RetreatManager = observer(({ store }) => {
         </div>
 
         <div>
-          <YogisList retreat={retreat} store={store} />
+          <YogisList retreat={retreat} />
         </div>
       </div>
     </div>
@@ -256,3 +269,4 @@ const RetreatManager = observer(({ store }) => {
 });
 
 export default RetreatManager;
+

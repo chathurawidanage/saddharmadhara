@@ -1,5 +1,6 @@
 import React from "react";
 import { useDataMutation, useDataQuery } from "@dhis2/app-runtime";
+import { observer } from "mobx-react";
 import {
   Button,
   ButtonStrip,
@@ -33,6 +34,7 @@ import {
   DHIS2_ROOT_ORG,
   DHIS_RETREATS_OPTION_SET_ID,
 } from "../dhis2";
+import { useStore } from "../stores/StoreProvider";
 
 const { Form, Field, FormSpy } = ReactFinalForm;
 
@@ -82,7 +84,9 @@ const editDataQuery = {
   },
 };
 
-const RetreatModel = ({ store, onCancel, retreat }) => {
+const RetreatModel = observer(({ onCancel, retreat }) => {
+  const store = useStore();
+
   const { data: editData, loading: editLoading } = useDataQuery(editDataQuery, {
     variables: { id: retreat?.id, locationId: retreat?.location },
     lazy: !retreat,
@@ -467,6 +471,13 @@ const RetreatModel = ({ store, onCancel, retreat }) => {
                 />
               </div>
               <div style={styles.fieldRow}>
+                {store.metadata.requestStates.supportingError && (
+                  <NoticeBox error title="Supporting metadata unavailable">
+                    {store.metadata.requestStates.supportingError}
+                  </NoticeBox>
+                )}
+              </div>
+              <div style={styles.fieldRow}>
                 {error && (
                   <NoticeBox error title="Retreat creation failed">
                     {error?.details?.response?.errorReports
@@ -504,6 +515,6 @@ const RetreatModel = ({ store, onCancel, retreat }) => {
       )}
     </Form>
   );
-};
+});
 
 export default RetreatModel;

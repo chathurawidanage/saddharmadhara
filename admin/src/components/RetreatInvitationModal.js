@@ -9,6 +9,7 @@ import {
   ModalContent,
   ModalTitle,
   CalendarInput,
+  NoticeBox,
 } from "@dhis2/ui";
 import { observer } from "mobx-react";
 import React, { useEffect } from "react";
@@ -29,9 +30,11 @@ const classes = {
     gap: 5,
   },
 };
+import { useStore } from "../stores/StoreProvider";
 
+const RetreatInvitationModal = observer(({ retreat, onCancel }) => {
+  const store = useStore();
 
-const RetreatInvitationModal = observer(({ store, retreat, onCancel }) => {
   const dataEngine = useDataEngine();
 
   // uninvited, failed, sent
@@ -59,45 +62,40 @@ const RetreatInvitationModal = observer(({ store, retreat, onCancel }) => {
   useEffect(() => {
     (async () => {
       setLoading(true);
-      let yogiList = await store.yogis.fetchExpressionOfInterests(
+      const yogis = await store.yogis.fetchYogiBatch(
         retreat.code,
         retreat.name,
+        () => {},
       );
-
-      const yogiFetchPromises = yogiList.map((yogiId) => {
-        return store.yogis.fetchYogi(yogiId);
-      });
 
       const sentYogisArr = [];
       const failedYogisArr = [];
       const toSendYogisArr = [];
 
-      await Promise.all(yogiFetchPromises).then((yogis) => {
-        yogis.forEach((yogi) => {
-          if (yogi.expressionOfInterests[retreat.code].state !== "pending") {
-            return;
-          }
+      yogis.forEach((yogi) => {
+        if (yogi.expressionOfInterests[retreat.code].state !== "pending") {
+          return;
+        }
 
-          if (
-            yogi.expressionOfInterests[retreat.code].invitationSent ===
-              "sent" ||
-            yogi.expressionOfInterests[retreat.code].invitationSent ===
-              "delivered"
-          ) {
-            sentYogisArr.push(yogi);
-          } else if (
-            yogi.expressionOfInterests[retreat.code].invitationSent === "failed"
-          ) {
-            failedYogisArr.push(yogi);
-          } else {
-            toSendYogisArr.push(yogi);
-          }
-        });
-        setSentYogis(sentYogisArr);
-        setFailedYogis(failedYogisArr);
-        setToSendYogis(toSendYogisArr);
-        setLoading(false);
+        if (
+          yogi.expressionOfInterests[retreat.code].invitationSent === "sent" ||
+          yogi.expressionOfInterests[retreat.code].invitationSent ===
+            "delivered"
+        ) {
+          sentYogisArr.push(yogi);
+        } else if (
+          yogi.expressionOfInterests[retreat.code].invitationSent === "failed"
+        ) {
+          failedYogisArr.push(yogi);
+        } else {
+          toSendYogisArr.push(yogi);
+        }
       });
+
+      setSentYogis(sentYogisArr);
+      setFailedYogis(failedYogisArr);
+      setToSendYogis(toSendYogisArr);
+      setLoading(false);
     })();
   }, [retreat, store.yogis]);
 
@@ -168,6 +166,11 @@ const RetreatInvitationModal = observer(({ store, retreat, onCancel }) => {
       {!loading && (
         <>
           <ModalContent>
+            {store.yogis.requestStates.batchErrors[retreat.code] && (
+              <NoticeBox error title="Some yogi records could not be loaded">
+                {store.yogis.requestStates.batchErrors[retreat.code]}
+              </NoticeBox>
+            )}
             <h6>Please confirm the recipients of the invitations</h6>
             <div style={classes.checkboxes}>
               <Checkbox

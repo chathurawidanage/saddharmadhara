@@ -1,4 +1,4 @@
-import { Button, Tag } from "@dhis2/ui";
+import { Button, Tag, CircularLoader, NoticeBox } from "@dhis2/ui";
 import { observer } from "mobx-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -15,6 +15,7 @@ import {
   FiUsers,
 } from "react-icons/fi";
 import "./RetreatsDashboard.css";
+import { useStore } from "../stores/StoreProvider";
 
 const getTypeColor = (type) => {
   const normalizedType = type?.toLowerCase() || "";
@@ -113,7 +114,8 @@ const Retreat = ({ retreat }) => {
   );
 };
 
-const RetreatsDashboard = observer(({ store }) => {
+const RetreatsDashboard = observer(() => {
+  const store = useStore();
   const [hideRetreatModel, setHideRetreatModel] = useState(true);
 
   return (
@@ -131,7 +133,6 @@ const RetreatsDashboard = observer(({ store }) => {
           </Button>
           {!hideRetreatModel && (
             <RetreatModel
-              store={store}
               onCancel={() => {
                 setHideRetreatModel(true);
               }}
@@ -144,10 +145,19 @@ const RetreatsDashboard = observer(({ store }) => {
         <div className="stat-card-wrapper">
           <div className="stat-title">SMS Credits</div>
           <div className="stat-value">
-            {store.metadata.smsCredits
-              ? `LKR ${store.metadata.smsCredits.balance}`
-              : "..."}
+            {store.metadata.requestStates.loadingSmsCredits ? (
+              <CircularLoader small />
+            ) : store.metadata.smsCredits ? (
+              `LKR ${store.metadata.smsCredits.balance}`
+            ) : (
+              "N/A"
+            )}
           </div>
+          {store.metadata.requestStates.smsCreditsError && (
+            <div style={{ marginTop: 8, fontSize: "0.8rem", color: "#d14343" }}>
+              {store.metadata.requestStates.smsCreditsError}
+            </div>
+          )}
           <FiMessageSquare className="stat-icon" />
         </div>
         <div className="stat-card-wrapper">
@@ -241,7 +251,25 @@ const RetreatsDashboard = observer(({ store }) => {
         >
           <FiUsers /> General Retreat Stats
         </h5>
+        {store.metadata.requestStates.statsError && (
+          <NoticeBox error title="Dashboard stats unavailable">
+            {store.metadata.requestStates.statsError}
+          </NoticeBox>
+        )}
         {(() => {
+          if (store.metadata.requestStates.loadingStats) {
+            return (
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  padding: "20px",
+                }}
+              >
+                <CircularLoader small />
+              </div>
+            );
+          }
           const stats = store.metadata.generalRetreatStats;
           return (
             <div
@@ -362,6 +390,11 @@ const RetreatsDashboard = observer(({ store }) => {
       </div>
 
       <h5 className="dashboard-section-title">Current Retreats</h5>
+      {store.metadata.requestStates.retreatRefreshError && (
+        <NoticeBox error title="Retreat refresh failed">
+          {store.metadata.requestStates.retreatRefreshError}
+        </NoticeBox>
+      )}
       {store.metadata.currentRetreats.length === 0 && (
         <p className="no-retreats-msg">There are no current retreats</p>
       )}

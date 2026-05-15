@@ -60,10 +60,13 @@ describe("MetadataStore.generalRetreatStats", () => {
     const stats = store.generalRetreatStats;
     expect(stats).toEqual({
       totalParticipants: 0,
+      totalApplicants: 0,
       oneTimeParticipants: 0,
       repeatParticipants: 0,
       unableToParticipate: 0,
+      repeatBreakdown: {},
     });
+
   });
 
   test("calculates stats correctly with mock data", () => {

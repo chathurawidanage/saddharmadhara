@@ -8,6 +8,7 @@ import {
   ModalActions,
   ModalContent,
   ModalTitle,
+  NoticeBox,
 } from "@dhis2/ui";
 import { observer } from "mobx-react";
 import React, { useEffect } from "react";
@@ -21,7 +22,11 @@ const classes = {
   },
 };
 
-const RetreatFinaliseModal = observer(({ store, retreat, onCancel }) => {
+import { useStore } from "../stores/StoreProvider";
+
+const RetreatFinaliseModal = observer(({ retreat, onCancel }) => {
+  const store = useStore();
+
   const [check, setChecks] = React.useState([false, false, false, false]);
 
   const [loading, setLoading] = React.useState(false);
@@ -40,33 +45,27 @@ const RetreatFinaliseModal = observer(({ store, retreat, onCancel }) => {
   useEffect(() => {
     (async () => {
       setLoading(true);
-      let yogiList = await store.yogis.fetchExpressionOfInterests(
+      const yogis = await store.yogis.fetchYogiBatch(
         retreat.code,
         retreat.name,
+        () => {},
       );
-
-      const yogiFetchPromises = yogiList.map((yogiId) => {
-        return store.yogis.fetchYogi(yogiId);
-      });
 
       let alreadyMarkedCount = 0;
 
-      await Promise.all(yogiFetchPromises).then((yogis) => {
-        const selectedYogis = yogis.filter((yogi) => {
-          if (yogi.participation[retreat.code]?.attendance) {
-            alreadyMarkedCount++;
-          }
-          return (
-            yogi.expressionOfInterests[retreat.code] &&
-            yogi.expressionOfInterests[retreat.code].state ===
-              DHIS2_RETREAT_SELECTION_STATE_SELECTED_CODE
-          );
-        });
-
-        setSelectedYogiList(selectedYogis);
-        setAlreadyMarkedCount(alreadyMarkedCount);
+      const selectedYogis = yogis.filter((yogi) => {
+        if (yogi.participation[retreat.code]?.attendance) {
+          alreadyMarkedCount++;
+        }
+        return (
+          yogi.expressionOfInterests[retreat.code] &&
+          yogi.expressionOfInterests[retreat.code].state ===
+            DHIS2_RETREAT_SELECTION_STATE_SELECTED_CODE
+        );
       });
 
+      setSelectedYogiList(selectedYogis);
+      setAlreadyMarkedCount(alreadyMarkedCount);
       setLoading(false);
     })();
   }, [retreat, store.yogis]);
@@ -99,6 +98,11 @@ const RetreatFinaliseModal = observer(({ store, retreat, onCancel }) => {
       {!loading && (
         <>
           <ModalContent>
+            {store.yogis.requestStates.batchErrors[retreat.code] && (
+              <NoticeBox error title="Some yogi records could not be loaded">
+                {store.yogis.requestStates.batchErrors[retreat.code]}
+              </NoticeBox>
+            )}
             <h6>Please confirm the checklist below to finalize the retreat?</h6>
             <div style={classes.checkboxes}>
               <Checkbox
