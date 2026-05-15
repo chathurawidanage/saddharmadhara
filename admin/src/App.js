@@ -2,10 +2,8 @@ import React, { useEffect } from "react";
 import { createHashRouter, RouterProvider } from "react-router-dom";
 import RetreatsDashboard from "./components/RetreatsDashboard";
 import RetreatManager from "./components/RetreatManager";
-import { observer } from "mobx-react"
-import {
-  CircularLoader
-} from "@dhis2/ui";
+import { observer } from "mobx-react";
+import { CircularLoader } from "@dhis2/ui";
 import RootStore from "./stores/root";
 import { useDataEngine } from "@dhis2/app-runtime";
 
@@ -23,7 +21,6 @@ const router = createHashRouter([
 ]);
 
 const App = observer(() => {
-
   const engine = useDataEngine();
 
   useEffect(() => {
@@ -31,7 +28,7 @@ const App = observer(() => {
   }, [engine]);
 
   if (!rootStore.initialized) {
-    return <CircularLoader />
+    return <CircularLoader />;
   }
 
   return (

@@ -1,0 +1,115 @@
+import MetadataStore, { getEndDate, transformRetreats } from "./metadata";
+import {
+  DHIS2_RETREAT_DATE_ATTRIBUTE,
+  DHIS2_RETREAT_NO_OF_DAYS_ATTRIBUTE,
+  DHIS2_RETREAT_CODE_ATTRIBUTE,
+} from "../dhis2";
+
+describe("MetadataStore Helpers", () => {
+  test("getEndDate calculates correct date", () => {
+    const startDate = new Date("2024-01-01T00:00:00Z");
+    const noOfDays = 10;
+    const endDate = getEndDate(startDate, noOfDays);
+    expect(endDate.toISOString()).toBe("2024-01-11T00:00:00.000Z");
+  });
+
+  test("transformRetreats transforms raw DHIS2 response correctly", () => {
+    const mockResponse = {
+      listGrid: {
+        rows: [
+          [
+            "id1",
+            "code1",
+            "Retreat 1",
+            JSON.stringify({
+              [DHIS2_RETREAT_DATE_ATTRIBUTE]: "2024-01-01", // Date
+              [DHIS2_RETREAT_NO_OF_DAYS_ATTRIBUTE]: "10", // No of days
+              [DHIS2_RETREAT_CODE_ATTRIBUTE]: "RC1", // Retreat Code
+            }),
+            "true", // Current
+          ],
+        ],
+      },
+    };
+
+    // Note: These IDs are from ../dhis2.js.
+    // I should ideally mock them or use the same constants.
+    // For now I am assuming the logic in transformRetreats uses them correctly.
+
+    const retreats = transformRetreats(mockResponse);
+    expect(retreats).toHaveLength(1);
+    expect(retreats[0].id).toBe("id1");
+    expect(retreats[0].current).toBe(true);
+    expect(retreats[0].date.toISOString()).toBe(
+      new Date("2024-01-01").toISOString(),
+    );
+  });
+});
+
+describe("MetadataStore.generalRetreatStats", () => {
+  let store;
+  const mockEngine = {};
+
+  beforeEach(() => {
+    store = new MetadataStore(mockEngine);
+  });
+
+  test("returns baseline stats when data is missing", () => {
+    const stats = store.generalRetreatStats;
+    expect(stats).toEqual({
+      totalParticipants: 0,
+      oneTimeParticipants: 0,
+      repeatParticipants: 0,
+      unableToParticipate: 0,
+    });
+  });
+
+  test("calculates stats correctly with mock data", () => {
+    store.retreats = [
+      {
+        id: "r1",
+        code: "R1",
+        name: "Retreat 1",
+        retreatType: "General Retreat",
+      },
+      {
+        id: "r2",
+        code: "R2",
+        name: "Retreat 2",
+        retreatType: "General Retreat",
+      },
+    ];
+
+    store.participationSummary = {
+      listGrid: {
+        rows: [
+          ["y1", "R1"], // Participant 1 in R1
+          ["y1", "R2"], // Participant 1 in R2 (Repeat)
+          ["y2", "R1"], // Participant 2 in R1 (One-time)
+        ],
+      },
+    };
+
+    store.eoiSummary = {
+      listGrid: {
+        rows: [
+          ["y1", "R1", "true"],
+          ["y2", "R1", "true"],
+          ["y3", "R1", "false"], // Applied but not invited
+        ],
+      },
+    };
+
+    const stats = store.generalRetreatStats;
+    expect(stats).toEqual({
+      totalParticipants: 2,
+      totalApplicants: 3,
+      repeatBreakdown: {
+        2: 1,
+      },
+      oneTimeParticipants: 1,
+      repeatParticipants: 1,
+      unableToParticipate: 1,
+    });
+  });
+});

@@ -22,12 +22,12 @@ import {
 } from "../dhis2";
 
 // Retreats Transforming
-const getEndDate = (startDate, noOfDays) => {
+export const getEndDate = (startDate, noOfDays) => {
   let endDate = new Date(startDate.getTime() + noOfDays * 24 * 60 * 60 * 1000);
   return endDate;
 };
 
-const transformRetreats = (retreatsReponse) => {
+export const transformRetreats = (retreatsReponse) => {
   let retreats = retreatsReponse?.listGrid?.rows?.map((row) => {
     let attributeIdToValueMap = JSON.parse(row[3]);
     let date = new Date(attributeIdToValueMap[DHIS2_RETREAT_DATE_ATTRIBUTE]);
@@ -254,7 +254,9 @@ class MetadataStore {
 
   fetchSmsCredits = async () => {
     try {
-      const response = await fetch("https://application.srisambuddhamission.org/api/sms/balance");
+      const response = await fetch(
+        "https://application.srisambuddhamission.org/api/sms/balance",
+      );
       if (response.ok) {
         const data = await response.json();
         runInAction(() => {
@@ -277,11 +279,6 @@ class MetadataStore {
 
   get generalRetreatStats() {
     if (!this.participationSummary || !this.eoiSummary || !this.retreats) {
-      console.log("Missing data for stats:", {
-        p: !!this.participationSummary,
-        e: !!this.eoiSummary,
-        r: !!this.retreats,
-      });
       return {
         totalParticipants: 0,
         oneTimeParticipants: 0,
@@ -290,16 +287,12 @@ class MetadataStore {
       };
     }
 
-    console.log("Raw participation:", this.participationSummary);
-    console.log("Raw EOI:", this.eoiSummary);
-    console.log("Retreats:", this.retreats);
-
     // Filter General Retreats
     // Filter General Retreats
     const generalRetreatCodes = new Set(
       this.retreats
         .filter((r) => r.retreatType?.toLowerCase().includes("general"))
-        .flatMap((r) => [r.code, r.name])
+        .flatMap((r) => [r.code, r.name]),
     );
 
     // Process Participation

@@ -19,10 +19,8 @@ import {
   TabBar,
   Table,
   TableBody,
-  TableCell,
   TableHead,
   TableCellHead,
-  TableRow,
   TableRowHead,
   Tag,
   TextAreaField,
@@ -47,10 +45,10 @@ import ReverendIndicator from "../indicators/ReverendIndicator";
 import "./YogiList.css";
 import YogiRow from "./YogiRow";
 
-const SELECTION_PRIORITY_SORT = "selection-priority";
-const AGE_SORT = "age";
+export const SELECTION_PRIORITY_SORT = "selection-priority";
+export const AGE_SORT = "age";
 
-const getYogiSortScore = (yogiObj) => {
+export const getYogiSortScore = (yogiObj) => {
   // reverends comes first
   let score = 0;
   if (yogiObj.attributes[DHIS2_TEI_ATTRIBUTE_MARITAL_STATE] === "reverend") {
@@ -74,7 +72,7 @@ const getYogiSortScore = (yogiObj) => {
   return score;
 };
 
-const selectionPrioritySorter = (y1, y2, retreat) => {
+export const selectionPrioritySorter = (y1, y2, retreat) => {
   let y1Score = getYogiSortScore(y1);
   let y2Score = getYogiSortScore(y2);
 
@@ -93,7 +91,7 @@ const selectionPrioritySorter = (y1, y2, retreat) => {
   return y2Score - y1Score;
 };
 
-const ageSorter = (y1, y2, retreat) => {
+export const ageSorter = (y1, y2, retreat) => {
   let dobY1 = new Date(y1.attributes[DHIS2_TEI_ATTRIBUTE_DOB]);
   let dobY2 = new Date(y2.attributes[DHIS2_TEI_ATTRIBUTE_DOB]);
 
@@ -127,7 +125,7 @@ const YogisList = observer(({ retreat, store }) => {
     store.metadata.selectionStates[0].code,
   );
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(25);
+  const [pageSize] = useState(25);
   const [yogiList, setYogiList] = useState([]);
   const [yogisFetched, setYogisFetched] = useState(false);
 
@@ -141,8 +139,8 @@ const YogisList = observer(({ retreat, store }) => {
 
   const [searchQuery, setSearchQuery] = useState("");
 
-
   const [sortBy, setSortBy] = useState(SELECTION_PRIORITY_SORT);
+  const sortByRef = React.useRef(sortBy);
 
   const countByState = computed(() => {
     let stateMap = {};
@@ -161,14 +159,13 @@ const YogisList = observer(({ retreat, store }) => {
   }, [selectionState, filters]);
 
   useEffect(() => {
-    let yogiListCopy = [...yogiList];
-    sortYogiList(yogiListCopy, retreat, sortBy);
-    setYogiList(yogiListCopy);
-  }, [retreat, sortBy]);
+    sortByRef.current = sortBy;
+  }, [sortBy]);
 
   useEffect(() => {
     (async () => {
       setYogisFetched(false);
+      setLoadProgress(0);
 
       const yogiIdList = await store.yogis.fetchExpressionOfInterests(
         retreat.code,
@@ -189,7 +186,7 @@ const YogisList = observer(({ retreat, store }) => {
           let yogiList = yogiIdList.map(
             (yogiId) => store.yogis.yogiIdToObjectMap[yogiId],
           );
-          sortYogiList(yogiList, retreat, sortBy);
+          sortYogiList(yogiList, retreat, sortByRef.current);
 
           setYogiList(yogiList);
           setYogisFetched(true);
@@ -198,7 +195,7 @@ const YogisList = observer(({ retreat, store }) => {
           console.error("Error in fetching yogis", err);
         });
     })();
-  }, [retreat]);
+  }, [retreat, store.yogis]);
 
   const pagination = (total) => {
     return (
@@ -238,7 +235,7 @@ const YogisList = observer(({ retreat, store }) => {
       (yogi) =>
         filters.reverend ||
         yogi.attributes[DHIS2_TEI_ATTRIBUTE_MARITAL_STATE].toLowerCase() !==
-        "reverend",
+          "reverend",
     )
     .filter((yogi) => {
       if (!searchQuery) return true;
@@ -247,8 +244,7 @@ const YogisList = observer(({ retreat, store }) => {
         yogi.attributes[DHIS2_TEI_ATTRIBUTE_FULL_NAME]?.toLowerCase() || "";
       const mobile =
         yogi.attributes[DHIS2_TEI_ATTRIBUTE_MOBILE]?.toLowerCase() || "";
-      const nic =
-        yogi.attributes[DHIS2_TEI_ATTRIBUTE_NIC]?.toLowerCase() || "";
+      const nic = yogi.attributes[DHIS2_TEI_ATTRIBUTE_NIC]?.toLowerCase() || "";
       const passport =
         yogi.attributes[DHIS2_TEI_ATTRIBUTE_PASSPORT]?.toLowerCase() || "";
 
@@ -269,7 +265,13 @@ const YogisList = observer(({ retreat, store }) => {
           placeholder="Sort"
           prefix="Sort"
           onChange={(e) => {
+            sortByRef.current = e.selected;
             setSortBy(e.selected);
+            setYogiList((currentYogis) => {
+              const sortedYogis = [...currentYogis];
+              sortYogiList(sortedYogis, retreat, e.selected);
+              return sortedYogis;
+            });
           }}
           selected={sortBy}
           tabIndex="0"
@@ -287,7 +289,6 @@ const YogisList = observer(({ retreat, store }) => {
           onChange={({ value }) => setSearchQuery(value)}
           type="search"
         />
-
       </div>
       <div>
         <TabBar>
@@ -317,7 +318,9 @@ const YogisList = observer(({ retreat, store }) => {
                   <TableCellHead width="100px">Indicators</TableCellHead>
                   <TableCellHead width="250px">Applications</TableCellHead>
                   <TableCellHead width="150px">Partiticipation</TableCellHead>
-                  {!retreat.finalized && <TableCellHead width="160px">Action</TableCellHead>}
+                  {!retreat.finalized && (
+                    <TableCellHead width="160px">Action</TableCellHead>
+                  )}
                 </TableRowHead>
               </TableHead>
               <TableBody>
@@ -347,7 +350,7 @@ const YogisList = observer(({ retreat, store }) => {
                             retreat={retreat}
                           />
                           {selectionState ===
-                            DHIS2_RETREAT_SELECTION_STATE_SELECTED_CODE ? (
+                          DHIS2_RETREAT_SELECTION_STATE_SELECTED_CODE ? (
                             <RoomSelect
                               store={store}
                               retreat={retreat}
@@ -356,7 +359,7 @@ const YogisList = observer(({ retreat, store }) => {
                             />
                           ) : null}
                           {selectionState ===
-                            DHIS2_RETREAT_SELECTION_STATE_SELECTED_CODE ? (
+                          DHIS2_RETREAT_SELECTION_STATE_SELECTED_CODE ? (
                             <AttendanceButton
                               store={store}
                               retreat={retreat}
@@ -364,7 +367,7 @@ const YogisList = observer(({ retreat, store }) => {
                             />
                           ) : null}
                           {selectionState ===
-                            DHIS2_RETREAT_SELECTION_STATE_PENDING_CONFIRMATION_CODE ? (
+                          DHIS2_RETREAT_SELECTION_STATE_PENDING_CONFIRMATION_CODE ? (
                             <InvitationIndicator
                               store={store}
                               retreat={retreat}
@@ -385,8 +388,6 @@ const YogisList = observer(({ retreat, store }) => {
     </div>
   );
 });
-
-
 
 const YogiFilter = ({ filters, setFilters }) => {
   return (
@@ -460,7 +461,7 @@ const StateChangeButton = ({ currentState, yogi, retreat, store }) => {
           { label: "Move", onClick: onMoveClicked },
           {
             label: "Don't Move",
-            onClick: () => { },
+            onClick: () => {},
           },
         ],
       };
@@ -650,7 +651,7 @@ const AttendanceButton = observer(({ yogi, retreat, store }) => {
   );
 });
 
-const InvitationIndicator = observer(({ yogi, retreat, store }) => {
+const InvitationIndicator = observer(({ yogi, retreat }) => {
   const status =
     yogi.expressionOfInterests[retreat.code]?.invitationSent || "pending";
   return (

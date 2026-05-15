@@ -78,7 +78,7 @@ https://application.srisambuddhamission.org/confirm/${retreatCode}/${teiId}
 
 async function sendSms(message, teiMobile, token) {
   let formattedTeiMobile = teiMobile.replace(/^\+94/, "0");
-  return await fetch(`https://application.srisambuddhamission.org/api/sms`, {
+  return await fetch("https://application.srisambuddhamission.org/api/sms", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -140,9 +140,9 @@ const RetreatInvitationModal = observer(({ store, retreat, onCancel }) => {
 
           if (
             yogi.expressionOfInterests[retreat.code].invitationSent ===
-            "sent" ||
+              "sent" ||
             yogi.expressionOfInterests[retreat.code].invitationSent ===
-            "delivered"
+              "delivered"
           ) {
             sentYogisArr.push(yogi);
           } else if (
@@ -159,7 +159,7 @@ const RetreatInvitationModal = observer(({ store, retreat, onCancel }) => {
         setLoading(false);
       });
     })();
-  }, [retreat]);
+  }, [retreat, store.yogis]);
 
   const onFinaliseClicked = async () => {
     setIsSending(true);
@@ -207,7 +207,7 @@ const RetreatInvitationModal = observer(({ store, retreat, onCancel }) => {
           retreat.date,
           retreat.endDate,
           confirmationDeadline,
-          retreat.retreatType
+          retreat.retreatType,
         ),
         finalYogisList[i].attributes[DHIS2_TEI_ATTRIBUTE_MOBILE],
         token,

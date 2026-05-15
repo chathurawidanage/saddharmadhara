@@ -1,33 +1,33 @@
 .yogi-row-reverend {
-    background-color: #FFF59D;
+  background-color: #fff59d;
 }
 
 .yogi-row-td {
-    background-color: transparent !important;
-    overflow: hidden;
-    /* Prevent spillover */
+  background-color: transparent !important;
+  overflow: hidden;
+  /* Prevent spillover */
 }
 
 .yogi-row-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
 }
 
 .yogi-profile-info {
-    padding-top: 5px;
-    padding-bottom: 5px;
-    display: flex;
-    column-gap: 15px;
-    row-gap: 5px;
-    flex-wrap: wrap;
-    /* Allow wrapping on small screens */
+  padding-top: 5px;
+  padding-bottom: 5px;
+  display: flex;
+  column-gap: 15px;
+  row-gap: 5px;
+  flex-wrap: wrap;
+  /* Allow wrapping on small screens */
 }
 
 .yogi-name-row {
-    display: flex;
-    flex-direction: row;
-    gap: 5px;
-    align-items: center;
-    font-weight: 600;
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+  align-items: center;
+  font-weight: 600;
 }

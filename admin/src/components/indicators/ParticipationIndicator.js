@@ -23,12 +23,17 @@ const ParticipationIndicator = observer(({ trackedEntity, store }) => {
             if (!acc[item.year]) acc[item.year] = [];
             acc[item.year].push(item);
             return acc;
-          }, {})
+          }, {}),
       )
         .sort(([yearA], [yearB]) => yearB - yearA)
         .map(([year, items]) => (
-          <div key={year} style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
-            <div style={{ fontSize: "10px", fontWeight: "bold", color: "#888" }}>
+          <div
+            key={year}
+            style={{ display: "flex", flexDirection: "column", gap: "2px" }}
+          >
+            <div
+              style={{ fontSize: "10px", fontWeight: "bold", color: "#888" }}
+            >
               {year}
             </div>
             <div className="yogi-applications">

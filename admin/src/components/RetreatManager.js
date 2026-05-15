@@ -1,4 +1,3 @@
-import { useDataMutation } from "@dhis2/app-runtime";
 import {
   Button,
   DropdownButton,
@@ -76,7 +75,7 @@ const styles = {
     alignItems: "center",
     gap: 6,
     color: "#404b5a",
-  }
+  },
 };
 
 function downloadTextFile(text, fileName, extension = "txt") {
@@ -91,6 +90,48 @@ function downloadTextFile(text, fileName, extension = "txt") {
   link.click();
   document.body.removeChild(link);
 }
+
+export const formatYogiList = (
+  yogiObj,
+  retreatCode,
+  gender,
+  selectionState,
+  format,
+  retreat,
+) => {
+  const yogiNames = [];
+
+  if (format === "csv") {
+    yogiNames.push(["", "Name", "NIC", "Passport", "Phone", "Room"].join(","));
+  }
+
+  let index = 0;
+  for (const yogi of yogiObj) {
+    if (
+      yogi.attributes[DHIS2_TEI_ATTRIBUTE_GENDER] === gender &&
+      yogi.expressionOfInterests[retreatCode].state === selectionState
+    ) {
+      if (format === "csv") {
+        const room = yogi.participation[retreat.code]?.room || "N/A";
+        yogiNames.push(
+          [
+            (++index).toString().padStart(2, "0"),
+            yogi.attributes[DHIS2_TEI_ATTRIBUTE_FULL_NAME].trim(),
+            yogi.attributes[DHIS2_TEI_ATTRIBUTE_NIC]?.trim() || "",
+            yogi.attributes[DHIS2_TEI_ATTRIBUTE_PASSPORT]?.trim() || "",
+            yogi.attributes[DHIS2_TEI_ATTRIBUTE_MOBILE]?.trim() || "",
+            room,
+          ].join(","),
+        );
+      } else {
+        yogiNames.push(
+          `${(++index).toString().padStart(2, "0")} ${yogi.attributes[DHIS2_TEI_ATTRIBUTE_FULL_NAME].trim()}`,
+        );
+      }
+    }
+  }
+  return yogiNames.join("\n");
+};
 
 const RetreatManager = observer(({ store }) => {
   const params = useParams();
@@ -112,46 +153,23 @@ const RetreatManager = observer(({ store }) => {
       retreatCode,
       retreat.name,
     );
-    const yogiNames = [];
 
-    if (format === "csv") {
-      yogiNames.push(
-        ["", "Name", "NIC", "Passport", "Phone", "Room"].join(","),
-      );
-    }
-
-    let index = 0;
     const yogiObj = yogis.map(
       (yogiId) => store.yogis.yogiIdToObjectMap[yogiId],
     );
     sortYogiList(yogiObj, retreat);
 
-    for (const yogi of yogiObj) {
-      if (
-        yogi.attributes[DHIS2_TEI_ATTRIBUTE_GENDER] === gender &&
-        yogi.expressionOfInterests[retreatCode].state === selectionState
-      ) {
-        if (format === "csv") {
-          const room = yogi.participation[retreat.code]?.room || "N/A";
-          yogiNames.push(
-            [
-              (++index).toString().padStart(2, "0"),
-              yogi.attributes[DHIS2_TEI_ATTRIBUTE_FULL_NAME].trim(),
-              yogi.attributes[DHIS2_TEI_ATTRIBUTE_NIC]?.trim() || "",
-              yogi.attributes[DHIS2_TEI_ATTRIBUTE_PASSPORT]?.trim() || "",
-              yogi.attributes[DHIS2_TEI_ATTRIBUTE_MOBILE]?.trim() || "",
-              room,
-            ].join(","),
-          );
-        } else {
-          yogiNames.push(
-            `${(++index).toString().padStart(2, "0")} ${yogi.attributes[DHIS2_TEI_ATTRIBUTE_FULL_NAME].trim()}`,
-          );
-        }
-      }
-    }
+    const formattedList = formatYogiList(
+      yogiObj,
+      retreatCode,
+      gender,
+      selectionState,
+      format,
+      retreat,
+    );
+
     downloadTextFile(
-      yogiNames.join("\n"),
+      formattedList,
       `${retreatCode}_${gender}_${selectionState}`,
       format,
     );
@@ -319,8 +337,7 @@ const RetreatManager = observer(({ store }) => {
               primary
               disabled={
                 Date.now() - retreat.date.getTime() <
-                retreat.noOfDays * 24 * 60 * 60 * 1000 ||
-                retreat.finalized
+                  retreat.noOfDays * 24 * 60 * 60 * 1000 || retreat.finalized
               }
               onClick={() => setShowFinaliseModel(true)}
             >

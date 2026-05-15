@@ -12,7 +12,7 @@ import {
   FiLayers,
   FiMapPin,
   FiMessageSquare,
-  FiUsers
+  FiUsers,
 } from "react-icons/fi";
 import "./RetreatsDashboard.css";
 
@@ -42,7 +42,11 @@ const Retreat = ({ retreat }) => {
         </div>
 
         <div className="tags-row">
-          {retreat.finalized && <Tag positive bold>Finalized</Tag>}
+          {retreat.finalized && (
+            <Tag positive bold>
+              Finalized
+            </Tag>
+          )}
           <Tag positive={!retreat.disabled} negative={retreat.disabled}>
             {retreat.disabled ? "Disabled" : "Active"}
           </Tag>
@@ -51,7 +55,9 @@ const Retreat = ({ retreat }) => {
 
         <div className="info-grid">
           <div className="info-item">
-            <span className="info-icon"><FiCalendar /></span>
+            <span className="info-icon">
+              <FiCalendar />
+            </span>
             <span>
               {retreat.date.toLocaleDateString("en-US", {
                 year: "numeric",
@@ -68,17 +74,25 @@ const Retreat = ({ retreat }) => {
           </div>
 
           <div className="info-item">
-            <span className="info-icon"><FiClock /></span>
+            <span className="info-icon">
+              <FiClock />
+            </span>
             <span>{retreat.noOfDays} Days</span>
           </div>
 
           <div className="info-item">
-            <span className="info-icon"><FiMapPin /></span>
-            <span><RetreatLocation locationId={retreat.location} /></span>
+            <span className="info-icon">
+              <FiMapPin />
+            </span>
+            <span>
+              <RetreatLocation locationId={retreat.location} />
+            </span>
           </div>
 
           <div className="info-item">
-            <span className="info-icon"><FiUsers /></span>
+            <span className="info-icon">
+              <FiUsers />
+            </span>
             <span>{retreat.totalYogis} Yogis</span>
           </div>
         </div>
@@ -130,20 +144,41 @@ const RetreatsDashboard = observer(({ store }) => {
         <div className="stat-card-wrapper">
           <div className="stat-title">SMS Credits</div>
           <div className="stat-value">
-            {store.metadata.smsCredits ? `LKR ${store.metadata.smsCredits.balance}` : "..."}
+            {store.metadata.smsCredits
+              ? `LKR ${store.metadata.smsCredits.balance}`
+              : "..."}
           </div>
           <FiMessageSquare className="stat-icon" />
         </div>
         <div className="stat-card-wrapper">
           <div className="stat-title">Active Retreats</div>
-          <div className="stat-value">{store.metadata.currentRetreats.length}</div>
+          <div className="stat-value">
+            {store.metadata.currentRetreats.length}
+          </div>
           <FiActivity className="stat-icon" />
         </div>
         <div className="stat-card-wrapper">
           <div className="stat-title">Total Retreats</div>
           <div className="stat-value">{store.metadata.retreats.length}</div>
-          <div style={{ display: 'flex', gap: '12px', marginTop: '8px', fontSize: '0.85em' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: '#e6fffa', padding: '2px 8px', borderRadius: '12px', color: '#28a745' }}>
+          <div
+            style={{
+              display: "flex",
+              gap: "12px",
+              marginTop: "8px",
+              fontSize: "0.85em",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "4px",
+                background: "#e6fffa",
+                padding: "2px 8px",
+                borderRadius: "12px",
+                color: "#28a745",
+              }}
+            >
               <span>General:</span>
               <strong>
                 {
@@ -153,7 +188,17 @@ const RetreatsDashboard = observer(({ store }) => {
                 }
               </strong>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: '#f3e8ff', padding: '2px 8px', borderRadius: '12px', color: '#6610f2' }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "4px",
+                background: "#f3e8ff",
+                padding: "2px 8px",
+                borderRadius: "12px",
+                color: "#6610f2",
+              }}
+            >
               <span>Silent:</span>
               <strong>
                 {
@@ -167,52 +212,148 @@ const RetreatsDashboard = observer(({ store }) => {
           <FiLayers className="stat-icon" />
         </div>
 
-
         <div className="stat-card-wrapper bg-danger-light">
           <div className="stat-title text-danger-custom">Unfinalized</div>
           <div className="stat-value text-danger-custom">
-            {store.metadata.retreats.filter(r => !r.finalized).length}
+            {store.metadata.retreats.filter((r) => !r.finalized).length}
           </div>
           <FiAlertCircle className="stat-icon text-danger-custom" />
         </div>
       </div>
 
-      <div style={{ marginTop: '24px', background: 'white', padding: '16px', borderRadius: '8px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
-        <h5 style={{ margin: '0 0 16px 0', color: '#404b5a', display: 'flex', alignItems: 'center', gap: '8px' }}>
+      <div
+        style={{
+          marginTop: "24px",
+          background: "white",
+          padding: "16px",
+          borderRadius: "8px",
+          boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+        }}
+      >
+        <h5
+          style={{
+            margin: "0 0 16px 0",
+            color: "#404b5a",
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+          }}
+        >
           <FiUsers /> General Retreat Stats
         </h5>
         {(() => {
           const stats = store.metadata.generalRetreatStats;
           return (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '24px' }}>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+                gap: "24px",
+              }}
+            >
               <div>
-                <div style={{ color: '#6e7a8a', fontSize: '0.9rem' }}>Total Unique Applicants</div>
-                <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#2c3e50' }}>{stats.totalApplicants}</div>
+                <div style={{ color: "#6e7a8a", fontSize: "0.9rem" }}>
+                  Total Unique Applicants
+                </div>
+                <div
+                  style={{
+                    fontSize: "1.5rem",
+                    fontWeight: "bold",
+                    color: "#2c3e50",
+                  }}
+                >
+                  {stats.totalApplicants}
+                </div>
               </div>
               <div>
-                <div style={{ color: '#6e7a8a', fontSize: '0.9rem' }}>Total Participants</div>
-                <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#28a745' }}>{stats.totalParticipants}</div>
+                <div style={{ color: "#6e7a8a", fontSize: "0.9rem" }}>
+                  Total Participants
+                </div>
+                <div
+                  style={{
+                    fontSize: "1.5rem",
+                    fontWeight: "bold",
+                    color: "#28a745",
+                  }}
+                >
+                  {stats.totalParticipants}
+                </div>
               </div>
               <div>
-                <div style={{ color: '#6e7a8a', fontSize: '0.9rem' }}>One-time Participants</div>
-                <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#17a2b8' }}>{stats.oneTimeParticipants}</div>
+                <div style={{ color: "#6e7a8a", fontSize: "0.9rem" }}>
+                  One-time Participants
+                </div>
+                <div
+                  style={{
+                    fontSize: "1.5rem",
+                    fontWeight: "bold",
+                    color: "#17a2b8",
+                  }}
+                >
+                  {stats.oneTimeParticipants}
+                </div>
               </div>
               <div>
-                <div style={{ color: '#6e7a8a', fontSize: '0.9rem' }}>Repeat Participants</div>
-                <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#6610f2' }}>{stats.repeatParticipants}</div>
+                <div style={{ color: "#6e7a8a", fontSize: "0.9rem" }}>
+                  Repeat Participants
+                </div>
+                <div
+                  style={{
+                    fontSize: "1.5rem",
+                    fontWeight: "bold",
+                    color: "#6610f2",
+                  }}
+                >
+                  {stats.repeatParticipants}
+                </div>
               </div>
               <div>
-                <div style={{ color: '#6e7a8a', fontSize: '0.9rem' }}>Waiting for Invitation</div>
-                <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#dc3545' }}>{stats.unableToParticipate}</div>
+                <div style={{ color: "#6e7a8a", fontSize: "0.9rem" }}>
+                  Waiting for Invitation
+                </div>
+                <div
+                  style={{
+                    fontSize: "1.5rem",
+                    fontWeight: "bold",
+                    color: "#dc3545",
+                  }}
+                >
+                  {stats.unableToParticipate}
+                </div>
               </div>
-              <div style={{ gridColumn: '1 / -1', borderTop: '1px solid #eee', paddingTop: '12px' }}>
-                <div style={{ color: '#6e7a8a', fontSize: '0.9rem', marginBottom: '8px' }}>Repeat Participation Breakdown</div>
-                <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-                  {Object.entries(stats.repeatBreakdown || {}).map(([count, users]) => (
-                    <div key={count} style={{ background: '#f8f9fa', padding: '4px 12px', borderRadius: '16px', fontSize: '0.85rem' }}>
-                      <strong style={{ color: '#6610f2' }}>{count}x</strong>: {users} yogis
-                    </div>
-                  ))}
+              <div
+                style={{
+                  gridColumn: "1 / -1",
+                  borderTop: "1px solid #eee",
+                  paddingTop: "12px",
+                }}
+              >
+                <div
+                  style={{
+                    color: "#6e7a8a",
+                    fontSize: "0.9rem",
+                    marginBottom: "8px",
+                  }}
+                >
+                  Repeat Participation Breakdown
+                </div>
+                <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
+                  {Object.entries(stats.repeatBreakdown || {}).map(
+                    ([count, users]) => (
+                      <div
+                        key={count}
+                        style={{
+                          background: "#f8f9fa",
+                          padding: "4px 12px",
+                          borderRadius: "16px",
+                          fontSize: "0.85rem",
+                        }}
+                      >
+                        <strong style={{ color: "#6610f2" }}>{count}x</strong>:{" "}
+                        {users} yogis
+                      </div>
+                    ),
+                  )}
                 </div>
               </div>
             </div>
@@ -232,9 +373,11 @@ const RetreatsDashboard = observer(({ store }) => {
 
       <h5 className="dashboard-section-title">Past Retreats</h5>
       <div className="retreats-grid">
-        {store.metadata.retreats.filter(retreat => !retreat.current).map((retreat) => {
-          return <Retreat retreat={retreat} key={retreat.id} />;
-        })}
+        {store.metadata.retreats
+          .filter((retreat) => !retreat.current)
+          .map((retreat) => {
+            return <Retreat retreat={retreat} key={retreat.id} />;
+          })}
       </div>
     </div>
   );

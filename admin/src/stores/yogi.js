@@ -77,11 +77,12 @@ class YogiStore {
 
     let response = await this.engine.query({
       yogis: {
-        resource: `tracker/events.json`,
+        resource: "tracker/events.json",
         params: {
           programStage: DHIS2_EXPRESSION_OF_INTEREST_PROGRAM_STAGE,
-          filter: `${DHIS2_RETREAT_DATA_ELEMENT}:eq:${retreatName || retreatCode
-            }`,
+          filter: `${DHIS2_RETREAT_DATA_ELEMENT}:eq:${
+            retreatName || retreatCode
+          }`,
           fields: "trackedEntity",
           skipPaging: true,
         },
@@ -145,11 +146,11 @@ class YogiStore {
             eventId: event.event,
             state:
               dataElementIdToValueMap[
-              DHIS2_RETREAT_SELECTION_STATE_DATA_ELEMENT
+                DHIS2_RETREAT_SELECTION_STATE_DATA_ELEMENT
               ],
             invitationSent:
               dataElementIdToValueMap[
-              DHIS2_RETREAT_INVITATION_SENT_DATA_ELEMENT
+                DHIS2_RETREAT_INVITATION_SENT_DATA_ELEMENT
               ],
             occurredAt: event.occurredAt,
           };
@@ -221,13 +222,13 @@ class YogiStore {
       const data = eventId
         ? attendanceEventData({ attendance, specialComment, retreat })
         : attendanceEventData({
-          attendance,
-          specialComment,
-          retreat,
-          trackedEntityInstance: yogiId,
-          orgUnit: retreat.location,
-          eventDate: new Date(),
-        });
+            attendance,
+            specialComment,
+            retreat,
+            trackedEntityInstance: yogiId,
+            orgUnit: retreat.location,
+            eventDate: new Date(),
+          });
       const mutation = {
         resource: "events",
         id: eventId,
@@ -264,12 +265,12 @@ class YogiStore {
       const data = eventId
         ? attendanceEventData({ roomCode, retreat })
         : attendanceEventData({
-          roomCode,
-          retreat,
-          trackedEntityInstance: yogiId,
-          orgUnit: retreat.location,
-          eventDate: new Date(),
-        });
+            roomCode,
+            retreat,
+            trackedEntityInstance: yogiId,
+            orgUnit: retreat.location,
+            eventDate: new Date(),
+          });
 
       const mutation = {
         resource: "events",
