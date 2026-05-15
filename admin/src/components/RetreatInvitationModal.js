@@ -1,58 +1,45 @@
+import { useAlert, useDataEngine } from "@dhis2/app-runtime";
 import {
   Button,
   ButtonStrip,
-  Checkbox,
+  CalendarInput,
   CircularLoader,
-  LinearLoader,
   Modal,
   ModalActions,
   ModalContent,
   ModalTitle,
-  CalendarInput,
   NoticeBox,
 } from "@dhis2/ui";
 import { observer } from "mobx-react";
-import React, { useEffect } from "react";
-import { useAlert, useDataEngine } from "@dhis2/app-runtime";
+import React, { useEffect, useState } from "react";
 import {
   DHIS2_TEI_ATTRIBUTE_FULL_NAME,
   DHIS2_TEI_ATTRIBUTE_MOBILE,
 } from "../dhis2";
-import {
-  getInvitationMessage,
-  sendRetreatInvitations,
-} from "../services/invitationService";
-
-const classes = {
-  checkboxes: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 5,
-  },
-};
+import { sendRetreatInvitations } from "../services/invitationService";
 import { useStore } from "../stores/StoreProvider";
+import MessagePreview from "./manager/invitation/MessagePreview";
+import RecipientSelection from "./manager/invitation/RecipientSelection";
+import SendProgress from "./manager/invitation/SendProgress";
 
 const RetreatInvitationModal = observer(({ retreat, onCancel }) => {
   const store = useStore();
-
   const dataEngine = useDataEngine();
 
-  // uninvited, failed, sent
-  const [check, setChecks] = React.useState([true, true, false]);
-  const [confirmationDeadline, setConfirmationDeadline] = React.useState(
+  const [check, setChecks] = useState([true, true, false]);
+  const [confirmationDeadline, setConfirmationDeadline] = useState(
     new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
   );
 
-  const [loading, setLoading] = React.useState(false);
+  const [loading, setLoading] = useState(false);
+  const [isSending, setIsSending] = useState(false);
 
-  const [isSending, setIsSending] = React.useState(false);
+  const [sentYogis, setSentYogis] = useState([]);
+  const [failedYogis, setFailedYogis] = useState([]);
+  const [toSendYogis, setToSendYogis] = useState([]);
 
-  const [sentYogis, setSentYogis] = React.useState([]);
-  const [failedYogis, setFailedYogis] = React.useState([]);
-  const [toSendYogis, setToSendYogis] = React.useState([]);
-
-  const [sentCount, setSentCount] = React.useState(0);
-  const [totalToSend, setTotalToSend] = React.useState(0);
+  const [sentCount, setSentCount] = useState(0);
+  const [totalToSend, setTotalToSend] = useState(0);
 
   const { show } = useAlert("Invitations Sent", {
     duration: 3000,
@@ -77,15 +64,10 @@ const RetreatInvitationModal = observer(({ retreat, onCancel }) => {
           return;
         }
 
-        if (
-          yogi.expressionOfInterests[retreat.code].invitationSent === "sent" ||
-          yogi.expressionOfInterests[retreat.code].invitationSent ===
-            "delivered"
-        ) {
+        const invitationStatus = yogi.expressionOfInterests[retreat.code].invitationSent;
+        if (invitationStatus === "sent" || invitationStatus === "delivered") {
           sentYogisArr.push(yogi);
-        } else if (
-          yogi.expressionOfInterests[retreat.code].invitationSent === "failed"
-        ) {
+        } else if (invitationStatus === "failed") {
           failedYogisArr.push(yogi);
         } else {
           toSendYogisArr.push(yogi);
@@ -108,18 +90,9 @@ const RetreatInvitationModal = observer(({ retreat, onCancel }) => {
     );
 
     const finalYogisList = [];
-
-    if (check[0]) {
-      finalYogisList.push(...toSendYogis);
-    }
-
-    if (check[1]) {
-      finalYogisList.push(...failedYogis);
-    }
-
-    if (check[2]) {
-      finalYogisList.push(...sentYogis);
-    }
+    if (check[0]) finalYogisList.push(...toSendYogis);
+    if (check[1]) finalYogisList.push(...failedYogis);
+    if (check[2]) finalYogisList.push(...sentYogis);
 
     setSentCount(0);
     setTotalToSend(finalYogisList.length);
@@ -153,17 +126,18 @@ const RetreatInvitationModal = observer(({ retreat, onCancel }) => {
     onCancel();
   };
 
-  const onCheckChange = (index) => {
-    const newChecks = [...check];
-    newChecks[index] = !newChecks[index];
-    setChecks(newChecks);
-  };
+  const countToSend = (check[0] ? toSendYogis.length : 0) +
+                     (check[1] ? failedYogis.length : 0) +
+                     (check[2] ? sentYogis.length : 0);
 
   return (
     <Modal>
       <ModalTitle>Send Invitations</ModalTitle>
-      {loading && <CircularLoader />}
-      {!loading && (
+      {loading ? (
+        <div style={{ display: "flex", justifyContent: "center", padding: "40px" }}>
+          <CircularLoader />
+        </div>
+      ) : (
         <>
           <ModalContent>
             {store.yogis.requestStates.batchErrors[retreat.code] && (
@@ -171,24 +145,21 @@ const RetreatInvitationModal = observer(({ retreat, onCancel }) => {
                 {store.yogis.requestStates.batchErrors[retreat.code]}
               </NoticeBox>
             )}
+            
             <h6>Please confirm the recipients of the invitations</h6>
-            <div style={classes.checkboxes}>
-              <Checkbox
-                label={`Send to the ${toSendYogis.length} uninvited yogis`}
-                checked={check[0]}
-                onChange={() => onCheckChange(0)}
-              />
-              <Checkbox
-                label={`Send to the ${failedYogis.length} yogis with previous invite SMS sending failures`}
-                checked={check[1]}
-                onChange={() => onCheckChange(1)}
-              />
-              <Checkbox
-                label={`ReSend to the ${sentYogis.length} yogis already invited`}
-                checked={check[2]}
-                onChange={() => onCheckChange(2)}
-              />
-            </div>
+            
+            <RecipientSelection 
+              toSendCount={toSendYogis.length}
+              failedCount={failedYogis.length}
+              sentCount={sentYogis.length}
+              checks={check}
+              onCheckChange={(index) => {
+                const newChecks = [...check];
+                newChecks[index] = !newChecks[index];
+                setChecks(newChecks);
+              }}
+            />
+
             <div>
               <h6 style={{ marginTop: 20 }}>Set the confirmation deadline</h6>
               <CalendarInput
@@ -201,35 +172,28 @@ const RetreatInvitationModal = observer(({ retreat, onCancel }) => {
                 }}
               />
             </div>
-            <div>
-              <h6 style={{ marginTop: 20 }}>
-                Check the correctness of the message below
-              </h6>
-              <textarea
-                disabled={true}
-                style={{ width: "100%", height: 350 }}
-                value={getInvitationMessage(
-                  "yogi-id",
-                  "yogi-full-name",
-                  retreat.retreatCode,
-                  retreat.date,
-                  retreat.endDate,
-                  confirmationDeadline,
-                  retreat.retreatType,
-                )}
-              />
-            </div>
+
+            <MessagePreview 
+              retreat={retreat}
+              confirmationDeadline={confirmationDeadline}
+            />
           </ModalContent>
           <ModalActions>
-            {isSending && totalToSend > 0 && (
-              <LinearLoader amount={(sentCount * 100) / totalToSend} />
-            )}
+            <div style={{ flex: 1, paddingRight: 20 }}>
+              {isSending && (
+                <SendProgress 
+                  sentCount={sentCount} 
+                  totalToSend={totalToSend} 
+                />
+              )}
+            </div>
             <ButtonStrip>
-              <Button onClick={onCancel}>Cancel</Button>
+              <Button onClick={onCancel} disabled={isSending}>Cancel</Button>
               <Button
                 destructive
                 onClick={onFinaliseClicked}
                 loading={isSending}
+                disabled={isSending || (countToSend === 0 && !isSending)}
               >
                 Send
               </Button>

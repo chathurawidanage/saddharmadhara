@@ -1,37 +1,8 @@
-import { useAlert } from "@dhis2/app-runtime";
-import {
-  Button,
-  ButtonStrip,
-  Checkbox,
-  DropdownButton,
-  FlyoutMenu,
-  InputField,
-  LinearLoader,
-  MenuItem,
-  Modal,
-  ModalActions,
-  ModalContent,
-  ModalTitle,
-  NoticeBox,
-  Pagination,
-  SingleSelectField,
-  SingleSelectOption,
-  Tab,
-  TabBar,
-  Table,
-  TableBody,
-  TableHead,
-  TableCellHead,
-  TableRowHead,
-  Tag,
-  TextAreaField,
-} from "@dhis2/ui";
+import { LinearLoader, NoticeBox } from "@dhis2/ui";
 import { computed } from "mobx";
 import { observer } from "mobx-react";
 import React, { useEffect, useState } from "react";
 import {
-  DHIS2_RETREAT_SELECTION_STATE_PENDING_CONFIRMATION_CODE,
-  DHIS2_RETREAT_SELECTION_STATE_SELECTED_CODE,
   DHIS2_TEI_ATTRIBUTE_DOB,
   DHIS2_TEI_ATTRIBUTE_FULL_NAME,
   DHIS2_TEI_ATTRIBUTE_GENDER,
@@ -41,11 +12,11 @@ import {
   DHIS2_TEI_ATTRIBUTE_PASSPORT,
   DHIS2_TEI_ATTRIBUTE_YOGI_PRIORITY,
 } from "../../dhis2";
-import GenderIndicator from "../indicators/GenderIndicator";
-import ReverendIndicator from "../indicators/ReverendIndicator";
 import { useStore } from "../../stores/StoreProvider";
 import "./YogiList.css";
-import YogiRow from "./YogiRow";
+import YogiListToolbar from "./YogiListToolbar";
+import YogiListTabs from "./YogiListTabs";
+import YogiTable from "./YogiTable";
 
 export const SELECTION_PRIORITY_SORT = "selection-priority";
 export const AGE_SORT = "age";
@@ -183,22 +154,6 @@ const YogisList = observer(({ retreat }) => {
     })();
   }, [retreat, store.yogis]);
 
-  const pagination = (total) => {
-    return (
-      <Pagination
-        page={currentPage}
-        pageCount={Math.ceil(total / pageSize)}
-        pageSize={pageSize}
-        total={total}
-        hidePageSizeSelect
-        onPageChange={(page) => {
-          setCurrentPage(page);
-        }}
-        className="pagination"
-      />
-    );
-  };
-
   if (!yogisFetched)
     return <LinearLoader width="100%" amount={loadProgress} margin="0" />;
 
@@ -258,405 +213,42 @@ const YogisList = observer(({ retreat }) => {
           </NoticeBox>
         </div>
       )}
-      <div className="yogi-list-top-bar">
-        <YogiFilter filters={filters} setFilters={setFilters} />
+      
+      <YogiListToolbar
+        filters={filters}
+        setFilters={setFilters}
+        sortBy={sortBy}
+        onSortChange={(newSortBy) => {
+          sortByRef.current = newSortBy;
+          setSortBy(newSortBy);
+          setYogiList((currentYogis) => {
+            const sortedYogis = [...currentYogis];
+            sortYogiList(sortedYogis, retreat, newSortBy);
+            return sortedYogis;
+          });
+        }}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+      />
 
-        <SingleSelectField
-          placeholder="Sort"
-          prefix="Sort"
-          onChange={(e) => {
-            sortByRef.current = e.selected;
-            setSortBy(e.selected);
-            setYogiList((currentYogis) => {
-              const sortedYogis = [...currentYogis];
-              sortYogiList(sortedYogis, retreat, e.selected);
-              return sortedYogis;
-            });
-          }}
-          selected={sortBy}
-          tabIndex="0"
-        >
-          <SingleSelectOption
-            value={SELECTION_PRIORITY_SORT}
-            label="Selection Priority"
-          />
-          <SingleSelectOption value={AGE_SORT} label="Age" />
-        </SingleSelectField>
-        <InputField
-          className="yogi-search-input"
-          placeholder="Search by Name, NIC/Passport, Mobile"
-          value={searchQuery}
-          onChange={({ value }) => setSearchQuery(value)}
-          type="search"
-        />
-      </div>
-      <div>
-        <TabBar>
-          {store.metadata.selectionStates.map((state) => {
-            return (
-              <Tab
-                key={state.code}
-                selected={selectionState === state.code}
-                onClick={() => {
-                  setSelectionState(state.code);
-                }}
-              >
-                {state.name} [{countByState[state.code] || "0"}]
-              </Tab>
-            );
-          })}
-        </TabBar>
-      </div>
-      <div>
-        <div>
-          {pagination(filteredYogis.length)}
-          <div className="yogi-table-container">
-            <Table className="yogi-table">
-              <TableHead>
-                <TableRowHead>
-                  <TableCellHead>Profile</TableCellHead>
-                  <TableCellHead width="100px">Indicators</TableCellHead>
-                  <TableCellHead width="250px">Applications</TableCellHead>
-                  <TableCellHead width="150px">Partiticipation</TableCellHead>
-                  {!retreat.finalized && (
-                    <TableCellHead width="160px">Action</TableCellHead>
-                  )}
-                </TableRowHead>
-              </TableHead>
-              <TableBody>
-                {filteredYogis.map((yogi, index) => {
-                  // pagination
-                  if (
-                    !(
-                      index >= (currentPage - 1) * pageSize &&
-                      index < currentPage * pageSize
-                    )
-                  ) {
-                    return null;
-                  }
+      <YogiListTabs
+        selectionStates={store.metadata.selectionStates}
+        selectionState={selectionState}
+        onStateChange={setSelectionState}
+        countByState={countByState}
+      />
 
-                  return (
-                    <YogiRow
-                      trackedEntity={yogi}
-                      key={yogi.id}
-                      currentRetreat={retreat}
-                      actions={
-                        <>
-                          <StateChangeButton
-                            yogi={yogi}
-                            currentState={selectionState}
-                            retreat={retreat}
-                          />
-                          {selectionState ===
-                          DHIS2_RETREAT_SELECTION_STATE_SELECTED_CODE ? (
-                            <RoomSelect
-                              retreat={retreat}
-                              yogi={yogi}
-                              allYogis={yogiList}
-                            />
-                          ) : null}
-                          {selectionState ===
-                          DHIS2_RETREAT_SELECTION_STATE_SELECTED_CODE ? (
-                            <AttendanceButton retreat={retreat} yogi={yogi} />
-                          ) : null}
-                          {selectionState ===
-                          DHIS2_RETREAT_SELECTION_STATE_PENDING_CONFIRMATION_CODE ? (
-                            <InvitationIndicator
-                              retreat={retreat}
-                              yogi={yogi}
-                            />
-                          ) : null}
-                        </>
-                      }
-                    />
-                  );
-                })}
-              </TableBody>
-            </Table>
-          </div>
-          {pagination(filteredYogis.length)}
-        </div>
-      </div>
+      <YogiTable
+        filteredYogis={filteredYogis}
+        currentPage={currentPage}
+        pageSize={pageSize}
+        onPageChange={(page) => setCurrentPage(page)}
+        retreat={retreat}
+        selectionState={selectionState}
+        allYogis={yogiList}
+      />
     </div>
   );
 });
-
-const YogiFilter = ({ filters, setFilters }) => {
-  return (
-    <DropdownButton
-      component={
-        <FlyoutMenu>
-          <MenuItem
-            label={
-              <Checkbox
-                label={<ReverendIndicator />}
-                checked={filters.reverend}
-              />
-            }
-            onClick={() => {
-              setFilters({ ...filters, reverend: !filters.reverend });
-            }}
-          />
-          <MenuItem
-            label={
-              <Checkbox
-                label={<GenderIndicator gender="male" />}
-                checked={filters.male}
-              />
-            }
-            onClick={() => {
-              setFilters({ ...filters, male: !filters.male });
-            }}
-          />
-          <MenuItem
-            label={
-              <Checkbox
-                label={<GenderIndicator gender="female" />}
-                checked={filters.female}
-              />
-            }
-            onClick={() => {
-              setFilters({ ...filters, female: !filters.female });
-            }}
-          />
-        </FlyoutMenu>
-      }
-    >
-      Filters
-    </DropdownButton>
-  );
-};
-
-const StateChangeButton = ({ currentState, yogi, retreat }) => {
-  const store = useStore();
-  const { show: alertStateChangeStatus } = useAlert(
-    ({ yogiName, toState, success }) =>
-      success
-        ? `${yogiName} moved to ${toState}`
-        : `Failed to move ${yogiName}`,
-    ({ success }) => {
-      return {
-        success,
-        critical: !success,
-        duration: 2000,
-      };
-    },
-  );
-
-  const { show: changeFromSelectedStatePrompt } = useAlert(
-    ({ yogiName }) =>
-      `Are you sure you want to remove ${yogiName} from the 'Selected' state? This will result in the loss of their room allocations and any attendance records if they exist.`,
-    ({ onMoveClicked }) => {
-      return {
-        critical: true,
-        permanent: true,
-        actions: [
-          { label: "Move", onClick: onMoveClicked },
-          {
-            label: "Don't Move",
-            onClick: () => {},
-          },
-        ],
-      };
-    },
-  );
-
-  const doStateChange = async (toStateCode) => {
-    let success = await store.yogis.changeRetreatState(
-      yogi.id,
-      retreat.code,
-      toStateCode,
-    );
-    alertStateChangeStatus({
-      yogiName: yogi.attributes[DHIS2_TEI_ATTRIBUTE_FULL_NAME],
-      toState: toStateCode,
-      success,
-    });
-  };
-
-  const onStateChanged = async (toStateCode) => {
-    if (
-      currentState === DHIS2_RETREAT_SELECTION_STATE_SELECTED_CODE &&
-      yogi.participation[retreat.code]
-    ) {
-      changeFromSelectedStatePrompt({
-        yogiName: yogi.attributes[DHIS2_TEI_ATTRIBUTE_FULL_NAME],
-        onMoveClicked: async () => {
-          let success = await store.yogis.deleteParticipationEvent(
-            yogi.id,
-            retreat,
-          );
-          if (success) {
-            await doStateChange(toStateCode);
-          }
-        },
-      });
-    } else {
-      await doStateChange(toStateCode);
-    }
-  };
-
-  return (
-    <DropdownButton
-      component={
-        <FlyoutMenu>
-          {store.metadata.selectionStates
-            .filter((state) => state.code !== currentState)
-            .map((state) => {
-              return (
-                <MenuItem
-                  key={state.code}
-                  onClick={() => {
-                    onStateChanged(state.code);
-                  }}
-                  label={state.name}
-                />
-              );
-            })}
-        </FlyoutMenu>
-      }
-    >
-      Move to
-    </DropdownButton>
-  );
-};
-
-const RoomSelect = observer(({ yogi, retreat, allYogis }) => {
-  const store = useStore();
-  let roomsAssignedToOthers = new Set(
-    allYogis
-      .filter((y) => y.id !== yogi.id)
-      .map((y) => {
-        return y.participation[retreat.code]?.room;
-      })
-      .filter((roomCode) => roomCode !== undefined),
-  );
-
-  let roomOptions = store.metadata.rooms
-    .filter((room) => room.location === retreat.location)
-    .filter((room) => !roomsAssignedToOthers.has(room.code))
-    .map((room) => (
-      <SingleSelectOption label={room.name} value={room.code} key={room.code} />
-    ));
-
-  const { show: alertStateChangeStatus } = useAlert(
-    ({ yogiName, toRoomCode, success }) =>
-      success
-        ? `${toRoomCode} assigned to ${yogiName}`
-        : `Failed to assign room  ${toRoomCode} to ${yogiName}`,
-    ({ success }) => {
-      return {
-        success,
-        critical: !success,
-        duration: 2000,
-      };
-    },
-  );
-
-  const onRoomAssigned = async ({ selected: roomCode }) => {
-    let success = await store.yogis.assignRoom(yogi.id, retreat, roomCode);
-    alertStateChangeStatus({
-      yogiName: yogi.attributes[DHIS2_TEI_ATTRIBUTE_FULL_NAME],
-      toRoomCode: roomCode,
-      success,
-    });
-  };
-
-  return (
-    <SingleSelectField
-      filterable
-      clearable
-      dense
-      placeholder="Room"
-      prefix="Room"
-      onChange={onRoomAssigned}
-      selected={yogi.participation[retreat.code]?.room}
-      tabIndex="0"
-    >
-      {roomOptions}
-    </SingleSelectField>
-  );
-});
-
-const AttendanceButton = observer(({ yogi, retreat }) => {
-  const store = useStore();
-  const [showModal, setShowModal] = useState(false);
-  const [status, setStatus] = useState(
-    yogi.participation[retreat.code]?.attendance,
-  );
-  const [specialComment, setSpecialComment] = useState(
-    yogi.participation[retreat.code]?.specialComment || "",
-  );
-  const [isMarkingAttendance, setIsMarkingAttendance] = useState(false);
-  const attendanceOptions = store.metadata?.attendance?.map((att) => (
-    <SingleSelectOption label={att?.name} value={att?.code} key={att?.code} />
-  ));
-  return (
-    <div>
-      <Modal hide={!showModal}>
-        <ModalTitle>
-          Mark Attendance for {yogi.attributes[DHIS2_TEI_ATTRIBUTE_FULL_NAME]}
-        </ModalTitle>
-        <ModalContent className="attendance-fields">
-          <SingleSelectField
-            label="Status"
-            required
-            selected={status}
-            onChange={(selection) => {
-              setStatus(selection.selected);
-            }}
-            tabIndex="0"
-          >
-            {attendanceOptions}
-          </SingleSelectField>
-          <TextAreaField
-            label="Special Comment"
-            value={specialComment}
-            onChange={(e) => setSpecialComment(e.value)}
-          />
-        </ModalContent>
-        <ModalActions>
-          <ButtonStrip>
-            <Button onClick={() => setShowModal(false)}>Cancel</Button>
-            <Button
-              disabled={status === undefined}
-              primary
-              onClick={async () => {
-                setIsMarkingAttendance(true);
-                await store.yogis.markAttendance(
-                  yogi.id,
-                  retreat,
-                  status,
-                  specialComment,
-                );
-                setIsMarkingAttendance(false);
-                setShowModal(false);
-              }}
-              loading={isMarkingAttendance}
-            >
-              Mark
-            </Button>
-          </ButtonStrip>
-        </ModalActions>
-      </Modal>
-      <Button onClick={() => setShowModal(true)}>
-        {status ? "Update Attendance" : "Mark Attendance"}
-      </Button>
-    </div>
-  );
-});
-
-const InvitationIndicator = observer(({ yogi, retreat }) => {
-  const status =
-    yogi.expressionOfInterests[retreat.code]?.invitationSent || "pending";
-  return (
-    <div style={{ marginTop: 20 }}>
-      <Tag positive={status === "sent"}>
-        {status === "sent" ? "Invitation Sent" : "Invitation Pending"}
-      </Tag>
-    </div>
-  );
-});
-
 
 export default YogisList;
