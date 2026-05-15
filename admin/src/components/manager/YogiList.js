@@ -198,16 +198,16 @@ const YogisList = observer(({ retreat }) => {
     });
 
   return (
-    <div>
+    <div className="yogi-list-panel">
       {store.metadata.requestStates.supportingError && (
-        <div style={{ marginBottom: 16 }}>
+        <div className="yogi-list-notice-box-wrapper">
           <NoticeBox error title="Supporting metadata unavailable">
             {store.metadata.requestStates.supportingError}
           </NoticeBox>
         </div>
       )}
       {store.yogis.requestStates.batchErrors[retreat.code] && (
-        <div style={{ marginBottom: 16 }}>
+        <div className="yogi-list-notice-box-wrapper">
           <NoticeBox error title="Some yogi records could not be loaded">
             {store.yogis.requestStates.batchErrors[retreat.code]}
           </NoticeBox>

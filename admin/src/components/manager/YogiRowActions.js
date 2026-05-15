@@ -245,7 +245,7 @@ export const InvitationIndicator = observer(({ yogi, retreat }) => {
   const status =
     yogi.expressionOfInterests[retreat.code]?.invitationSent || "pending";
   return (
-    <div style={{ marginTop: 20 }}>
+    <div className="invitation-tag-wrapper">
       <Tag positive={status === "sent"}>
         {status === "sent" ? "Invitation Sent" : "Invitation Pending"}
       </Tag>

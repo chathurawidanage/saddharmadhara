@@ -1,33 +1,41 @@
 .yogi-row-reverend {
-  background-color: #fff59d;
+  background-color: #fff9c4; /* Keeping a light yellow for reverends, maybe add to variables later */
 }
 
 .yogi-row-td {
   background-color: transparent !important;
   overflow: hidden;
-  /* Prevent spillover */
 }
 
 .yogi-row-actions {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: var(--spacing-xs);
 }
 
 .yogi-profile-info {
-  padding-top: 5px;
-  padding-bottom: 5px;
+  padding-top: var(--spacing-xs);
+  padding-bottom: var(--spacing-xs);
   display: flex;
-  column-gap: 15px;
-  row-gap: 5px;
+  column-gap: var(--spacing-m);
+  row-gap: var(--spacing-xs);
   flex-wrap: wrap;
-  /* Allow wrapping on small screens */
 }
 
 .yogi-name-row {
   display: flex;
   flex-direction: row;
-  gap: 5px;
+  gap: var(--spacing-xs);
   align-items: center;
   font-weight: 600;
+}
+
+.mini-indicators-container {
+  display: flex;
+  gap: var(--spacing-xs);
+  align-items: center;
+}
+
+.invitation-tag-wrapper {
+  margin-top: var(--spacing-m);
 }

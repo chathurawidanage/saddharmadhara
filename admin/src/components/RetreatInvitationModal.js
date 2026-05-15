@@ -21,6 +21,7 @@ import { useStore } from "../stores/StoreProvider";
 import MessagePreview from "./manager/invitation/MessagePreview";
 import RecipientSelection from "./manager/invitation/RecipientSelection";
 import SendProgress from "./manager/invitation/SendProgress";
+import "./RetreatInvitationModal.css";
 
 const RetreatInvitationModal = observer(({ retreat, onCancel }) => {
   const store = useStore();
@@ -134,7 +135,7 @@ const RetreatInvitationModal = observer(({ retreat, onCancel }) => {
     <Modal>
       <ModalTitle>Send Invitations</ModalTitle>
       {loading ? (
-        <div style={{ display: "flex", justifyContent: "center", padding: "40px" }}>
+        <div className="retreat-invitation-modal-loader">
           <CircularLoader />
         </div>
       ) : (
@@ -160,8 +161,8 @@ const RetreatInvitationModal = observer(({ retreat, onCancel }) => {
               }}
             />
 
-            <div>
-              <h6 style={{ marginTop: 20 }}>Set the confirmation deadline</h6>
+            <div className="retreat-invitation-deadline-section">
+              <h6 className="retreat-invitation-deadline-title">Set the confirmation deadline</h6>
               <CalendarInput
                 label="Confirmation Deadline"
                 calendar="gregory"
@@ -179,7 +180,7 @@ const RetreatInvitationModal = observer(({ retreat, onCancel }) => {
             />
           </ModalContent>
           <ModalActions>
-            <div style={{ flex: 1, paddingRight: 20 }}>
+            <div className="retreat-invitation-progress-wrapper">
               {isSending && (
                 <SendProgress 
                   sentCount={sentCount} 

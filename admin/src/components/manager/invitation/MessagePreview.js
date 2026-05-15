@@ -1,15 +1,16 @@
 import React from "react";
 import { getInvitationMessage } from "../../../services/invitationService";
+import "./MessagePreview.css";
 
 const MessagePreview = ({ retreat, confirmationDeadline }) => {
   return (
     <div>
-      <h6 style={{ marginTop: 20 }}>
+      <h6 className="message-preview-title">
         Check the correctness of the message below
       </h6>
       <textarea
+        className="message-preview-textarea"
         disabled={true}
-        style={{ width: "100%", height: 350 }}
         value={getInvitationMessage(
           "yogi-id",
           "yogi-full-name",

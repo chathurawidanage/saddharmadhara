@@ -1,0 +1,19 @@
+.retreat-invitation-modal-loader {
+  display: flex;
+  justify-content: center;
+  padding: var(--spacing-xxl);
+}
+
+.retreat-invitation-deadline-section {
+  margin-top: var(--spacing-l);
+}
+
+.retreat-invitation-deadline-title {
+  margin-top: var(--spacing-l);
+  margin-bottom: var(--spacing-s);
+}
+
+.retreat-invitation-progress-wrapper {
+  flex: 1;
+  padding-right: var(--spacing-l);
+}

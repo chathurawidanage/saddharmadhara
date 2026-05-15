@@ -20,6 +20,7 @@ import {
   mapRetreatToInitialValues,
 } from "../utils/retreatFormMapping";
 import RetreatFormFields from "./modal/RetreatFormFields";
+import "./modal/RetreatModal.css";
 
 const { Form } = ReactFinalForm;
 
@@ -102,14 +103,7 @@ const RetreatModal = observer(({ onCancel, retreat }) => {
       <Modal>
         <ModalTitle>Edit Retreat</ModalTitle>
         <ModalContent>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              height: 200,
-            }}
-          >
+          <div className="retreat-modal-loader">
             <CircularLoader />
           </div>
         </ModalContent>
@@ -157,22 +151,23 @@ const RetreatModal = observer(({ onCancel, retreat }) => {
                 store={store} 
               />
               
-              <div style={{ marginBottom: 10 }}>
-                {store.metadata.requestStates.supportingError && (
+              {store.metadata.requestStates.supportingError && (
+                <div className="retreat-modal-notice-box">
                   <NoticeBox error title="Supporting metadata unavailable">
                     {store.metadata.requestStates.supportingError}
                   </NoticeBox>
-                )}
-              </div>
-              <div style={{ marginBottom: 10 }}>
-                {error && (
+                </div>
+              )}
+              
+              {error && (
+                <div className="retreat-modal-notice-box">
                   <NoticeBox error title="Retreat creation failed">
                     {error?.details?.response?.errorReports
                       ?.map((report) => report.message)
                       .join(",")}
                   </NoticeBox>
-                )}
-              </div>
+                </div>
+              )}
             </ModalContent>
             <ModalActions>
               <ButtonStrip end>

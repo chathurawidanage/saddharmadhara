@@ -1,5 +1,5 @@
 .indicator {
-  border-radius: 500px;
+  border-radius: var(--radius-full);
   width: 24px;
   height: 24px;
   display: flex;
@@ -13,7 +13,7 @@
 }
 
 .gender-indicator {
-  background: #37474f;
+  background: #37474f; /* Maybe extract these to variables if they are standard DHIS2 colors */
 }
 
 .has-kids-indicator {
@@ -21,7 +21,7 @@
 }
 
 .has-permission-indicator {
-  background: #e53935;
+  background: var(--color-error-500);
 }
 
 .reverend-indicator {

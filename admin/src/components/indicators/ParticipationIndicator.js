@@ -9,7 +9,7 @@ const ParticipationIndicator = observer(({ trackedEntity }) => {
   const store = useStore();
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+    <div className="participation-list">
       {Object.entries(
         Object.keys(trackedEntity.participation)
           .filter((retreatId) => retreatId !== undefined)
@@ -31,15 +31,8 @@ const ParticipationIndicator = observer(({ trackedEntity }) => {
       )
         .sort(([yearA], [yearB]) => yearB - yearA)
         .map(([year, items]) => (
-          <div
-            key={year}
-            style={{ display: "flex", flexDirection: "column", gap: "2px" }}
-          >
-            <div
-              style={{ fontSize: "10px", fontWeight: "bold", color: "#888" }}
-            >
-              {year}
-            </div>
+          <div key={year} className="participation-year-group">
+            <div className="participation-year-label">{year}</div>
             <div className="yogi-applications">
               {items.map(({ retreat, participation: p }) => {
                 let hasSpecialComment =

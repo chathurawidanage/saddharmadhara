@@ -6,6 +6,9 @@ import { observer } from "mobx-react";
 import { Button, CircularLoader, NoticeBox } from "@dhis2/ui";
 import { StoreProvider, useStore } from "./stores/StoreProvider";
 
+import "./index.css";
+import "./App.css";
+
 const router = createHashRouter([
   {
     path: "/",
@@ -22,15 +25,7 @@ const AppContent = observer(() => {
 
   if (store.initializing || (!store.initialized && !store.initializationError)) {
     return (
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-          width: "100vw",
-        }}
-      >
+      <div className="app-loader-container">
         <CircularLoader />
       </div>
     );
@@ -38,17 +33,11 @@ const AppContent = observer(() => {
 
   if (store.initializationError) {
     return (
-      <div
-        style={{
-          maxWidth: 640,
-          margin: "80px auto",
-          padding: "0 24px",
-        }}
-      >
+      <div className="app-error-container">
         <NoticeBox error title="Unable to load admin data">
           {store.initializationError}
         </NoticeBox>
-        <div style={{ marginTop: 16 }}>
+        <div className="app-error-actions">
           <Button onClick={() => store.init(store.engine)}>
             Retry
           </Button>

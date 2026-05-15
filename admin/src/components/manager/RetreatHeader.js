@@ -2,31 +2,6 @@ import { Button, DropdownButton, FlyoutMenu, IconMore16, MenuItem, Tag } from "@
 import React from "react";
 import { canFinalizeRetreat } from "../../utils/retreatUtils";
 
-const styles = {
-  retreatHeader: {
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    marginBottom: 20,
-    flexWrap: "wrap",
-    gap: 16,
-  },
-  retreatHeaderButtons: {
-    display: "flex",
-    flexDirection: "row",
-    columnGap: 10,
-    alignItems: "center",
-  },
-  retreatHeaderTitle: {
-    display: "flex",
-    flexDirection: "row",
-    columnGap: 16,
-    alignItems: "center",
-    flexWrap: "wrap",
-  },
-};
-
 const RetreatHeader = ({ 
   retreat, 
   onSendInvitations, 
@@ -35,9 +10,9 @@ const RetreatHeader = ({
   downloadMenu 
 }) => {
   return (
-    <div style={styles.retreatHeader}>
-      <div style={styles.retreatHeaderTitle}>
-        <h2 style={{ padding: 0, margin: 0 }}>{retreat.name} </h2>
+    <div className="retreat-header-container">
+      <div className="retreat-header-title-row">
+        <h2 className="retreat-header-title-text">{retreat.name} </h2>
         {retreat.finalized ? (
           <Tag positive bold>
             Finalized
@@ -47,7 +22,7 @@ const RetreatHeader = ({
           {retreat.disabled ? "Disabled" : "Active"}
         </Tag>
       </div>
-      <div style={styles.retreatHeaderButtons}>
+      <div className="retreat-header-actions">
         <Button onClick={onSendInvitations}>
           Send Invitations
         </Button>

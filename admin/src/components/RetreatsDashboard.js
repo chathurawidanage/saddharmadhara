@@ -40,9 +40,11 @@ const RetreatsDashboard = observer(() => {
       <GeneralRetreatStatsPanel store={store} />
 
       {store.metadata.requestStates.retreatRefreshError && (
-        <NoticeBox error title="Retreat refresh failed" style={{ marginTop: 24 }}>
-          {store.metadata.requestStates.retreatRefreshError}
-        </NoticeBox>
+        <div className="notice-box-wrapper">
+          <NoticeBox error title="Retreat refresh failed">
+            {store.metadata.requestStates.retreatRefreshError}
+          </NoticeBox>
+        </div>
       )}
 
       <RetreatSection 

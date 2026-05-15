@@ -1,0 +1,17 @@
+.app-loader-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100vw;
+}
+
+.app-error-container {
+  max-width: 640px;
+  margin: 80px auto;
+  padding: 0 24px;
+}
+
+.app-error-actions {
+  margin-top: 16px;
+}

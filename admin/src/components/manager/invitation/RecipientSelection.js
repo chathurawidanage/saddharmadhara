@@ -1,5 +1,6 @@
 import { Checkbox } from "@dhis2/ui";
 import React from "react";
+import "./RecipientSelection.css";
 
 const RecipientSelection = ({ 
   toSendCount, 
@@ -8,16 +9,8 @@ const RecipientSelection = ({
   checks, 
   onCheckChange 
 }) => {
-  const classes = {
-    checkboxes: {
-      display: "flex",
-      flexDirection: "column",
-      gap: 5,
-    },
-  };
-
   return (
-    <div style={classes.checkboxes}>
+    <div className="recipient-selection-container">
       <Checkbox
         label={`Send to the ${toSendCount} uninvited yogis`}
         checked={checks[0]}

@@ -78,3 +78,21 @@
 .participation-state-absent {
   background-color: #2196f3;
 }
+
+.participation-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-m);
+}
+
+.participation-year-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.participation-year-label {
+  font-size: 10px;
+  font-weight: bold;
+  color: var(--color-grey-500);
+}

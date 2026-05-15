@@ -50,7 +50,7 @@ const YogiTable = ({
               <TableCellHead>Profile</TableCellHead>
               <TableCellHead width="100px">Indicators</TableCellHead>
               <TableCellHead width="250px">Applications</TableCellHead>
-              <TableCellHead width="150px">Partiticipation</TableCellHead>
+              <TableCellHead width="150px">Participation</TableCellHead>
               {!retreat.finalized && (
                 <TableCellHead width="160px">Action</TableCellHead>
               )}

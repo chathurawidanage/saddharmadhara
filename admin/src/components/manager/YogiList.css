@@ -32,12 +32,26 @@
   background-color: #d81b60;
 }
 
+.yogi-list-notice-box-wrapper {
+  margin-bottom: var(--spacing-m);
+}
+
+.yogi-list-panel {
+  background: var(--color-white);
+  border: 1px solid var(--color-grey-200);
+  border-radius: var(--radius-l);
+  padding: var(--spacing-m);
+  margin-top: var(--spacing-l);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
 .yogi-list-top-bar {
-  margin-top: 20px;
+  margin-top: 0;
   display: flex;
-  column-gap: 20px;
+  gap: var(--spacing-l);
   align-items: center;
   justify-content: flex-start;
+  margin-bottom: var(--spacing-m);
 }
 
 .yogi-list-top-bar button[data-test="dhis2-uicore-dropdownbutton-toggle"] {
@@ -49,19 +63,19 @@
 }
 
 .selection-progress-remaining {
-  background-color: #cfd8dc;
+  background-color: var(--color-grey-300);
 }
 
 .attendance-fields {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--spacing-s);
 }
 
 .attendance-buttons {
   display: flex;
   flex-direction: row;
-  gap: 10px;
+  gap: var(--spacing-s);
 }
 
 /* Add column separators */
@@ -73,7 +87,7 @@
 
 .yogi-table th,
 .yogi-table td {
-  border-right: 1px solid #e0e0e0;
+  border-right: 1px solid var(--color-grey-200);
 }
 
 /* Explicit column widths */

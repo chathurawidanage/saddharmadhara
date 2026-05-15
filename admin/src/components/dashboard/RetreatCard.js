@@ -4,23 +4,21 @@ import { FiCalendar, FiClock, FiMapPin, FiUsers } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import RetreatLocation from "../RetreatLocation";
 
-const getTypeColor = (type) => {
-  const normalizedType = type?.toLowerCase() || "";
-  if (normalizedType.includes("silent")) return "#6610f2"; // Purple
-  if (normalizedType.includes("general")) return "#28a745"; // Green
-  return "#6c757d"; // Gray default
-};
-
 const RetreatCard = ({ retreat }) => {
   const navigate = useNavigate();
 
   const plusDateTo = new Date(retreat.endDate);
   plusDateTo.setDate(plusDateTo.getDate() + 1);
 
+  const typeClass = retreat.retreatType?.toLowerCase().includes("silent")
+    ? "silent"
+    : retreat.retreatType?.toLowerCase().includes("general")
+    ? "general"
+    : "default";
+
   return (
     <div
-      className="retreat-card-wrapper"
-      style={{ borderTopColor: getTypeColor(retreat.retreatType) }}
+      className={`retreat-card-wrapper ${typeClass}`}
       onClick={() => navigate(retreat.id)}
     >
       <div className="retreat-card-body">

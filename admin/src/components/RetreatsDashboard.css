@@ -1,32 +1,31 @@
 /* Main container mimicking DHIS2 styling */
 .retreats-dashboard-container {
-  padding: 24px;
-  background-color: var(--colors-grey100, #f8f9fa);
-  /* Fallback or variable */
+  padding: var(--spacing-l);
+  background-color: var(--color-grey-100);
   min-height: 100vh;
-  font-family: Roboto, sans-serif;
+  font-family: var(--font-family);
 }
 
 .dashboard-header-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: var(--spacing-l);
 }
 
 .dashboard-header-title {
-  font-size: 24px;
+  font-size: var(--font-size-xxl);
   font-weight: 500;
-  color: #1d2125;
+  color: var(--color-grey-800);
   margin: 0;
 }
 
 .dashboard-section-title {
-  margin-top: 32px;
-  margin-bottom: 16px;
-  font-size: 16px;
+  margin-top: var(--spacing-xl);
+  margin-bottom: var(--spacing-m);
+  font-size: var(--font-size-l);
   font-weight: 500;
-  color: #404b5a;
+  color: var(--color-grey-600);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -35,25 +34,24 @@
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 24px;
-  margin-bottom: 32px;
+  gap: var(--spacing-l);
+  margin-bottom: var(--spacing-xl);
 }
 
 .retreats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-  gap: 24px;
+  gap: var(--spacing-l);
 }
 
-/* Card Styling to match DHIS2 Card roughly or use explicit style if we don't import Card */
+/* Card Styling to match DHIS2 Card roughly */
 .stat-card-wrapper {
-  background: white;
-  border-radius: 3px;
-  /* DHIS2 style uses sharp or small radius */
+  background: var(--color-white);
+  border-radius: var(--radius-s);
   box-shadow:
     0 0 1px 0 rgba(64, 75, 90, 0.2),
     0 2px 1px 0 rgba(64, 75, 90, 0.12);
-  padding: 16px;
+  padding: var(--spacing-m);
   height: 100%;
   position: relative;
   overflow: hidden;
@@ -61,8 +59,8 @@
 }
 
 .retreat-card-wrapper {
-  background: white;
-  border-radius: 3px;
+  background: var(--color-white);
+  border-radius: var(--radius-s);
   box-shadow:
     0 0 1px 0 rgba(64, 75, 90, 0.2),
     0 2px 1px 0 rgba(64, 75, 90, 0.12);
@@ -71,7 +69,6 @@
   height: 100%;
   transition: box-shadow 0.2s ease-in-out;
   border-top: 4px solid transparent;
-  /* For color accent */
   cursor: pointer;
 }
 
@@ -82,7 +79,7 @@
 }
 
 .retreat-card-body {
-  padding: 16px;
+  padding: var(--spacing-m);
   display: flex;
   flex-direction: column;
   flex-grow: 1;
@@ -92,21 +89,21 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 16px;
+  margin-bottom: var(--spacing-m);
 }
 
 .retreat-name {
-  font-size: 18px;
+  font-size: var(--font-size-xl);
   font-weight: 500;
-  color: #1d2125;
-  margin-right: 8px;
+  color: var(--color-grey-800);
+  margin-right: var(--spacing-s);
 }
 
 .tags-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 16px;
+  gap: var(--spacing-s);
+  margin-bottom: var(--spacing-m);
 }
 
 /* Info Rows */
@@ -114,54 +111,53 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
-  margin-bottom: 24px;
+  margin-bottom: var(--spacing-l);
 }
 
 .info-item {
   display: flex;
   align-items: center;
-  font-size: 14px;
-  color: #404b5a;
+  font-size: var(--font-size-m);
+  color: var(--color-grey-600);
 }
 
 .info-icon {
-  margin-right: 8px;
-  color: #6e7a8a;
+  margin-right: var(--spacing-s);
+  color: var(--color-grey-500);
   font-size: 16px;
   display: inline-flex;
 }
 
 /* Stats specific */
 .stat-title {
-  font-size: 13px;
-  color: #6e7a8a;
+  font-size: var(--font-size-s);
+  color: var(--color-grey-500);
   text-transform: uppercase;
   font-weight: 500;
   margin-bottom: 4px;
 }
 
 .stat-value {
-  font-size: 32px;
-  color: #1d2125;
+  font-size: var(--font-size-giant);
+  color: var(--color-grey-800);
   font-weight: 400;
-  /* DHIS2 often uses lighter weights for large numbers */
 }
 
 .stat-icon {
   position: absolute;
-  right: 16px;
-  bottom: 16px;
+  right: var(--spacing-m);
+  bottom: var(--spacing-m);
   font-size: 48px;
   opacity: 0.1;
   color: currentColor;
 }
 
 .bg-danger-light {
-  background-color: #fff5f5;
+  background-color: var(--color-error-100);
 }
 
 .text-danger-custom {
-  color: #b92b27;
+  color: var(--color-error-600);
 }
 
 .manage-btn-container {
@@ -171,6 +167,45 @@
 }
 
 .no-retreats-msg {
-  color: #6e7a8a;
+  color: var(--color-grey-500);
   font-style: italic;
+}
+
+.notice-box-wrapper {
+  margin-top: var(--spacing-l);
+}
+
+.retreat-card-wrapper.silent { border-top-color: var(--color-purple-500); }
+.retreat-card-wrapper.general { border-top-color: var(--color-success-500); }
+.retreat-card-wrapper.default { border-top-color: var(--color-grey-500); }
+
+.stat-error-msg {
+  margin-top: var(--spacing-s);
+  font-size: 0.8rem;
+  color: var(--color-error-500);
+}
+
+.stat-breakdown-row {
+  display: flex;
+  gap: 12px;
+  margin-top: var(--spacing-s);
+  font-size: 0.85em;
+}
+
+.breakdown-tag {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 12px;
+}
+
+.breakdown-tag.general {
+  background: var(--color-success-100);
+  color: var(--color-success-500);
+}
+
+.breakdown-tag.silent {
+  background: var(--color-purple-100);
+  color: var(--color-purple-500);
 }

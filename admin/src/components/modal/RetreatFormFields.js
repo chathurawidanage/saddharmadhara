@@ -13,12 +13,6 @@ import { generateRetreatName } from "../../utils/retreatFormMapping";
 
 const { Field, FormSpy } = ReactFinalForm;
 
-const styles = {
-  fieldRow: {
-    marginBottom: 10,
-  },
-};
-
 const RetreatFormFields = ({ values, form, store }) => {
   return (
     <>
@@ -37,7 +31,7 @@ const RetreatFormFields = ({ values, form, store }) => {
           }
         }}
       />
-      <div style={styles.fieldRow}>
+      <div className="retreat-form-field-row">
         <Field
           name="name"
           label="Retreat Name"
@@ -47,7 +41,7 @@ const RetreatFormFields = ({ values, form, store }) => {
           disabled={values.autoGenerateName}
         />
       </div>
-      <div style={styles.fieldRow}>
+      <div className="retreat-form-field-row">
         <Field
           type="checkbox"
           name="autoGenerateName"
@@ -56,7 +50,7 @@ const RetreatFormFields = ({ values, form, store }) => {
           component={SwitchFieldFF}
         />
       </div>
-      <div style={styles.fieldRow}>
+      <div className="retreat-form-field-row">
         <Field
           required
           name="code"
@@ -67,7 +61,7 @@ const RetreatFormFields = ({ values, form, store }) => {
           validate={hasValue}
         />
       </div>
-      <div style={styles.fieldRow}>
+      <div className="retreat-form-field-row">
         <Field
           required
           name="date"
@@ -77,7 +71,7 @@ const RetreatFormFields = ({ values, form, store }) => {
           validate={hasValue}
         />
       </div>
-      <div style={styles.fieldRow}>
+      <div className="retreat-form-field-row">
         <Field
           required
           name="noOfDays"
@@ -87,7 +81,7 @@ const RetreatFormFields = ({ values, form, store }) => {
           validate={hasValue}
         />
       </div>
-      <div style={styles.fieldRow}>
+      <div className="retreat-form-field-row">
         <Field name="location" label="Location" validate={hasValue} required>
           {(props) => (
             <div>
@@ -104,7 +98,7 @@ const RetreatFormFields = ({ values, form, store }) => {
           )}
         </Field>
       </div>
-      <div style={styles.fieldRow}>
+      <div className="retreat-form-field-row">
         <Field
           required
           name="noOfYogis"
@@ -114,7 +108,7 @@ const RetreatFormFields = ({ values, form, store }) => {
           validate={hasValue}
         />
       </div>
-      <div style={styles.fieldRow}>
+      <div className="retreat-form-field-row">
         <Field
           required
           name="medium"
@@ -131,7 +125,7 @@ const RetreatFormFields = ({ values, form, store }) => {
           })}
         />
       </div>
-      <div style={styles.fieldRow}>
+      <div className="retreat-form-field-row">
         <Field
           required
           name="retreatType"
@@ -146,7 +140,7 @@ const RetreatFormFields = ({ values, form, store }) => {
           })}
         />
       </div>
-      <div style={styles.fieldRow}>
+      <div className="retreat-form-field-row">
         <Field
           type="checkbox"
           name="clergyOnly"
@@ -155,7 +149,7 @@ const RetreatFormFields = ({ values, form, store }) => {
           component={SwitchFieldFF}
         />
       </div>
-      <div style={styles.fieldRow}>
+      <div className="retreat-form-field-row">
         <Field
           type="checkbox"
           name="privateRetreat"
@@ -164,7 +158,7 @@ const RetreatFormFields = ({ values, form, store }) => {
           component={SwitchFieldFF}
         />
       </div>
-      <div style={styles.fieldRow}>
+      <div className="retreat-form-field-row">
         <Field
           type="checkbox"
           name="accomodationNotProvided"
@@ -188,7 +182,7 @@ const RetreatFormFields = ({ values, form, store }) => {
           )}
         </Field>
       </div>
-      <div style={styles.fieldRow}>
+      <div className="retreat-form-field-row">
         <Field
           type="checkbox"
           name="accomodationOptional"
@@ -198,7 +192,7 @@ const RetreatFormFields = ({ values, form, store }) => {
           disabled={values.accomodationNotProvided}
         />
       </div>
-      <div style={styles.fieldRow}>
+      <div className="retreat-form-field-row">
         <Field
           type="checkbox"
           name="disabled"

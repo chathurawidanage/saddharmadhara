@@ -39,22 +39,6 @@ import {
 import { BiLinkExternal } from "react-icons/bi";
 import NotesIndicator from "../indicators/NotesIndicator";
 
-const styles = {
-  indicators: {
-    display: "flex",
-    columnGap: 2,
-    rowGap: 2,
-    flexDirection: "column",
-  },
-  miniIndicators: {
-    display: "flex",
-    columnGap: 2,
-    rowGap: 2,
-    flexDirection: "row",
-    flexWrap: "wrap",
-  },
-};
-
 const YogiRow = observer(({ trackedEntity, currentRetreat, actions }) => {
     const { baseUrl } = useConfig();
 
@@ -84,7 +68,6 @@ const YogiRow = observer(({ trackedEntity, currentRetreat, actions }) => {
                   "_blank",
                 );
               }}
-              style={styles.actionButton}
             >
               <BiLinkExternal />
             </Button>
@@ -110,7 +93,7 @@ const YogiRow = observer(({ trackedEntity, currentRetreat, actions }) => {
           </div>
         </TableCell>
         <TableCell className="yogi-row-td">
-          <div style={styles.miniIndicators}>
+          <div className="mini-indicators-container">
             <GenderIndicator
               gender={trackedEntity.attributes[DHIS2_TEI_ATTRIBUTE_GENDER]}
             />

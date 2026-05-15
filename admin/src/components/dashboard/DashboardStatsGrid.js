@@ -18,7 +18,7 @@ const DashboardStatsGrid = observer(({ store }) => {
           )}
         </div>
         {store.metadata.requestStates.smsCreditsError && (
-          <div style={{ marginTop: 8, fontSize: "0.8rem", color: "#d14343" }}>
+          <div className="stat-error-msg">
             {store.metadata.requestStates.smsCreditsError}
           </div>
         )}
@@ -34,25 +34,8 @@ const DashboardStatsGrid = observer(({ store }) => {
       <div className="stat-card-wrapper">
         <div className="stat-title">Total Retreats</div>
         <div className="stat-value">{store.metadata.retreats.length}</div>
-        <div
-          style={{
-            display: "flex",
-            gap: "12px",
-            marginTop: "8px",
-            fontSize: "0.85em",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "4px",
-              background: "#e6fffa",
-              padding: "2px 8px",
-              borderRadius: "12px",
-              color: "#28a745",
-            }}
-          >
+        <div className="stat-breakdown-row">
+          <div className="breakdown-tag general">
             <span>General:</span>
             <strong>
               {
@@ -62,17 +45,7 @@ const DashboardStatsGrid = observer(({ store }) => {
               }
             </strong>
           </div>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "4px",
-              background: "#f3e8ff",
-              padding: "2px 8px",
-              borderRadius: "12px",
-              color: "#6610f2",
-            }}
-          >
+          <div className="breakdown-tag silent">
             <span>Silent:</span>
             <strong>
               {

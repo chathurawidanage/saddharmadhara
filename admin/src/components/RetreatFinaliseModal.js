@@ -14,15 +14,8 @@ import { observer } from "mobx-react";
 import React, { useEffect } from "react";
 import { DHIS2_RETREAT_SELECTION_STATE_SELECTED_CODE } from "../dhis2";
 import { useAlert } from "@dhis2/app-runtime";
-const classes = {
-  checkboxes: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 5,
-  },
-};
-
 import { useStore } from "../stores/StoreProvider";
+import "./RetreatFinaliseModal.css";
 
 const RetreatFinaliseModal = observer(({ retreat, onCancel }) => {
   const store = useStore();
@@ -104,7 +97,7 @@ const RetreatFinaliseModal = observer(({ retreat, onCancel }) => {
               </NoticeBox>
             )}
             <h6>Please confirm the checklist below to finalize the retreat?</h6>
-            <div style={classes.checkboxes}>
+            <div className="finalise-modal-checkboxes">
               <Checkbox
                 label={`This retreat had only ${selectedYogiList.length} selected Yogis`}
                 checked={check[0]}

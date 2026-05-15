@@ -19,16 +19,7 @@ import { useStore } from "../stores/StoreProvider";
 import RetreatHeader from "./manager/RetreatHeader";
 import RetreatDetails from "./manager/RetreatDetails";
 import RetreatDownloadMenu from "./manager/RetreatDownloadMenu";
-
-const styles = {
-  container: {
-    marginTop: 20,
-    padding: "0 20px",
-  },
-  backButton: {
-    marginBottom: 20,
-  },
-};
+import "./RetreatManager.css";
 
 const RetreatManager = observer(() => {
   const store = useStore();
@@ -43,13 +34,7 @@ const RetreatManager = observer(() => {
 
   if (!retreat) {
     return (
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          padding: "100px",
-        }}
-      >
+      <div className="retreat-manager-loading-container">
         <CircularLoader />
       </div>
     );
@@ -88,9 +73,9 @@ const RetreatManager = observer(() => {
   };
 
   return (
-    <div style={styles.container}>
+    <div className="retreat-manager-container">
       <div>
-        <div style={styles.backButton}>
+        <div className="retreat-manager-back-button">
           <Button
             small
             icon={<IconArrowLeft16 />}
