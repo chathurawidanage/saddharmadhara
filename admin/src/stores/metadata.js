@@ -20,81 +20,16 @@ import {
   DHIS2_DASHBOARD_PARTICIPATION_SUMMARY_SQL_VIEW,
   DHIS2_DASHBOARD_EOI_SUMMARY_SQL_VIEW,
 } from "../dhis2";
+import { isGeneralRetreat } from "../utils/retreatUtils";
+import {
+  transformAttendance,
+  transformEoiSummary,
+  transformLanguages,
+  transformParticipationSummary,
+  transformRetreats,
+  transformRooms,
+} from "../utils/transformers";
 
-// Retreats Transforming
-export const getEndDate = (startDate, noOfDays) => {
-  let endDate = new Date(startDate.getTime() + noOfDays * 24 * 60 * 60 * 1000);
-  return endDate;
-};
-
-export const transformRetreats = (retreatsReponse) => {
-  let retreats = retreatsReponse?.listGrid?.rows?.map((row) => {
-    let attributeIdToValueMap = JSON.parse(row[3]);
-    let date = new Date(attributeIdToValueMap[DHIS2_RETREAT_DATE_ATTRIBUTE]);
-    let noOfDays = attributeIdToValueMap[DHIS2_RETREAT_NO_OF_DAYS_ATTRIBUTE];
-    let endDate = getEndDate(date, noOfDays);
-    return {
-      id: row[0],
-      code: row[1],
-      name: row[2],
-      current: row[4] === "true",
-      retreatCode: attributeIdToValueMap[DHIS2_RETREAT_CODE_ATTRIBUTE],
-      date,
-      endDate,
-      disabled:
-        attributeIdToValueMap[DHIS2_RETREAT_DISABLED_ATTRIBUTE] === "true",
-      location: attributeIdToValueMap[DHIS2_RETREAT_LOCATION_ATTRIBUTE],
-      totalYogis: attributeIdToValueMap[DHIS2_RETREAT_TOTAL_YOGIS_ATTRIBUTE],
-      retreatType: attributeIdToValueMap[DHIS2_RETREAT_TYPE_ATTRIBUTE],
-      noOfDays: attributeIdToValueMap[DHIS2_RETREAT_NO_OF_DAYS_ATTRIBUTE],
-      medium: attributeIdToValueMap[DHIS2_RETREAT_MEDIUM_ATTRIBUTE],
-      finalized:
-        attributeIdToValueMap[DHIS2_RETREAT_FINALIZED_ATTRIBUTE] === "true",
-    };
-  });
-
-  retreats.sort((a, b) => a.date - b.date);
-
-  return retreats;
-};
-// End of Retreats Transforming
-
-const transformRooms = (roomResponse) => {
-  return roomResponse.options.map((room) => {
-    let attributeIdToValueMap = {};
-    room.attributeValues.forEach((attribute) => {
-      attributeIdToValueMap[attribute.attribute.id] = attribute.value;
-    });
-    return {
-      code: room.code,
-      name: room.name,
-      location: attributeIdToValueMap[DHIS2_RETREAT_LOCATION_ATTRIBUTE],
-      floor: attributeIdToValueMap[DHIS2_ROOMS_FLOOR_ATTRIBUTE],
-    };
-  });
-};
-
-const transformLanguages = (languagesResponse) => {
-  return languagesResponse.options.map((language) => {
-    let attributeIdToValueMap = {};
-    language.attributeValues.forEach((attribute) => {
-      attributeIdToValueMap[attribute.attribute.id] = attribute.value;
-    });
-    return {
-      code: language.code,
-      name: language.name,
-    };
-  });
-};
-
-const transformAttendance = (attendanceResponse) => {
-  return attendanceResponse.options.map((attendance) => {
-    return {
-      code: attendance.code,
-      name: attendance.name,
-    };
-  });
-};
 
 const metadataQuery = {
   retreatTypes: {
@@ -288,10 +223,9 @@ class MetadataStore {
     }
 
     // Filter General Retreats
-    // Filter General Retreats
     const generalRetreatCodes = new Set(
       this.retreats
-        .filter((r) => r.retreatType?.toLowerCase().includes("general"))
+        .filter((r) => isGeneralRetreat(r))
         .flatMap((r) => [r.code, r.name]),
     );
 
@@ -299,10 +233,7 @@ class MetadataStore {
     const participantCounts = {};
     const processedUids = new Set(); // To count unique participants efficiently
 
-    this.participationSummary.listGrid?.rows?.forEach((row) => {
-      const yogiUid = row[0];
-      const retreatCode = row[1];
-
+    this.participationSummary.forEach(({ yogiUid, retreatCode }) => {
       if (generalRetreatCodes.has(retreatCode)) {
         participantCounts[yogiUid] = (participantCounts[yogiUid] || 0) + 1;
         processedUids.add(yogiUid);
@@ -328,14 +259,10 @@ class MetadataStore {
     const invitedUids = new Set();
     const applicantUids = new Set();
 
-    this.eoiSummary.listGrid?.rows?.forEach((row) => {
-      const yogiUid = row[0];
-      const retreatCode = row[1];
-      const invitationSent = row[2]; // Index 2 is now invitation_sent
-
+    this.eoiSummary.forEach(({ yogiUid, retreatCode, invitationSent }) => {
       if (generalRetreatCodes.has(retreatCode)) {
         applicantUids.add(yogiUid);
-        if (invitationSent === "true") {
+        if (invitationSent) {
           invitedUids.add(yogiUid);
         }
       }
@@ -369,8 +296,10 @@ class MetadataStore {
       this.rooms = transformRooms(response.rooms);
       this.languages = transformLanguages(response.languages);
       this.attendance = transformAttendance(response.attendance);
-      this.participationSummary = response.participationSummary; // Store raw response
-      this.eoiSummary = response.eoiSummary; // Store raw response
+      this.participationSummary = transformParticipationSummary(
+        response.participationSummary,
+      );
+      this.eoiSummary = transformEoiSummary(response.eoiSummary);
       this.fetchSmsCredits();
     });
   };

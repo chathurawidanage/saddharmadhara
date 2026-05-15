@@ -1,4 +1,6 @@
-import MetadataStore, { getEndDate, transformRetreats } from "./metadata";
+import MetadataStore from "./metadata";
+import { getRetreatEndDate } from "../utils/retreatUtils";
+import { transformRetreats } from "../utils/transformers";
 import {
   DHIS2_RETREAT_DATE_ATTRIBUTE,
   DHIS2_RETREAT_NO_OF_DAYS_ATTRIBUTE,
@@ -6,10 +8,10 @@ import {
 } from "../dhis2";
 
 describe("MetadataStore Helpers", () => {
-  test("getEndDate calculates correct date", () => {
+  test("getRetreatEndDate calculates correct date", () => {
     const startDate = new Date("2024-01-01T00:00:00Z");
     const noOfDays = 10;
-    const endDate = getEndDate(startDate, noOfDays);
+    const endDate = getRetreatEndDate(startDate, noOfDays);
     expect(endDate.toISOString()).toBe("2024-01-11T00:00:00.000Z");
   });
 
@@ -80,25 +82,17 @@ describe("MetadataStore.generalRetreatStats", () => {
       },
     ];
 
-    store.participationSummary = {
-      listGrid: {
-        rows: [
-          ["y1", "R1"], // Participant 1 in R1
-          ["y1", "R2"], // Participant 1 in R2 (Repeat)
-          ["y2", "R1"], // Participant 2 in R1 (One-time)
-        ],
-      },
-    };
+    store.participationSummary = [
+      { yogiUid: "y1", retreatCode: "R1" },
+      { yogiUid: "y1", retreatCode: "R2" },
+      { yogiUid: "y2", retreatCode: "R1" },
+    ];
 
-    store.eoiSummary = {
-      listGrid: {
-        rows: [
-          ["y1", "R1", "true"],
-          ["y2", "R1", "true"],
-          ["y3", "R1", "false"], // Applied but not invited
-        ],
-      },
-    };
+    store.eoiSummary = [
+      { yogiUid: "y1", retreatCode: "R1", invitationSent: true },
+      { yogiUid: "y2", retreatCode: "R1", invitationSent: true },
+      { yogiUid: "y3", retreatCode: "R1", invitationSent: false },
+    ];
 
     const stats = store.generalRetreatStats;
     expect(stats).toEqual({

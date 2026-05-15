@@ -11,13 +11,14 @@ import { observer } from "mobx-react";
 import React from "react";
 import { useParams } from "react-router";
 import { useNavigate } from "react-router-dom";
+import { canFinalizeRetreat } from "../utils/retreatUtils";
 import {
-  DHIS2_TEI_ATTRIBUTE_FULL_NAME,
-  DHIS2_TEI_ATTRIBUTE_GENDER,
-  DHIS2_TEI_ATTRIBUTE_MOBILE,
-  DHIS2_TEI_ATTRIBUTE_NIC,
-  DHIS2_TEI_ATTRIBUTE_PASSPORT,
-} from "../dhis2";
+  buildYogiExport,
+  downloadTextFile,
+  YOGI_EXPORT_DEFINITIONS,
+  YOGI_EXPORT_FORMATS,
+  YOGI_EXPORT_GENDERS,
+} from "../services/exportService";
 import YogisList, { sortYogiList } from "./manager/YogiList";
 import RetreatFinaliseModal from "./RetreatFinaliseModal";
 import RetreatInvitationModal from "./RetreatInvitationModal";
@@ -78,60 +79,6 @@ const styles = {
   },
 };
 
-function downloadTextFile(text, fileName, extension = "txt") {
-  const BOM = "\uFEFF"; // UTF-8 BOM
-  const blob = new Blob([BOM + text], { type: "text/plain;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-
-  link.setAttribute("href", url);
-  link.setAttribute("download", `${fileName}.${extension}`);
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-}
-
-export const formatYogiList = (
-  yogiObj,
-  retreatCode,
-  gender,
-  selectionState,
-  format,
-  retreat,
-) => {
-  const yogiNames = [];
-
-  if (format === "csv") {
-    yogiNames.push(["", "Name", "NIC", "Passport", "Phone", "Room"].join(","));
-  }
-
-  let index = 0;
-  for (const yogi of yogiObj) {
-    if (
-      yogi.attributes[DHIS2_TEI_ATTRIBUTE_GENDER] === gender &&
-      yogi.expressionOfInterests[retreatCode].state === selectionState
-    ) {
-      if (format === "csv") {
-        const room = yogi.participation[retreat.code]?.room || "N/A";
-        yogiNames.push(
-          [
-            (++index).toString().padStart(2, "0"),
-            yogi.attributes[DHIS2_TEI_ATTRIBUTE_FULL_NAME].trim(),
-            yogi.attributes[DHIS2_TEI_ATTRIBUTE_NIC]?.trim() || "",
-            yogi.attributes[DHIS2_TEI_ATTRIBUTE_PASSPORT]?.trim() || "",
-            yogi.attributes[DHIS2_TEI_ATTRIBUTE_MOBILE]?.trim() || "",
-            room,
-          ].join(","),
-        );
-      } else {
-        yogiNames.push(
-          `${(++index).toString().padStart(2, "0")} ${yogi.attributes[DHIS2_TEI_ATTRIBUTE_FULL_NAME].trim()}`,
-        );
-      }
-    }
-  }
-  return yogiNames.join("\n");
-};
 
 const RetreatManager = observer(({ store }) => {
   const params = useParams();
@@ -159,7 +106,7 @@ const RetreatManager = observer(({ store }) => {
     );
     sortYogiList(yogiObj, retreat);
 
-    const formattedList = formatYogiList(
+    const formattedList = buildYogiExport(
       yogiObj,
       retreatCode,
       gender,
@@ -216,118 +163,30 @@ const RetreatManager = observer(({ store }) => {
             <DropdownButton
               component={
                 <FlyoutMenu>
-                  <MenuItem label="Applied">
-                    {["Male", "Female"].map((gender) => (
-                      <MenuItem label={gender} key={gender}>
-                        <MenuItem
-                          label="Name List (Text)"
-                          onClick={() => {
-                            downloadYogiList(
-                              retreat.code,
-                              gender.toLowerCase(),
-                              "applied",
-                              "txt",
-                            );
-                          }}
-                        />
-                        <MenuItem
-                          label="Name with details (Excel)"
-                          onClick={() => {
-                            downloadYogiList(
-                              retreat.code,
-                              gender.toLowerCase(),
-                              "applied",
-                              "csv",
-                            );
-                          }}
-                        />
+                  {YOGI_EXPORT_DEFINITIONS.map(
+                    ({ label, selectionState }) => (
+                      <MenuItem label={label} key={selectionState}>
+                        {YOGI_EXPORT_GENDERS.map((gender) => (
+                          <MenuItem label={gender.label} key={gender.value}>
+                            {YOGI_EXPORT_FORMATS.map((exportFormat) => (
+                              <MenuItem
+                                key={`${selectionState}-${gender.value}-${exportFormat.format}`}
+                                label={exportFormat.label}
+                                onClick={() => {
+                                  downloadYogiList(
+                                    retreat.code,
+                                    gender.value,
+                                    selectionState,
+                                    exportFormat.format,
+                                  );
+                                }}
+                              />
+                            ))}
+                          </MenuItem>
+                        ))}
                       </MenuItem>
-                    ))}
-                  </MenuItem>
-                  <MenuItem label="Pending Confirmation">
-                    {["Male", "Female"].map((gender) => (
-                      <MenuItem label={gender} key={gender}>
-                        <MenuItem
-                          label="Name List (Text)"
-                          onClick={() => {
-                            downloadYogiList(
-                              retreat.code,
-                              gender.toLowerCase(),
-                              "pending",
-                              "txt",
-                            );
-                          }}
-                        />
-                        <MenuItem
-                          label="Name with details (Excel)"
-                          onClick={() => {
-                            downloadYogiList(
-                              retreat.code,
-                              gender.toLowerCase(),
-                              "pending",
-                              "csv",
-                            );
-                          }}
-                        />
-                      </MenuItem>
-                    ))}
-                  </MenuItem>
-                  <MenuItem label="Selected">
-                    {["Male", "Female"].map((gender) => (
-                      <MenuItem label={gender} key={gender}>
-                        <MenuItem
-                          label="Name List (Text)"
-                          onClick={() => {
-                            downloadYogiList(
-                              retreat.code,
-                              gender.toLowerCase(),
-                              "selected",
-                              "txt",
-                            );
-                          }}
-                        />
-                        <MenuItem
-                          label="Name with details (Excel)"
-                          onClick={() => {
-                            downloadYogiList(
-                              retreat.code,
-                              gender.toLowerCase(),
-                              "selected",
-                              "csv",
-                            );
-                          }}
-                        />
-                      </MenuItem>
-                    ))}
-                  </MenuItem>
-                  <MenuItem label="Waiting">
-                    {["Male", "Female"].map((gender) => (
-                      <MenuItem label={gender} key={gender}>
-                        <MenuItem
-                          label="Name List (Text)"
-                          onClick={() => {
-                            downloadYogiList(
-                              retreat.code,
-                              gender.toLowerCase(),
-                              "waiting",
-                              "txt",
-                            );
-                          }}
-                        />
-                        <MenuItem
-                          label="Name with details (Excel)"
-                          onClick={() => {
-                            downloadYogiList(
-                              retreat.code,
-                              gender.toLowerCase(),
-                              "waiting",
-                              "csv",
-                            );
-                          }}
-                        />
-                      </MenuItem>
-                    ))}
-                  </MenuItem>
+                    ),
+                  )}
                 </FlyoutMenu>
               }
             >
@@ -335,10 +194,7 @@ const RetreatManager = observer(({ store }) => {
             </DropdownButton>
             <Button
               primary
-              disabled={
-                Date.now() - retreat.date.getTime() <
-                  retreat.noOfDays * 24 * 60 * 60 * 1000 || retreat.finalized
-              }
+              disabled={!canFinalizeRetreat(retreat)}
               onClick={() => setShowFinaliseModel(true)}
             >
               Finalise Retreat

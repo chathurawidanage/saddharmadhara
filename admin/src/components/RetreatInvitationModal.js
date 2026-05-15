@@ -17,6 +17,10 @@ import {
   DHIS2_TEI_ATTRIBUTE_FULL_NAME,
   DHIS2_TEI_ATTRIBUTE_MOBILE,
 } from "../dhis2";
+import {
+  getInvitationMessage,
+  sendRetreatInvitations,
+} from "../services/invitationService";
 
 const classes = {
   checkboxes: {
@@ -26,70 +30,6 @@ const classes = {
   },
 };
 
-const tokenCreateMutation = {
-  type: "create",
-  resource: "apiToken",
-  data: ({ expire }) => ({
-    expire,
-    attributes: [{ type: "MethodAllowedList", allowedMethods: ["GET"] }],
-  }),
-};
-
-function getMessage(
-  teiId,
-  teiFullName,
-  retreatCode,
-  retreatFrom,
-  retreatTo,
-  deadLine,
-  retreatType,
-) {
-  // todo send in English for english retreats
-  const plusDateTo = new Date(retreatTo);
-  plusDateTo.setDate(plusDateTo.getDate() + 1);
-
-  const retreatPrefix = retreatType === "silent" ? "ස්වයං " : "";
-
-  return `ඔබ ${retreatFrom.toLocaleDateString("si-LK", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  })} සිට ${plusDateTo.toLocaleDateString("si-LK", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  })} දක්වා පැවැත්වෙන සද්ධර්මධාරා ${retreatPrefix}භාවනා වැඩසටහන හා සම්බන්ධවීමට තේරී පත් ව ඇත. ${new Date(
-    deadLine,
-  ).toLocaleDateString("si-LK", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  })} දිනට පෙර පහත යොමුව (Link එක) මගින් ඔබගේ සහභාගි වීම/නොවීම තහවුරු කරන්න.
-
-https://application.srisambuddhamission.org/confirm/${retreatCode}/${teiId}
-
-එසේ අපහසු නම් පමණක් ඔබගේ සහභාගිත්වය පහත පරිදි 0743208734 අංකයට SMS හෝ Whatsapp පණිවිඩයක් මගින් තහවුරු කරන්න.
-
-වැඩසටහන් අංකය: ${retreatCode}
-නම: ${teiFullName}
-ජා.හැ.අ./ගමන් බ.ප.අ:
-පැමිණීම / නොපැමිණීම:`;
-}
-
-async function sendSms(message, teiMobile, token) {
-  let formattedTeiMobile = teiMobile.replace(/^\+94/, "0");
-  return await fetch("https://application.srisambuddhamission.org/api/sms", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `ApiToken ${token}`,
-    },
-    body: JSON.stringify({
-      to: [formattedTeiMobile],
-      message,
-    }),
-  });
-}
 
 const RetreatInvitationModal = observer(({ store, retreat, onCancel }) => {
   const dataEngine = useDataEngine();
@@ -169,18 +109,6 @@ const RetreatInvitationModal = observer(({ store, retreat, onCancel }) => {
       confirmationDeadline,
     );
 
-    // create a temporary token
-    const tokenResponse = await dataEngine.mutate(tokenCreateMutation, {
-      variables: {
-        expire: Date.now() + 60 * 60 * 1000,
-      },
-    });
-
-    const token = tokenResponse?.response.key;
-    const tokenId = tokenResponse?.response.uid;
-
-    // send invites to yogis
-
     const finalYogisList = [];
 
     if (check[0]) {
@@ -195,55 +123,31 @@ const RetreatInvitationModal = observer(({ store, retreat, onCancel }) => {
       finalYogisList.push(...sentYogis);
     }
 
-    setTotalToSend(toSendYogis.length);
-    setIsSending(true);
+    setSentCount(0);
+    setTotalToSend(finalYogisList.length);
 
-    for (let i = 0; i < finalYogisList.length; i++) {
-      let sentResponse = await sendSms(
-        getMessage(
-          finalYogisList[i].id,
-          finalYogisList[i].attributes[DHIS2_TEI_ATTRIBUTE_FULL_NAME],
-          retreat.retreatCode,
-          retreat.date,
-          retreat.endDate,
-          confirmationDeadline,
-          retreat.retreatType,
-        ),
-        finalYogisList[i].attributes[DHIS2_TEI_ATTRIBUTE_MOBILE],
-        token,
-      );
-
-      let sent = sentResponse?.ok;
-
-      await store.yogis.changeInvitationSentState(
-        finalYogisList[i].id,
-        retreat.code,
-        sent ? "sent" : "failed",
-      );
-
-      // set the campaign id into the datastore to handel delivery report
-      if (sent) {
-        const sentResponseJson = await sentResponse.json();
-        const expressionOInterestEvent =
-          finalYogisList[i].expressionOfInterests[retreat.code];
-        // write to datastore
-        await dataEngine.mutate({
-          type: "create",
-          resource: "dataStore/invitation-sms/" + sentResponseJson.campaignId,
-          data: {
-            eventId: expressionOInterestEvent.eventId,
-          },
-        });
-      }
-
-      setSentCount(i + 1);
-    }
-
-    // delete the token
-    await dataEngine.mutate({
-      type: "delete",
-      resource: "apiToken",
-      id: tokenId,
+    await sendRetreatInvitations({
+      engine: dataEngine,
+      retreat,
+      confirmationDeadline,
+      yogis: finalYogisList.map((yogi) => ({
+        id: yogi.id,
+        eventId: yogi.expressionOfInterests[retreat.code].eventId,
+        attributes: {
+          fullName: yogi.attributes[DHIS2_TEI_ATTRIBUTE_FULL_NAME],
+          mobile: yogi.attributes[DHIS2_TEI_ATTRIBUTE_MOBILE],
+        },
+      })),
+      onResult: async ({ yogiId, sent }) => {
+        await store.yogis.changeInvitationSentState(
+          yogiId,
+          retreat.code,
+          sent ? "sent" : "failed",
+        );
+      },
+      onProgress: ({ completed }) => {
+        setSentCount(completed);
+      },
     });
 
     setIsSending(false);
@@ -301,7 +205,7 @@ const RetreatInvitationModal = observer(({ store, retreat, onCancel }) => {
               <textarea
                 disabled={true}
                 style={{ width: "100%", height: 350 }}
-                value={getMessage(
+                value={getInvitationMessage(
                   "yogi-id",
                   "yogi-full-name",
                   retreat.retreatCode,

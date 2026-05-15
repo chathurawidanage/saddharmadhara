@@ -1,10 +1,10 @@
-import { buildYogiExport } from "../services/exportService";
+import { buildYogiExport } from "./exportService";
 import {
   DHIS2_TEI_ATTRIBUTE_FULL_NAME,
   DHIS2_TEI_ATTRIBUTE_GENDER,
 } from "../dhis2";
 
-describe("RetreatManager Export Formatting", () => {
+describe("exportService", () => {
   const retreat = { code: "R1" };
   const yogiObj = [
     {
@@ -21,7 +21,7 @@ describe("RetreatManager Export Formatting", () => {
     },
   ];
 
-  test("formats as text correctly", () => {
+  test("buildYogiExport formats as text correctly", () => {
     const result = buildYogiExport(
       yogiObj,
       "R1",
@@ -33,7 +33,7 @@ describe("RetreatManager Export Formatting", () => {
     expect(result).toBe("01 John Doe");
   });
 
-  test("formats as csv correctly", () => {
+  test("buildYogiExport formats as csv correctly", () => {
     const result = buildYogiExport(
       yogiObj,
       "R1",
@@ -48,7 +48,7 @@ describe("RetreatManager Export Formatting", () => {
     expect(lines[1]).toContain("Room 101");
   });
 
-  test("filters by gender and state", () => {
+  test("buildYogiExport filters by gender and state", () => {
     const result = buildYogiExport(
       yogiObj,
       "R1",
