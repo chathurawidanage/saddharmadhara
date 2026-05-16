@@ -29,6 +29,8 @@ import {
   EoiSummary,
   MetadataOption
 } from "../types/domain";
+import { Dhis2Engine, DataQuery, DataMutation } from "../types/dhis2";
+
 
 interface RequestStates {
   loadingBootstrap: boolean;
@@ -43,7 +45,8 @@ interface RequestStates {
   smsCreditsError: string | null;
 }
 
-const bootstrapQuery = {
+const bootstrapQuery: DataQuery = {
+
   retreatTypes: {
     resource: `optionSets/${DHIS_RETREAT_TYPE_OPTION_SET_ID}.json`,
     params: {
@@ -64,7 +67,8 @@ const bootstrapQuery = {
   },
 };
 
-const supportingMetadataQuery = {
+const supportingMetadataQuery: DataQuery = {
+
   rooms: {
     resource: `optionSets/${DHIS2_ROOMS_OPTION_SET_ID}.json`,
     params: {
@@ -85,7 +89,8 @@ const supportingMetadataQuery = {
   },
 };
 
-const statsQuery = {
+const statsQuery: DataQuery = {
+
   participationSummary: {
     resource: `sqlViews/${DHIS2_DASHBOARD_PARTICIPATION_SUMMARY_SQL_VIEW}/data.json`,
     params: {
@@ -109,8 +114,9 @@ class MetadataStore {
   attendance: Attendance[] = [];
   participationSummary: ParticipationSummary[] = [];
   eoiSummary: EoiSummary[] = [];
-  smsCredits: any = null;
-  engine: any;
+  smsCredits: { balance: number; currency: string } | null = null;
+  engine: Dhis2Engine;
+
 
   requestStates: RequestStates = {
     loadingBootstrap: false,
@@ -125,8 +131,9 @@ class MetadataStore {
     smsCreditsError: null,
   };
 
-  constructor(engine: any) {
+  constructor(engine: Dhis2Engine) {
     this.engine = engine;
+
     makeAutoObservable(this);
   }
 
@@ -179,9 +186,22 @@ class MetadataStore {
     );
   };
 
-  updateRetreatAttribute = async (retreat: Retreat, attributeId: string, value: any): Promise<boolean> => {
+  updateRetreatAttribute = async (
+    retreat: Retreat,
+    attributeId: string,
+    value: any,
+  ): Promise<boolean> => {
     try {
-      const retreatObj: any = await this.engine.query({
+      const retreatObj: {
+        retreat: {
+          id: string;
+          code: string;
+          name: string;
+          optionSet: { id: string };
+          attributeValues: Array<{ attribute: { id: string }; value: any }>;
+        };
+      } = await this.engine.query({
+
         retreat: {
           resource: `options/${retreat.id}.json`,
           params: {
@@ -216,13 +236,14 @@ class MetadataStore {
         ],
       };
 
-      const mutation = {
+      const mutation: DataMutation = {
         resource: "options",
         id: retreat.id,
         data: mutatedRetreat,
         type: "update",
       };
-      let response: any = await this.engine.mutate(mutation);
+      let response = await this.engine.mutate(mutation);
+
 
       return response.httpStatusCode === 200;
     } catch (error) {

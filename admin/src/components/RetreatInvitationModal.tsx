@@ -113,10 +113,8 @@ const RetreatInvitationModal = observer(({ retreat, onCancel }: RetreatInvitatio
       yogis: finalYogisList.map((yogi) => ({
         id: yogi.id,
         eventId: yogi.expressionOfInterests[retreat.code].eventId,
-        attributes: {
-          fullName: yogi.attributes[DHIS2_TEI_ATTRIBUTE_FULL_NAME],
-          mobile: yogi.attributes[DHIS2_TEI_ATTRIBUTE_MOBILE],
-        },
+        fullName: yogi.attributes[DHIS2_TEI_ATTRIBUTE_FULL_NAME],
+        mobile: yogi.attributes[DHIS2_TEI_ATTRIBUTE_MOBILE],
       })),
       onResult: async ({ yogiId, sent }: { yogiId: string; sent: boolean }) => {
         await store.yogis!.changeInvitationSentState(

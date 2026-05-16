@@ -3,6 +3,18 @@
  */
 
 import { Yogi, Retreat } from "../types/domain";
+import { Dhis2Engine } from "../types/dhis2";
+
+/**
+ * Interface for a yogi being invited to a retreat
+ */
+export interface InvitationYogi {
+  id: string;
+  fullName: string;
+  mobile: string;
+  eventId: string;
+}
+
 
 /**
  * Normalizes phone number to 07xxxxxxxx format
@@ -93,7 +105,11 @@ export const sendInvitationSms = async (message: string, teiMobile: string, toke
  * @param {number} expireTimestamp
  * @returns {Promise<{ key: string, uid: string }>} { key, uid }
  */
-export const createInvitationToken = async (engine: any, expireTimestamp: number): Promise<{ key: string, uid: string }> => {
+export const createInvitationToken = async (
+  engine: Dhis2Engine,
+  expireTimestamp: number,
+): Promise<{ key: string; uid: string }> => {
+
   const mutation = {
     type: "create",
     resource: "apiToken",
@@ -102,7 +118,8 @@ export const createInvitationToken = async (engine: any, expireTimestamp: number
       attributes: [{ type: "MethodAllowedList", allowedMethods: ["GET"] }],
     },
   };
-  const response: any = await engine.mutate(mutation);
+  const response = await engine.mutate(mutation);
+
   return {
     key: response?.response?.key,
     uid: response?.response?.uid,
@@ -114,7 +131,11 @@ export const createInvitationToken = async (engine: any, expireTimestamp: number
  * @param {any} engine
  * @param {string} tokenId
  */
-export const deleteInvitationToken = async (engine: any, tokenId: string): Promise<void> => {
+export const deleteInvitationToken = async (
+  engine: Dhis2Engine,
+  tokenId: string,
+): Promise<void> => {
+
   await engine.mutate({
     type: "delete",
     resource: "apiToken",
@@ -128,7 +149,12 @@ export const deleteInvitationToken = async (engine: any, tokenId: string): Promi
  * @param {string} campaignId
  * @param {string} eventId
  */
-export const recordSmsCampaign = async (engine: any, campaignId: string, eventId: string): Promise<void> => {
+export const recordSmsCampaign = async (
+  engine: Dhis2Engine,
+  campaignId: string,
+  eventId: string,
+): Promise<void> => {
+
   await engine.mutate({
     type: "create",
     resource: "dataStore/invitation-sms/" + campaignId,
@@ -139,9 +165,10 @@ export const recordSmsCampaign = async (engine: any, campaignId: string, eventId
 };
 
 interface SendInvitationsParams {
-  engine: any;
+  engine: Dhis2Engine;
   retreat: Retreat;
-  yogis: any[]; // List of yogis to invite
+  yogis: InvitationYogi[]; // List of yogis to invite
+
   confirmationDeadline: string | Date;
   onProgress?: (progress: { completed: number; total: number }) => void;
   onResult?: (result: { yogiId: string; sent: boolean }) => Promise<void>;

@@ -9,13 +9,14 @@ import {
   SwitchFieldFF,
 } from "@dhis2/ui";
 import { DHIS2_ROOT_ORG } from "../../dhis2";
-import { generateRetreatName } from "../../utils/retreatFormMapping";
+import { RetreatFormValues, generateRetreatName } from "../../utils/retreatFormMapping";
 import RootStore from "../../stores/root";
+
 
 const { Field, FormSpy } = ReactFinalForm;
 
 interface RetreatFormFieldsProps {
-  values: any;
+  values: RetreatFormValues;
   form: any;
   store: RootStore;
 }
@@ -27,7 +28,8 @@ const RetreatFormFields = ({ values, form, store }: RetreatFormFieldsProps) => {
     <>
       <FormSpy
         subscription={{ values: true }}
-        onChange={({ values }: { values: any }) => {
+        onChange={({ values }: { values: RetreatFormValues }) => {
+
           if (values.autoGenerateName && values.date && values.location) {
             const generatedName = generateRetreatName(
               values.date,
@@ -92,14 +94,15 @@ const RetreatFormFields = ({ values, form, store }: RetreatFormFieldsProps) => {
       </div>
       <div className="retreat-form-field-row">
         <Field name="location" label="Location" validate={hasValue} required>
-          {(props: any) => (
+          {(props: { input: { onChange: (e: any) => void; value: any } }) => (
             <div>
               <Label required>Location</Label>
               <OrganisationUnitTree
                 roots={[DHIS2_ROOT_ORG]}
-                onChange={(e: any) => {
+                onChange={(e: { path: string; displayName: string; id: string }) => {
                   props.input.onChange(e);
                 }}
+
                 autoExpandLoadingError={true}
                 selected={props.input.value ? [props.input.value.path] : []}
               />
@@ -174,13 +177,14 @@ const RetreatFormFields = ({ values, form, store }: RetreatFormFieldsProps) => {
           label="Accommodation Not Provided (Travel from home)"
           defaultValue={false}
         >
-          {({ input, meta }: any) => (
+          {({ input, meta }: { input: any; meta: any }) => (
             <SwitchFieldFF
               input={{
                 ...input,
-                onChange: (e: any) => {
+                onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
                   input.onChange(e);
                   if (e.target.checked) {
+
                     form.change("accomodationOptional", false);
                   }
                 },

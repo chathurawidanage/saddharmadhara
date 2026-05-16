@@ -14,20 +14,25 @@ import { observer } from "mobx-react";
 import React, { useMemo } from "react";
 import { DHIS_RETREATS_OPTION_SET_ID } from "../dhis2";
 import { useStore } from "../stores/StoreProvider";
+import { DataMutation, DataQuery } from "../types/dhis2";
 import {
+  RetreatFormValues,
   generateRetreatName,
   mapFormValuesToAttributeValues,
   mapRetreatToInitialValues,
 } from "../utils/retreatFormMapping";
+
 import RetreatFormFields from "./modal/RetreatFormFields";
 import "./modal/RetreatModal.css";
 import { Retreat } from "../types/domain";
 
 const { Form } = ReactFinalForm;
 
-const optionMutation: any = {
+const optionMutation: DataMutation = {
+
   resource: "options",
   data: ({ code, name, attributeValues }: any) => ({
+
     code,
     name,
     optionSet: { id: DHIS_RETREATS_OPTION_SET_ID },
@@ -36,10 +41,12 @@ const optionMutation: any = {
   type: "create",
 };
 
-const updateMutation: any = {
+const updateMutation: DataMutation = {
+
   resource: "options",
   id: ({ id }: any) => id,
   data: ({ code, name, attributeValues }: any) => ({
+
     code,
     name,
     optionSet: { id: DHIS_RETREATS_OPTION_SET_ID },
@@ -48,10 +55,12 @@ const updateMutation: any = {
   type: "update",
 };
 
-const editDataQuery: any = {
+const editDataQuery: DataQuery = {
+
   option: {
     resource: "options",
     id: ({ id }: any) => id,
+
     params: {
       fields: "attributeValues[attribute[id],value],name,code",
     },
@@ -59,6 +68,7 @@ const editDataQuery: any = {
   orgUnit: {
     resource: "organisationUnits",
     id: ({ locationId }: any) => locationId,
+
     params: {
       fields: "id,path,displayName",
     },
@@ -117,12 +127,14 @@ const RetreatModal = observer(({ onCancel, retreat }: RetreatModalProps) => {
     );
   }
 
-  const error: any = createError || updateError;
+  const error = createError || updateError;
+
 
   return (
     <Form
       initialValues={initialValues}
-      onSubmit={(values: any) => {
+      onSubmit={(values: RetreatFormValues) => {
+
         const attributeValues = mapFormValuesToAttributeValues(values);
 
         const generatedString = generateRetreatName(
@@ -146,7 +158,13 @@ const RetreatModal = observer(({ onCancel, retreat }: RetreatModalProps) => {
         }
       }}
     >
-      {({ handleSubmit, form, submitting, values }: any) => (
+      {({ handleSubmit, form, submitting, values }: {
+        handleSubmit: () => void;
+        form: any;
+        submitting: boolean;
+        values: RetreatFormValues;
+      }) => (
+
         <form onSubmit={handleSubmit}>
           <Modal>
             <ModalTitle>{retreat ? "Edit Retreat" : "New Retreat"}</ModalTitle>
@@ -169,8 +187,9 @@ const RetreatModal = observer(({ onCancel, retreat }: RetreatModalProps) => {
                 <div className="retreat-modal-notice-box">
                   <NoticeBox error title="Retreat creation failed">
                     {error?.details?.response?.errorReports
-                      ?.map((report: any) => report.message)
+                      ?.map((report: { message: string }) => report.message)
                       .join(",")}
+
                   </NoticeBox>
                 </div>
               )}

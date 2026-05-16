@@ -33,7 +33,7 @@ export interface RetreatFormValues {
   noOfDays: string;
   noOfYogis: string;
   retreatType: string;
-  location: any;
+  location: { id: string; displayName: string };
   medium: string;
   clergyOnly: boolean;
   privateRetreat: boolean;
@@ -42,10 +42,21 @@ export interface RetreatFormValues {
   disabled: boolean;
 }
 
-export const mapRetreatToInitialValues = (retreat: Retreat | null, editData: any): Partial<RetreatFormValues> => {
+export const mapRetreatToInitialValues = (
+  retreat: Retreat | null,
+  editData: {
+    option: {
+      name: string;
+      attributeValues: Array<{ attribute: { id: string }; value: string }>;
+    };
+    orgUnit?: { id: string; displayName: string };
+  } | null,
+): Partial<RetreatFormValues> => {
+
   if (!editData) return {};
   const attrs = editData.option.attributeValues;
-  const getValue = (id: string) => attrs.find((a: any) => a.attribute.id === id)?.value;
+  const getValue = (id: string) => attrs.find((a) => a.attribute.id === id)?.value;
+
   const getBoolValue = (id: string) => getValue(id) === "true";
 
   const name = editData.option.name;
@@ -77,7 +88,10 @@ export const mapRetreatToInitialValues = (retreat: Retreat | null, editData: any
   };
 };
 
-export const mapFormValuesToAttributeValues = (values: any): any[] => {
+export const mapFormValuesToAttributeValues = (
+  values: RetreatFormValues,
+): Array<{ attribute: { id: string }; value: any }> => {
+
   return [
     {
       attribute: { id: DHIS2_RETREAT_DATE_ATTRIBUTE },

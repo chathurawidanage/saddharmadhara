@@ -12,6 +12,26 @@ import {
   DHIS_PROGRAM,
 } from "../dhis2";
 import { Yogi, Retreat, ExpressionOfInterest, Participation, SpecialComment, Note } from "../types/domain";
+import { Dhis2Engine, DataMutation } from "../types/dhis2";
+
+
+interface TrackerEvent {
+  trackedEntity: string;
+  event: string;
+  occurredAt: string;
+  programStage: string;
+  dataValues: Array<{ dataElement: string; value: string }>;
+}
+
+interface TrackerTEI {
+  attributes: Array<{ attribute: string; value: string }>;
+  enrollments: Array<{
+    status: string;
+    notes: Array<Note>;
+    events: Array<TrackerEvent>;
+  }>;
+}
+
 
 interface AttendanceEventDataParams {
   retreat?: Partial<Retreat>;
@@ -87,7 +107,8 @@ interface RequestStates {
 class YogiStore {
   yogiIdToObjectMap: Record<string, Yogi> = {};
   expressionOfInterestsYogiIds: Record<string, string[]> = {};
-  engine: any;
+  engine: Dhis2Engine;
+
 
   requestStates: RequestStates = {
     loadingEoi: {},
@@ -101,7 +122,7 @@ class YogiStore {
     mutationError: null,
   };
 
-  constructor(engine: any) {
+  constructor(engine: Dhis2Engine) {
     this.engine = engine;
     makeAutoObservable(this);
   }
@@ -117,7 +138,8 @@ class YogiStore {
     });
 
     try {
-      let response: any = await this.engine.query({
+      let response: { yogis: { instances: Array<{ trackedEntity: string }> } } = await this.engine.query({
+
         yogis: {
           resource: "tracker/events.json",
           params: {
@@ -132,8 +154,9 @@ class YogiStore {
       });
 
       const yogiIdList = [
-        ...new Set<string>(response.yogis?.instances.map((i: any) => i.trackedEntity)),
+        ...new Set<string>(response.yogis?.instances.map((i) => i.trackedEntity)),
       ];
+
       runInAction(() => {
         this.expressionOfInterestsYogiIds[retreatCode] = yogiIdList;
       });
@@ -163,7 +186,8 @@ class YogiStore {
     });
 
     try {
-      let response: any = await this.engine.query({
+      let response: { trackedEntity: TrackerTEI } = await this.engine.query({
+
         trackedEntity: {
           resource: `tracker/trackedEntities/${yogiId}`,
           params: {
@@ -176,7 +200,8 @@ class YogiStore {
       });
 
       let attributeIdToValueMap: Record<string, string> = {};
-      response.trackedEntity.attributes.forEach((attribute: any) => {
+      response.trackedEntity.attributes.forEach((attribute) => {
+
         attributeIdToValueMap[attribute.attribute] = attribute.value;
       });
 
@@ -190,9 +215,10 @@ class YogiStore {
         let enrollment = response.trackedEntity.enrollments[0];
         active = enrollment.status === "ACTIVE";
 
-        enrollment.events.forEach((event: any) => {
+        enrollment.events.forEach((event) => {
           let dataElementIdToValueMap: Record<string, string> = {};
-          event.dataValues.forEach((dv: any) => {
+          event.dataValues.forEach((dv) => {
+
             dataElementIdToValueMap[dv.dataElement] = dv.value;
           });
 
@@ -351,7 +377,11 @@ class YogiStore {
     }
   };
 
-  applyMutation = async (mutation: any, localUpdate: (response: any) => void): Promise<boolean> => {
+  applyMutation = async (
+    mutation: DataMutation,
+    localUpdate: (response: any) => void,
+  ): Promise<boolean> => {
+
     runInAction(() => {
       this.requestStates.performingMutation = true;
       this.requestStates.mutationError = null;
