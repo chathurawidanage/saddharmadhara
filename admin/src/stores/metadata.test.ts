@@ -6,6 +6,7 @@ import {
   DHIS2_RETREAT_NO_OF_DAYS_ATTRIBUTE,
   DHIS2_RETREAT_CODE_ATTRIBUTE,
 } from "../dhis2";
+import { Dhis2SqlViewResponse } from "../types/dhis2";
 
 describe("MetadataStore Helpers", () => {
   test("getRetreatEndDate calculates correct date", () => {
@@ -16,8 +17,9 @@ describe("MetadataStore Helpers", () => {
   });
 
   test("transformRetreats transforms raw DHIS2 response correctly", () => {
-    const mockResponse = {
+    const mockResponse: Dhis2SqlViewResponse = {
       listGrid: {
+        headers: [],
         rows: [
           [
             "id1",
@@ -92,10 +94,10 @@ describe("MetadataStore.generalRetreatStats", () => {
     ];
 
     store.eoiSummary = [
-      { yogiUid: "y1", retreatCode: "R1", invitationSent: true },
-      { yogiUid: "y2", retreatCode: "R1", invitationSent: true },
-      { yogiUid: "y3", retreatCode: "R1", invitationSent: false },
-    ] as any;
+      { yogiUid: "y1", retreatCode: "R1", state: "SELECTED", invitationSent: "SENT" },
+      { yogiUid: "y2", retreatCode: "R1", state: "SELECTED", invitationSent: "SENT" },
+      { yogiUid: "y3", retreatCode: "R1", state: "PENDING", invitationSent: "NOT_SENT" },
+    ];
 
     const stats = store.generalRetreatStats;
     expect(stats).toEqual({

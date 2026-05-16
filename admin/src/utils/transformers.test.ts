@@ -18,12 +18,14 @@ import {
   DHIS2_RETREAT_MEDIUM_ATTRIBUTE,
   DHIS2_RETREAT_FINALIZED_ATTRIBUTE,
 } from "../dhis2";
+import { Dhis2SqlViewResponse, Dhis2OptionSetResponse } from "../types/dhis2";
 
 describe("transformers", () => {
   describe("transformRetreats", () => {
     test("transforms retreat response correctly", () => {
-      const mockResponse = {
+      const mockResponse: Dhis2SqlViewResponse = {
         listGrid: {
+          headers: [],
           rows: [
             [
               "id1",
@@ -68,8 +70,9 @@ describe("transformers", () => {
     });
 
     test("sorts retreats by date", () => {
-      const mockResponse = {
+      const mockResponse: Dhis2SqlViewResponse = {
         listGrid: {
+          headers: [],
           rows: [
             [
               "id2",
@@ -96,9 +99,10 @@ describe("transformers", () => {
 
   describe("transformRooms", () => {
     test("transforms room options correctly", () => {
-      const mockResponse = {
+      const mockResponse: Dhis2OptionSetResponse = {
         options: [
           {
+            id: "opt1",
             code: "RM1",
             name: "Room 1",
             attributeValues: [
@@ -124,8 +128,8 @@ describe("transformers", () => {
 
   describe("transformLanguages", () => {
     test("transforms language options correctly", () => {
-      const mockResponse = {
-        options: [{ code: "en", name: "English" }],
+      const mockResponse: Dhis2OptionSetResponse = {
+        options: [{ id: "opt1", code: "en", name: "English" }],
       };
       const result = transformLanguages(mockResponse);
       expect(result).toHaveLength(1);
@@ -135,8 +139,8 @@ describe("transformers", () => {
 
   describe("transformAttendance", () => {
     test("transforms attendance options correctly", () => {
-      const mockResponse = {
-        options: [{ code: "present", name: "Present" }],
+      const mockResponse: Dhis2OptionSetResponse = {
+        options: [{ id: "opt1", code: "present", name: "Present" }],
       };
       const result = transformAttendance(mockResponse);
       expect(result).toEqual([{ code: "present", name: "Present" }]);
@@ -145,8 +149,9 @@ describe("transformers", () => {
 
   describe("transformParticipationSummary", () => {
     test("normalizes participation summary rows", () => {
-      const mockResponse = {
+      const mockResponse: Dhis2SqlViewResponse = {
         listGrid: {
+          headers: [],
           rows: [["y1", "R1"]],
         },
       };
@@ -159,15 +164,19 @@ describe("transformers", () => {
 
   describe("transformEoiSummary", () => {
     test("normalizes EOI summary rows", () => {
-      const mockResponse = {
+      const mockResponse: Dhis2SqlViewResponse = {
         listGrid: {
-          rows: [["y1", "R1", "true"], ["y2", "R1", "false"]],
+          headers: [],
+          rows: [
+            ["y1", "R1", "SELECTED", "SENT"], 
+            ["y2", "R1", "PENDING", "NOT_SENT"]
+          ],
         },
       };
 
       expect(transformEoiSummary(mockResponse)).toEqual([
-        { yogiUid: "y1", retreatCode: "R1", invitationSent: true },
-        { yogiUid: "y2", retreatCode: "R1", invitationSent: false },
+        { yogiUid: "y1", retreatCode: "R1", state: "SELECTED", invitationSent: "SENT" },
+        { yogiUid: "y2", retreatCode: "R1", state: "PENDING", invitationSent: "NOT_SENT" },
       ]);
     });
   });

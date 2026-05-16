@@ -20,7 +20,7 @@ import {
   DHIS2_RETREAT_SELECTION_STATE_SELECTED_CODE,
 } from "../../dhis2";
 import { useStore } from "../../stores/StoreProvider";
-import { Retreat, Yogi } from "../../types/domain";
+import { Retreat, SelectionState, Yogi } from "../../types/domain";
 
 interface StateChangeButtonProps {
   currentState: string;
@@ -28,7 +28,7 @@ interface StateChangeButtonProps {
   retreat: Retreat;
 }
 
-export const StateChangeButton = ({ currentState, yogi, retreat }: StateChangeButtonProps) => {
+export const StateChangeButton = observer(({ currentState, yogi, retreat }: StateChangeButtonProps) => {
   const store = useStore();
   const { show: alertStateChangeStatus } = useAlert(
     ({ yogiName, toState, success }: any) =>
@@ -62,7 +62,7 @@ export const StateChangeButton = ({ currentState, yogi, retreat }: StateChangeBu
     },
   );
 
-  const doStateChange = async (toStateCode: string) => {
+  const doStateChange = async (toStateCode: SelectionState) => {
     if (!store.yogis) return;
     let success = await store.yogis.changeRetreatState(
       yogi.id,
@@ -76,7 +76,7 @@ export const StateChangeButton = ({ currentState, yogi, retreat }: StateChangeBu
     });
   };
 
-  const onStateChanged = async (toStateCode: string) => {
+  const onStateChanged = async (toStateCode: SelectionState) => {
     if (!store.yogis) return;
     if (
       currentState === DHIS2_RETREAT_SELECTION_STATE_SELECTED_CODE &&
@@ -122,7 +122,7 @@ export const StateChangeButton = ({ currentState, yogi, retreat }: StateChangeBu
       Move to
     </DropdownButton>
   );
-};
+});
 
 interface RoomSelectProps {
   yogi: Yogi;

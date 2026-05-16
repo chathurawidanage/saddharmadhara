@@ -64,14 +64,14 @@ const RetreatInvitationModal = observer(({ retreat, onCancel }: RetreatInvitatio
       const toSendYogisArr: Yogi[] = [];
 
       yogis.forEach((yogi) => {
-        if (yogi.expressionOfInterests[retreat.code]?.state !== "pending") {
+        if (yogi.expressionOfInterests[retreat.code]?.state !== "PENDING") {
           return;
         }
 
         const invitationStatus = yogi.expressionOfInterests[retreat.code].invitationSent;
-        if (invitationStatus === "sent" || invitationStatus === "delivered") {
+        if (invitationStatus === "SENT" || invitationStatus === "DELIVERED") {
           sentYogisArr.push(yogi);
-        } else if (invitationStatus === "failed") {
+        } else if (invitationStatus === "FAILED") {
           failedYogisArr.push(yogi);
         } else {
           toSendYogisArr.push(yogi);

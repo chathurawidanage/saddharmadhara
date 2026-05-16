@@ -14,7 +14,7 @@ import { observer } from "mobx-react";
 import React, { useMemo } from "react";
 import { DHIS_RETREATS_OPTION_SET_ID } from "../dhis2";
 import { useStore } from "../stores/StoreProvider";
-import { DataMutation, DataQuery } from "../types/dhis2";
+// import { DataMutation, DataQuery } from "../types/dhis2";
 import {
   RetreatFormValues,
   generateRetreatName,
@@ -28,7 +28,7 @@ import { Retreat } from "../types/domain";
 
 const { Form } = ReactFinalForm;
 
-const optionMutation: DataMutation = {
+const optionMutation: any = {
 
   resource: "options",
   data: ({ code, name, attributeValues }: any) => ({
@@ -41,7 +41,7 @@ const optionMutation: DataMutation = {
   type: "create",
 };
 
-const updateMutation: DataMutation = {
+const updateMutation: any = {
 
   resource: "options",
   id: ({ id }: any) => id,
@@ -55,7 +55,7 @@ const updateMutation: DataMutation = {
   type: "update",
 };
 
-const editDataQuery: DataQuery = {
+const editDataQuery: any = {
 
   option: {
     resource: "options",

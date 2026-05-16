@@ -90,7 +90,7 @@ export const mapRetreatToInitialValues = (
 
 export const mapFormValuesToAttributeValues = (
   values: RetreatFormValues,
-): Array<{ attribute: { id: string }; value: any }> => {
+): Array<{ attribute: { id: string }; value: string | boolean }> => {
 
   return [
     {

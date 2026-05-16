@@ -17,14 +17,17 @@ import {
   Language, 
   Attendance, 
   ParticipationSummary, 
-  EoiSummary 
+  EoiSummary,
+  SelectionState,
+  InvitationState
 } from "../types/domain";
+import { Dhis2SqlViewResponse, Dhis2OptionSetResponse, Dhis2Option } from "../types/dhis2";
 
 /**
  * Transformers for DHIS2 responses
  */
 
-export const transformRetreats = (retreatsResponse: any): Retreat[] => {
+export const transformRetreats = (retreatsResponse: Dhis2SqlViewResponse): Retreat[] => {
   let retreats = retreatsResponse?.listGrid?.rows?.map((row: any[]) => {
     let attributeIdToValueMap = JSON.parse(row[3]);
     let dateStr = attributeIdToValueMap[DHIS2_RETREAT_DATE_ATTRIBUTE];
@@ -57,11 +60,11 @@ export const transformRetreats = (retreatsResponse: any): Retreat[] => {
   return retreats || [];
 };
 
-export const transformRooms = (roomResponse: any): Room[] => {
+export const transformRooms = (roomResponse: Dhis2OptionSetResponse): Room[] => {
   return (
-    roomResponse?.options?.map((room: any) => {
+    roomResponse?.options?.map((room: Dhis2Option) => {
       let attributeIdToValueMap: Record<string, string> = {};
-      room.attributeValues?.forEach((attribute: any) => {
+      room.attributeValues?.forEach((attribute) => {
         attributeIdToValueMap[attribute.attribute.id] = attribute.value;
       });
       return {
@@ -74,9 +77,9 @@ export const transformRooms = (roomResponse: any): Room[] => {
   );
 };
 
-export const transformLanguages = (languagesResponse: any): Language[] => {
+export const transformLanguages = (languagesResponse: Dhis2OptionSetResponse): Language[] => {
   return (
-    languagesResponse?.options?.map((language: any) => {
+    languagesResponse?.options?.map((language: Dhis2Option) => {
       return {
         code: language.code,
         name: language.name,
@@ -85,9 +88,9 @@ export const transformLanguages = (languagesResponse: any): Language[] => {
   );
 };
 
-export const transformAttendance = (attendanceResponse: any): Attendance[] => {
+export const transformAttendance = (attendanceResponse: Dhis2OptionSetResponse): Attendance[] => {
   return (
-    attendanceResponse?.options?.map((attendance: any) => {
+    attendanceResponse?.options?.map((attendance: Dhis2Option) => {
       return {
         code: attendance.code,
         name: attendance.name,
@@ -96,22 +99,23 @@ export const transformAttendance = (attendanceResponse: any): Attendance[] => {
   );
 };
 
-export const transformParticipationSummary = (summaryResponse: any): ParticipationSummary[] => {
+export const transformParticipationSummary = (summaryResponse: Dhis2SqlViewResponse): ParticipationSummary[] => {
   return (
-    summaryResponse?.listGrid?.rows?.map(([yogiUid, retreatCode]: [string, string]) => ({
+    summaryResponse?.listGrid?.rows?.map(([yogiUid, retreatCode]) => ({
       yogiUid,
       retreatCode,
     })) || []
   );
 };
 
-export const transformEoiSummary = (summaryResponse: any): EoiSummary[] => {
+export const transformEoiSummary = (summaryResponse: Dhis2SqlViewResponse): EoiSummary[] => {
   return (
     summaryResponse?.listGrid?.rows?.map(
-      ([yogiUid, retreatCode, invitationSent]: [string, string, string]) => ({
+      ([yogiUid, retreatCode, state, invitationSent]) => ({
         yogiUid,
         retreatCode,
-        invitationSent: invitationSent === "true",
+        state: state as SelectionState,
+        invitationSent: invitationSent as InvitationState,
       }),
     ) || []
   );

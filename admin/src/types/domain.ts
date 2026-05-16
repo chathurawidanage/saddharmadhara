@@ -1,6 +1,5 @@
-/**
- * Core domain types for the Saddharmadhara admin application.
- */
+export type RetreatType = "residential" | "online" | string;
+export type RetreatMedium = "sinhala" | "english" | string;
 
 export interface Retreat {
   id: string;
@@ -13,9 +12,9 @@ export interface Retreat {
   disabled: boolean;
   location: string;
   totalYogis: string;
-  retreatType: string;
+  retreatType: RetreatType;
   noOfDays: string;
-  medium: string;
+  medium: RetreatMedium;
   finalized: boolean;
 }
 
@@ -41,22 +40,6 @@ export interface Attendance {
   name: string;
 }
 
-export interface ExpressionOfInterest {
-  eventId: string;
-  state: string;
-  invitationSent: string;
-  occurredAt: string;
-}
-
-export interface Participation {
-  eventId: string;
-  attendance?: string;
-  room?: string;
-  retreat: string;
-  specialComment?: string;
-  occurredAt: string;
-}
-
 export interface SpecialComment {
   eventId: string;
   comment: string;
@@ -71,17 +54,18 @@ export interface Note {
 }
 
 export type SelectionState =
-  | "selected"
-  | "reserved"
-  | "not_selected"
-  | "pending";
+  | "SELECTED"
+  | "RESERVED"
+  | "NOT_SELECTED"
+  | "PENDING"
+  | string;
 
-export type InvitationState = "sent" | "pending";
+export type InvitationState = "SENT" | "NOT_SENT" | string;
 
 export interface ExpressionOfInterest {
   eventId: string;
-  state: SelectionState | string;
-  invitationSent: InvitationState | string;
+  state: SelectionState;
+  invitationSent: InvitationState;
   occurredAt: string;
 }
 
@@ -133,5 +117,6 @@ export interface ParticipationSummary {
 export interface EoiSummary {
   yogiUid: string;
   retreatCode: string;
-  invitationSent: boolean;
+  state: SelectionState;
+  invitationSent: InvitationState;
 }

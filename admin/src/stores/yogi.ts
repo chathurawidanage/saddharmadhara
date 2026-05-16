@@ -1,4 +1,4 @@
-import { makeAutoObservable, runInAction } from "mobx";
+import { makeAutoObservable, runInAction, observable } from "mobx";
 import {
   DHIS2_ATTENDANCE_DATA_ELEMENT,
   DHIS2_EXPRESSION_OF_INTEREST_PROGRAM_STAGE,
@@ -27,26 +27,12 @@ import {
   DHIS2_TEI_ATTRIBUTE_HAS_STRESS,
   DHIS2_TEI_ATTRIBUTE_HAS_STRESS_COMMENT,
 } from "../dhis2";
-import { Yogi, Retreat, ExpressionOfInterest, Participation, SpecialComment, Note, YogiAttributes } from "../types/domain";
-import { Dhis2Engine, DataMutation } from "../types/dhis2";
-
-
-interface TrackerEvent {
-  trackedEntity: string;
-  event: string;
-  occurredAt: string;
-  programStage: string;
-  dataValues: Array<{ dataElement: string; value: string }>;
-}
-
-interface TrackerTEI {
-  attributes: Array<{ attribute: string; value: string }>;
-  enrollments: Array<{
-    status: string;
-    notes: Array<Note>;
-    events: Array<TrackerEvent>;
-  }>;
-}
+import { Yogi, Retreat, ExpressionOfInterest, Participation, SpecialComment, Note, YogiAttributes, SelectionState, InvitationState } from "../types/domain";
+import {
+  Dhis2Engine,
+  Dhis2TrackerEventsResponse,
+  Dhis2TrackedEntityInstance,
+} from "../types/dhis2";
 
 
 interface AttendanceEventDataParams {
@@ -141,8 +127,8 @@ interface RequestStates {
 }
 
 class YogiStore {
-  yogiIdToObjectMap: Record<string, Yogi> = {};
-  expressionOfInterestsYogiIds: Record<string, string[]> = {};
+  yogiIdToObjectMap = new Map<string, Yogi>();
+  expressionOfInterestsYogiIds = new Map<string, string[]>();
   engine: Dhis2Engine;
 
 
@@ -164,8 +150,8 @@ class YogiStore {
   }
 
   fetchExpressionOfInterests = async (retreatCode: string, retreatName?: string): Promise<string[] | null> => {
-    if (this.expressionOfInterestsYogiIds[retreatCode]) {
-      return this.expressionOfInterestsYogiIds[retreatCode];
+    if (this.expressionOfInterestsYogiIds.has(retreatCode)) {
+      return this.expressionOfInterestsYogiIds.get(retreatCode)!;
     }
 
     runInAction(() => {
@@ -174,7 +160,7 @@ class YogiStore {
     });
 
     try {
-      let response: { yogis: { instances: Array<{ trackedEntity: string }> } } = await this.engine.query({
+      const response = await this.engine.query({
 
         yogis: {
           resource: "tracker/events.json",
@@ -189,12 +175,13 @@ class YogiStore {
         },
       });
 
+      const yogisResponse = response.yogis as Dhis2TrackerEventsResponse;
       const yogiIdList = [
-        ...new Set<string>(response.yogis?.instances.map((i) => i.trackedEntity)),
+        ...new Set<string>(yogisResponse?.instances.map((i) => i.trackedEntity)),
       ];
 
       runInAction(() => {
-        this.expressionOfInterestsYogiIds[retreatCode] = yogiIdList;
+        this.expressionOfInterestsYogiIds.set(retreatCode, yogiIdList);
       });
       return yogiIdList;
     } catch (error) {
@@ -212,8 +199,8 @@ class YogiStore {
   };
 
   fetchYogi = async (yogiId: string, forceRefetch = false): Promise<Yogi | null> => {
-    if (this.yogiIdToObjectMap[yogiId] && !forceRefetch) {
-      return this.yogiIdToObjectMap[yogiId];
+    if (this.yogiIdToObjectMap.has(yogiId) && !forceRefetch) {
+      return this.yogiIdToObjectMap.get(yogiId)!;
     }
 
     runInAction(() => {
@@ -222,7 +209,7 @@ class YogiStore {
     });
 
     try {
-      let response: { trackedEntity: TrackerTEI } = await this.engine.query({
+      const response = await this.engine.query({
 
         trackedEntity: {
           resource: `tracker/trackedEntities/${yogiId}`,
@@ -235,8 +222,10 @@ class YogiStore {
         },
       });
 
+      const tei = response.trackedEntity as Dhis2TrackedEntityInstance;
+
       let attributeIdToValueMap: YogiAttributes = {};
-      response.trackedEntity.attributes.forEach((attribute) => {
+      tei.attributes.forEach((attribute) => {
         attributeIdToValueMap[attribute.attribute] = attribute.value;
 
         const name = attributeUIDToNameMap[attribute.attribute];
@@ -251,14 +240,13 @@ class YogiStore {
       let participation: Record<string, Participation> = {};
       let notes: Note[] = [];
 
-      if (response.trackedEntity.enrollments.length > 0) {
-        let enrollment = response.trackedEntity.enrollments[0];
+      if (tei.enrollments.length > 0) {
+        let enrollment = tei.enrollments[0];
         active = enrollment.status === "ACTIVE";
 
         enrollment.events.forEach((event) => {
           let dataElementIdToValueMap: Record<string, string> = {};
           event.dataValues.forEach((dv) => {
-
             dataElementIdToValueMap[dv.dataElement] = dv.value;
           });
 
@@ -272,11 +260,11 @@ class YogiStore {
               state:
                 dataElementIdToValueMap[
                   DHIS2_RETREAT_SELECTION_STATE_DATA_ELEMENT
-                ],
+                ] as SelectionState,
               invitationSent:
                 dataElementIdToValueMap[
                   DHIS2_RETREAT_INVITATION_SENT_DATA_ELEMENT
-                ],
+                ] as InvitationState,
               occurredAt: event.occurredAt,
             };
           } else if (
@@ -316,10 +304,10 @@ class YogiStore {
       };
 
       runInAction(() => {
-        this.yogiIdToObjectMap[yogiId] = yogiObj;
+        this.yogiIdToObjectMap.set(yogiId, observable(yogiObj));
       });
 
-      return yogiObj;
+      return this.yogiIdToObjectMap.get(yogiId)!;
     } catch (error) {
       runInAction(() => {
         this.requestStates.yogiErrors[yogiId] = `Failed to fetch yogi ${yogiId}.`;
@@ -418,7 +406,7 @@ class YogiStore {
   };
 
   applyMutation = async (
-    mutation: DataMutation,
+    mutation: any,
     localUpdate: (response: any) => void,
   ): Promise<boolean> => {
 
@@ -451,7 +439,7 @@ class YogiStore {
 
   deleteParticipationEvent = async (yogiId: string, retreat: Retreat): Promise<boolean> => {
     let eventId =
-      this.yogiIdToObjectMap[yogiId].participation[retreat.code]?.eventId;
+      this.yogiIdToObjectMap.get(yogiId)?.participation[retreat.code]?.eventId;
     if (!eventId) return true;
 
     const mutation = {
@@ -461,13 +449,13 @@ class YogiStore {
     };
 
     return this.applyMutation(mutation, () => {
-      delete this.yogiIdToObjectMap[yogiId].participation[retreat.code];
+      delete this.yogiIdToObjectMap.get(yogiId)!.participation[retreat.code];
     });
   };
 
   markAttendance = async (yogiId: string, retreat: Retreat, attendance: string, specialComment?: string): Promise<boolean> => {
     let eventId =
-      this.yogiIdToObjectMap[yogiId].participation[retreat.code]?.eventId;
+      this.yogiIdToObjectMap.get(yogiId)?.participation[retreat.code]?.eventId;
     const type = eventId ? ("update" as const) : ("create" as const);
     const data = eventId
       ? attendanceEventData({ attendance, specialComment, retreat })
@@ -488,23 +476,26 @@ class YogiStore {
     };
 
     return this.applyMutation(mutation, (response) => {
-      this.yogiIdToObjectMap[yogiId].participation[retreat.code] = {
-        attendance,
-        specialComment,
-        eventId:
-          eventId ||
-          (response.response?.importSummaries
-            ? response.response.importSummaries[0].reference
-            : response.response?.reference),
-        retreat: retreat.code,
-        occurredAt: (data.eventDate as Date).toISOString(),
-      };
+      const yogi = this.yogiIdToObjectMap.get(yogiId);
+      if (yogi) {
+        yogi.participation[retreat.code] = {
+          attendance,
+          specialComment,
+          eventId:
+            eventId ||
+            (response.response?.importSummaries
+              ? response.response.importSummaries[0].reference
+              : response.response?.reference),
+          retreat: retreat.code,
+          occurredAt: (data.eventDate as Date).toISOString(),
+        };
+      }
     });
   };
 
   assignRoom = async (yogiId: string, retreat: Retreat, roomCode: string): Promise<boolean> => {
     let eventId =
-      this.yogiIdToObjectMap[yogiId].participation[retreat.code]?.eventId;
+      this.yogiIdToObjectMap.get(yogiId)?.participation[retreat.code]?.eventId;
     const type = eventId ? ("update" as const) : ("create" as const);
     const data = eventId
       ? attendanceEventData({ roomCode, retreat })
@@ -524,22 +515,27 @@ class YogiStore {
     };
 
     return this.applyMutation(mutation, (response) => {
-      this.yogiIdToObjectMap[yogiId].participation[retreat.code] = {
-        ...this.yogiIdToObjectMap[yogiId].participation[retreat.code],
-        room: roomCode,
-        eventId:
-          eventId ||
-          (response.response?.importSummaries
-            ? response.response.importSummaries[0].reference
-            : response.response?.reference),
-        retreat: retreat.code,
-        occurredAt: (data.eventDate as Date).toISOString(),
-      };
+      const yogi = this.yogiIdToObjectMap.get(yogiId);
+      if (yogi) {
+        yogi.participation[retreat.code] = {
+          ...yogi.participation[retreat.code],
+          room: roomCode,
+          eventId:
+            eventId ||
+            (response.response?.importSummaries
+              ? response.response.importSummaries[0].reference
+              : response.response?.reference),
+          retreat: retreat.code,
+          occurredAt: (data.eventDate as Date).toISOString(),
+        };
+      }
     });
   };
 
-  changeRetreatState = async (yogiId: string, retreatCode: string, newState: string): Promise<boolean> => {
-    const eoi = this.yogiIdToObjectMap[yogiId].expressionOfInterests[retreatCode];
+  changeRetreatState = async (yogiId: string, retreatCode: string, newState: SelectionState): Promise<boolean> => {
+    const yogi = this.yogiIdToObjectMap.get(yogiId);
+    if (!yogi) return false;
+    const eoi = yogi.expressionOfInterests[retreatCode];
     const dataValues = [
       {
         dataElement: DHIS2_RETREAT_SELECTION_STATE_DATA_ELEMENT,
@@ -571,13 +567,17 @@ class YogiStore {
     };
 
     return this.applyMutation(mutation, () => {
-      this.yogiIdToObjectMap[yogiId].expressionOfInterests[retreatCode].state =
-        newState;
+      const yogi = this.yogiIdToObjectMap.get(yogiId);
+      if (yogi) {
+        yogi.expressionOfInterests[retreatCode].state = newState;
+      }
     });
   };
 
-  changeInvitationSentState = async (yogiId: string, retreatCode: string, invitationState: string): Promise<boolean> => {
-    const eoi = this.yogiIdToObjectMap[yogiId].expressionOfInterests[retreatCode];
+  changeInvitationSentState = async (yogiId: string, retreatCode: string, invitationState: InvitationState): Promise<boolean> => {
+    const yogi = this.yogiIdToObjectMap.get(yogiId);
+    if (!yogi) return false;
+    const eoi = yogi.expressionOfInterests[retreatCode];
     const mutation = {
       resource: "events",
       id: eoi.eventId,
@@ -604,9 +604,10 @@ class YogiStore {
     };
 
     return this.applyMutation(mutation, () => {
-      this.yogiIdToObjectMap[yogiId].expressionOfInterests[
-        retreatCode
-      ].invitationSent = invitationState;
+      const yogi = this.yogiIdToObjectMap.get(yogiId);
+      if (yogi) {
+        yogi.expressionOfInterests[retreatCode].invitationSent = invitationState;
+      }
     });
   };
 }

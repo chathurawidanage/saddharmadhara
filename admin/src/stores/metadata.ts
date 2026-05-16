@@ -29,7 +29,7 @@ import {
   EoiSummary,
   MetadataOption
 } from "../types/domain";
-import { Dhis2Engine, DataQuery, DataMutation } from "../types/dhis2";
+import { Dhis2Engine, Dhis2SqlViewResponse, Dhis2OptionSetResponse, Dhis2Option } from "../types/dhis2";
 
 
 interface RequestStates {
@@ -45,7 +45,7 @@ interface RequestStates {
   smsCreditsError: string | null;
 }
 
-const bootstrapQuery: DataQuery = {
+const bootstrapQuery: any = {
 
   retreatTypes: {
     resource: `optionSets/${DHIS_RETREAT_TYPE_OPTION_SET_ID}.json`,
@@ -67,7 +67,7 @@ const bootstrapQuery: DataQuery = {
   },
 };
 
-const supportingMetadataQuery: DataQuery = {
+const supportingMetadataQuery: any = {
 
   rooms: {
     resource: `optionSets/${DHIS2_ROOMS_OPTION_SET_ID}.json`,
@@ -89,7 +89,7 @@ const supportingMetadataQuery: DataQuery = {
   },
 };
 
-const statsQuery: DataQuery = {
+const statsQuery: any = {
 
   participationSummary: {
     resource: `sqlViews/${DHIS2_DASHBOARD_PARTICIPATION_SUMMARY_SQL_VIEW}/data.json`,
@@ -192,16 +192,7 @@ class MetadataStore {
     value: any,
   ): Promise<boolean> => {
     try {
-      const retreatObj: {
-        retreat: {
-          id: string;
-          code: string;
-          name: string;
-          optionSet: { id: string };
-          attributeValues: Array<{ attribute: { id: string }; value: any }>;
-        };
-      } = await this.engine.query({
-
+      const response = await this.engine.query({
         retreat: {
           resource: `options/${retreat.id}.json`,
           params: {
@@ -210,10 +201,14 @@ class MetadataStore {
         },
       });
 
-      const existingRetreatOnServer = retreatObj.retreat;
+      const existingRetreatOnServer = response.retreat as Dhis2Option;
+      if (!existingRetreatOnServer.attributeValues) {
+        existingRetreatOnServer.attributeValues = [];
+      }
+
       const updatingAttributeIndex =
         existingRetreatOnServer.attributeValues.findIndex(
-          (attributeValue: any) => attributeValue.attribute.id === attributeId,
+          (attributeValue) => attributeValue.attribute.id === attributeId,
         );
       if (updatingAttributeIndex !== -1) {
         // remove
@@ -236,16 +231,16 @@ class MetadataStore {
         ],
       };
 
-      const mutation: DataMutation = {
+      const mutation: any = {
         resource: "options",
         id: retreat.id,
         data: mutatedRetreat,
         type: "update",
       };
-      let response = await this.engine.mutate(mutation);
+      let result = await this.engine.mutate(mutation);
 
 
-      return response.httpStatusCode === 200;
+      return result.httpStatusCode === 200;
     } catch (error) {
       console.error("Failed to update retreat attribute", error);
       return false;
@@ -290,7 +285,7 @@ class MetadataStore {
     });
 
     try {
-      let response: any = await this.engine.query({
+      const response = await this.engine.query({
         retreats: {
           resource: `sqlViews/${DHIS2_ACTIVE_RETREATS_SQL_VIEW}/data.json`,
           params: {
@@ -299,7 +294,7 @@ class MetadataStore {
         },
       });
       runInAction(() => {
-        this.retreats = transformRetreats(response.retreats);
+        this.retreats = transformRetreats(response.retreats as Dhis2SqlViewResponse);
       });
     } catch (error) {
       runInAction(() => {
@@ -327,11 +322,11 @@ class MetadataStore {
       this.requestStates.bootstrapError = null;
     });
     try {
-      let response: any = await this.engine.query(bootstrapQuery);
+      const response = await this.engine.query(bootstrapQuery);
       runInAction(() => {
-        this.retreatTypes = response.retreatTypes.options;
-        this.selectionStates = response.selectionStates.options;
-        this.retreats = transformRetreats(response.retreats);
+        this.retreatTypes = (response.retreatTypes as Dhis2OptionSetResponse).options;
+        this.selectionStates = (response.selectionStates as Dhis2OptionSetResponse).options;
+        this.retreats = transformRetreats(response.retreats as Dhis2SqlViewResponse);
       });
     } catch (error) {
       runInAction(() => {
@@ -352,11 +347,11 @@ class MetadataStore {
       this.requestStates.supportingError = null;
     });
     try {
-      let response: any = await this.engine.query(supportingMetadataQuery);
+      const response = await this.engine.query(supportingMetadataQuery);
       runInAction(() => {
-        this.rooms = transformRooms(response.rooms);
-        this.languages = transformLanguages(response.languages);
-        this.attendance = transformAttendance(response.attendance);
+        this.rooms = transformRooms(response.rooms as Dhis2OptionSetResponse);
+        this.languages = transformLanguages(response.languages as Dhis2OptionSetResponse);
+        this.attendance = transformAttendance(response.attendance as Dhis2OptionSetResponse);
       });
     } catch (error) {
       runInAction(() => {
@@ -377,12 +372,12 @@ class MetadataStore {
       this.requestStates.statsError = null;
     });
     try {
-      let response: any = await this.engine.query(statsQuery);
+      const response = await this.engine.query(statsQuery);
       runInAction(() => {
         this.participationSummary = transformParticipationSummary(
-          response.participationSummary,
+          response.participationSummary as Dhis2SqlViewResponse,
         );
-        this.eoiSummary = transformEoiSummary(response.eoiSummary);
+        this.eoiSummary = transformEoiSummary(response.eoiSummary as Dhis2SqlViewResponse);
       });
     } catch (error) {
       runInAction(() => {

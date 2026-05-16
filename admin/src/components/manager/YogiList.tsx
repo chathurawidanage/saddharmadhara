@@ -1,5 +1,4 @@
 import { LinearLoader, NoticeBox } from "@dhis2/ui";
-import { computed } from "mobx";
 import { observer } from "mobx-react";
 import React, { useEffect, useState, useRef } from "react";
 import { useStore } from "../../stores/StoreProvider";
@@ -113,19 +112,16 @@ const YogisList = observer(({ retreat }: YogisListProps) => {
   const [sortBy, setSortBy] = useState(SELECTION_PRIORITY_SORT);
   const sortByRef = useRef(sortBy);
 
-  const countByState = computed(() => {
-    let stateMap: Record<string, number> = {};
-    yogiList.forEach((yogi) => {
-      let state = yogi.expressionOfInterests[retreat.code]?.state;
-      if (state) {
-        if (!stateMap[state]) {
-          stateMap[state] = 0;
-        }
-        stateMap[state]++;
+  const countByState: Record<string, number> = {};
+  yogiList.forEach((yogi) => {
+    let state = yogi.expressionOfInterests[retreat.code]?.state;
+    if (state) {
+      if (!countByState[state]) {
+        countByState[state] = 0;
       }
-    });
-    return stateMap;
-  }).get();
+      countByState[state]++;
+    }
+  });
 
   useEffect(() => {
     setCurrentPage(1);

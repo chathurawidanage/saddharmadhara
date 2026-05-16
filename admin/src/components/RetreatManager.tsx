@@ -19,6 +19,7 @@ import RetreatHeader from "./manager/RetreatHeader";
 import RetreatDetails from "./manager/RetreatDetails";
 import RetreatDownloadMenu from "./manager/RetreatDownloadMenu";
 import "./RetreatManager.css";
+import { Yogi } from "../types/domain";
 
 const RetreatManager = observer(() => {
   const store = useStore();
@@ -55,13 +56,13 @@ const RetreatManager = observer(() => {
 
     if (!yogiIdList) return;
 
-    const yogiObj = yogiIdList.map(
-      (yogiId) => store.yogis!.yogiIdToObjectMap[yogiId],
-    );
-    sortYogiList(yogiObj, retreat);
+    const yogis = yogiIdList
+      .map((yogiId) => store.yogis!.yogiIdToObjectMap.get(yogiId))
+      .filter((yogi): yogi is Yogi => !!yogi);
+    sortYogiList(yogis, retreat);
 
     const formattedList = buildYogiExport(
-      yogiObj,
+      yogis,
       retreatCode,
       gender,
       selectionState,
