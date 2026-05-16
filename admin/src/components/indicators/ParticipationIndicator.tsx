@@ -19,7 +19,7 @@ const ParticipationIndicator = observer(({ trackedEntity }: ParticipationIndicat
   const participationByYear = Object.keys(trackedEntity.participation)
     .filter((retreatId) => retreatId !== undefined)
     .map((retreatId) => {
-      let retreat = store.metadata!.retreatsMapWithCodeKey[retreatId];
+      const retreat = store.metadata.retreatsMapWithCodeKey[retreatId];
       if (!retreat) return null;
       return {
         retreat,
@@ -43,7 +43,7 @@ const ParticipationIndicator = observer(({ trackedEntity }: ParticipationIndicat
             <div className="participation-year-label">{year}</div>
             <div className="yogi-applications">
               {items.map(({ retreat, participation: p }) => {
-                let hasSpecialComment =
+                const hasSpecialComment =
                   p.specialComment && p.specialComment.trim().length > 0;
                 return (
                   <Tooltip

@@ -31,11 +31,11 @@ interface StateChangeButtonProps {
 export const StateChangeButton = observer(({ currentState, yogi, retreat }: StateChangeButtonProps) => {
   const store = useStore();
   const { show: alertStateChangeStatus } = useAlert(
-    ({ yogiName, toState, success }: any) =>
+    ({ yogiName, toState, success }: { yogiName: string; toState: string; success: boolean }) =>
       success
         ? `${yogiName} moved to ${toState}`
         : `Failed to move ${yogiName}`,
-    ({ success }: any) => {
+    ({ success }: { success: boolean }) => {
       return {
         success,
         critical: !success,
@@ -45,9 +45,9 @@ export const StateChangeButton = observer(({ currentState, yogi, retreat }: Stat
   );
 
   const { show: changeFromSelectedStatePrompt } = useAlert(
-    ({ yogiName }: any) =>
+    ({ yogiName }: { yogiName: string }) =>
       `Are you sure you want to remove ${yogiName} from the 'Selected' state? This will result in the loss of their room allocations and any attendance records if they exist.`,
-    ({ onMoveClicked }: any) => {
+    ({ onMoveClicked }: { onMoveClicked: () => void }) => {
       return {
         critical: true,
         permanent: true,
@@ -55,6 +55,7 @@ export const StateChangeButton = observer(({ currentState, yogi, retreat }: Stat
           { label: "Move", onClick: onMoveClicked },
           {
             label: "Don't Move",
+            // eslint-disable-next-line @typescript-eslint/no-empty-function
             onClick: () => {},
           },
         ],
@@ -64,7 +65,7 @@ export const StateChangeButton = observer(({ currentState, yogi, retreat }: Stat
 
   const doStateChange = async (toStateCode: SelectionState) => {
     if (!store.yogis) return;
-    let success = await store.yogis.changeRetreatState(
+    const success = await store.yogis.changeRetreatState(
       yogi.id,
       retreat.code,
       toStateCode,
@@ -85,7 +86,7 @@ export const StateChangeButton = observer(({ currentState, yogi, retreat }: Stat
       changeFromSelectedStatePrompt({
         yogiName: yogi.attributes.fullName,
         onMoveClicked: async () => {
-          let success = await store.yogis!.deleteParticipationEvent(
+          const success = await store.yogis?.deleteParticipationEvent(
             yogi.id,
             retreat,
           );
@@ -132,7 +133,7 @@ interface RoomSelectProps {
 
 export const RoomSelect = observer(({ yogi, retreat, allYogis }: RoomSelectProps) => {
   const store = useStore();
-  let roomsAssignedToOthers = new Set(
+  const roomsAssignedToOthers = new Set(
     allYogis
       .filter((y) => y.id !== yogi.id)
       .map((y) => {
@@ -141,7 +142,7 @@ export const RoomSelect = observer(({ yogi, retreat, allYogis }: RoomSelectProps
       .filter((roomCode) => roomCode !== undefined),
   );
 
-  let roomOptions = (store.metadata?.rooms || [])
+  const roomOptions = (store.metadata?.rooms || [])
     .filter((room) => room.location === retreat.location)
     .filter((room) => !roomsAssignedToOthers.has(room.code))
     .map((room) => (
@@ -149,11 +150,11 @@ export const RoomSelect = observer(({ yogi, retreat, allYogis }: RoomSelectProps
     ));
 
   const { show: alertStateChangeStatus } = useAlert(
-    ({ yogiName, toRoomCode, success }: any) =>
+    ({ yogiName, toRoomCode, success }: { yogiName: string; toRoomCode: string; success: boolean }) =>
       success
         ? `${toRoomCode} assigned to ${yogiName}`
         : `Failed to assign room  ${toRoomCode} to ${yogiName}`,
-    ({ success }: any) => {
+    ({ success }: { success: boolean }) => {
       return {
         success,
         critical: !success,
@@ -162,9 +163,9 @@ export const RoomSelect = observer(({ yogi, retreat, allYogis }: RoomSelectProps
     },
   );
 
-  const onRoomAssigned = async ({ selected: roomCode }: any) => {
+  const onRoomAssigned = async ({ selected: roomCode }: { selected: string }) => {
     if (!store.yogis) return;
-    let success = await store.yogis.assignRoom(yogi.id, retreat, roomCode);
+    const success = await store.yogis.assignRoom(yogi.id, retreat, roomCode);
     alertStateChangeStatus({
       yogiName: yogi.attributes.fullName,
       toRoomCode: roomCode,
@@ -217,7 +218,7 @@ export const AttendanceButton = observer(({ yogi, retreat }: AttendanceButtonPro
             label="Status"
             required
             selected={status}
-            onChange={(selection: any) => {
+            onChange={(selection: { selected: string }) => {
               setStatus(selection.selected);
             }}
             tabIndex={0}
@@ -227,7 +228,7 @@ export const AttendanceButton = observer(({ yogi, retreat }: AttendanceButtonPro
           <TextAreaField
             label="Special Comment"
             value={specialComment}
-            onChange={(e: any) => setSpecialComment(e.value)}
+            onChange={(e: { value: string }) => setSpecialComment(e.value)}
           />
         </ModalContent>
         <ModalActions>
@@ -242,7 +243,7 @@ export const AttendanceButton = observer(({ yogi, retreat }: AttendanceButtonPro
                 await store.yogis.markAttendance(
                   yogi.id,
                   retreat,
-                  status!,
+                  status ?? "",
                   specialComment,
                 );
                 setIsMarkingAttendance(false);

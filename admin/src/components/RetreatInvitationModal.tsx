@@ -53,10 +53,11 @@ const RetreatInvitationModal = observer(({ retreat, onCancel }: RetreatInvitatio
     (async () => {
       if (!store.yogis) return;
       setLoading(true);
+      const noop = () => { /* no progress tracking in this context */ };
       const yogis = await store.yogis.fetchYogiBatch(
         retreat.code,
         retreat.name,
-        () => {},
+        noop,
       );
 
       const sentYogisArr: Yogi[] = [];
@@ -113,7 +114,7 @@ const RetreatInvitationModal = observer(({ retreat, onCancel }: RetreatInvitatio
         mobile: yogi.attributes.mobile || "",
       })),
       onResult: async ({ yogiId, sent }: { yogiId: string; sent: boolean }) => {
-        await store.yogis!.changeInvitationSentState(
+        await store.yogis?.changeInvitationSentState(
           yogiId,
           retreat.code,
           sent ? "sent" : "failed",

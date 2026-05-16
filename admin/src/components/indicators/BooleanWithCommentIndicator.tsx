@@ -34,13 +34,7 @@ const BooleanWithCommentIndicator = ({
   );
 };
 
-interface IndicatorProps {
-  hasKids?: string;
-  hasPermission?: string;
-  hasUnattendedDeformities?: string;
-  hasStress?: string;
-  comment?: string;
-}
+
 
 export const HasKidsIndicator = ({ hasKids, comment }: { hasKids?: string; comment?: string }) => {
   return (

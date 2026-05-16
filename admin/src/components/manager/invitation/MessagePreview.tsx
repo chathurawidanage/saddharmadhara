@@ -22,7 +22,7 @@ const MessagePreview = ({ retreat, confirmationDeadline }: MessagePreviewProps) 
           "yogi-full-name",
           retreat.retreatCode,
           retreat.date,
-          retreat.endDate!, // Assuming endDate exists or handle it
+          retreat.endDate ?? "",
           confirmationDeadline,
           retreat.retreatType,
         )}

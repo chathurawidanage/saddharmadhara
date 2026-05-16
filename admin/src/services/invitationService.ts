@@ -2,7 +2,7 @@
  * Service for handling retreat invitations and SMS communications
  */
 
-import { Yogi, Retreat } from "../types/domain";
+import { Retreat } from "../types/domain";
 import { Dhis2Engine } from "../types/dhis2";
 
 /**

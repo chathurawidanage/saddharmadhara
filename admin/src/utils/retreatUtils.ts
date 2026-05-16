@@ -15,7 +15,7 @@ export const getRetreatEndDate = (startDate: Date | null, noOfDays: number | str
   const days = typeof noOfDays === "string" ? parseInt(noOfDays, 10) : noOfDays;
   if (isNaN(days)) return startDate;
   
-  let endDate = new Date(startDate.getTime() + days * 24 * 60 * 60 * 1000);
+  const endDate = new Date(startDate.getTime() + days * 24 * 60 * 60 * 1000);
   return endDate;
 };
 

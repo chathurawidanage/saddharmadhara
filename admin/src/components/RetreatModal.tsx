@@ -28,7 +28,7 @@ import { Retreat } from "../types/domain";
 
 const { Form } = ReactFinalForm;
 
-const optionMutation: any = {
+const optionMutation: object = {
 
   resource: "options",
   data: ({ code, name, attributeValues }: any) => ({
@@ -41,7 +41,7 @@ const optionMutation: any = {
   type: "create",
 };
 
-const updateMutation: any = {
+const updateMutation: object = {
 
   resource: "options",
   id: ({ id }: any) => id,
@@ -55,11 +55,11 @@ const updateMutation: any = {
   type: "update",
 };
 
-const editDataQuery: any = {
+const editDataQuery: object = {
 
   option: {
     resource: "options",
-    id: ({ id }: any) => id,
+    id: ({ id }: { id: string }) => id,
 
     params: {
       fields: "attributeValues[attribute[id],value],name,code",
@@ -67,7 +67,7 @@ const editDataQuery: any = {
   },
   orgUnit: {
     resource: "organisationUnits",
-    id: ({ locationId }: any) => locationId,
+    id: ({ locationId }: { locationId: string }) => locationId,
 
     params: {
       fields: "id,path,displayName",
@@ -142,7 +142,7 @@ const RetreatModal = observer(({ onCancel, retreat }: RetreatModalProps) => {
           values.location?.displayName,
         );
 
-        let optionName = values.autoGenerateName
+        const optionName = values.autoGenerateName
           ? generatedString
           : values.name;
 
@@ -160,7 +160,7 @@ const RetreatModal = observer(({ onCancel, retreat }: RetreatModalProps) => {
     >
       {({ handleSubmit, form, submitting, values }: {
         handleSubmit: () => void;
-        form: any;
+        form: object;
         submitting: boolean;
         values: RetreatFormValues;
       }) => (

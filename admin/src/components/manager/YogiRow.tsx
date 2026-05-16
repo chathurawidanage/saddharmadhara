@@ -51,7 +51,7 @@ const YogiRow = observer(({ trackedEntity, currentRetreat, actions }: YogiRowPro
             <Button
               small
               onClick={() => {
-                let tempElement = document.createElement("a");
+                const tempElement = document.createElement("a");
                 tempElement.href = baseUrl;
                 window.open(
                   new URL(

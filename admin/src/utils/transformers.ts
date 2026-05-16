@@ -28,12 +28,12 @@ import { Dhis2SqlViewResponse, Dhis2OptionSetResponse, Dhis2Option } from "../ty
  */
 
 export const transformRetreats = (retreatsResponse: Dhis2SqlViewResponse): Retreat[] => {
-  let retreats = retreatsResponse?.listGrid?.rows?.map((row: any[]) => {
-    let attributeIdToValueMap = JSON.parse(row[3]);
-    let dateStr = attributeIdToValueMap[DHIS2_RETREAT_DATE_ATTRIBUTE];
-    let date = dateStr ? new Date(dateStr) : new Date();
-    let noOfDays = attributeIdToValueMap[DHIS2_RETREAT_NO_OF_DAYS_ATTRIBUTE];
-    let endDate = getRetreatEndDate(date, noOfDays) || date;
+  const retreats = retreatsResponse?.listGrid?.rows?.map((row: any[]) => {
+    const attributeIdToValueMap = JSON.parse(row[3]);
+    const dateStr = attributeIdToValueMap[DHIS2_RETREAT_DATE_ATTRIBUTE];
+    const date = dateStr ? new Date(dateStr) : new Date();
+    const noOfDays = attributeIdToValueMap[DHIS2_RETREAT_NO_OF_DAYS_ATTRIBUTE];
+    const endDate = getRetreatEndDate(date, noOfDays) || date;
     
     return {
       id: row[0],
@@ -63,7 +63,7 @@ export const transformRetreats = (retreatsResponse: Dhis2SqlViewResponse): Retre
 export const transformRooms = (roomResponse: Dhis2OptionSetResponse): Room[] => {
   return (
     roomResponse?.options?.map((room: Dhis2Option) => {
-      let attributeIdToValueMap: Record<string, string> = {};
+      const attributeIdToValueMap: Record<string, string> = {};
       room.attributeValues?.forEach((attribute) => {
         attributeIdToValueMap[attribute.attribute.id] = attribute.value;
       });

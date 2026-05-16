@@ -45,10 +45,11 @@ const RetreatFinaliseModal = observer(({ retreat, onCancel }: RetreatFinaliseMod
     (async () => {
       if (!store.yogis) return;
       setLoading(true);
+      const noop = () => { /* no progress tracking in this context */ };
       const yogis = await store.yogis.fetchYogiBatch(
         retreat.code,
         retreat.name,
-        () => {},
+        noop,
       );
 
       let alreadyMarkedCount = 0;

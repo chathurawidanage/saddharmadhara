@@ -45,7 +45,7 @@ interface RequestStates {
   smsCreditsError: string | null;
 }
 
-const bootstrapQuery: any = {
+const bootstrapQuery: object = {
 
   retreatTypes: {
     resource: `optionSets/${DHIS_RETREAT_TYPE_OPTION_SET_ID}.json`,
@@ -67,7 +67,7 @@ const bootstrapQuery: any = {
   },
 };
 
-const supportingMetadataQuery: any = {
+const supportingMetadataQuery: object = {
 
   rooms: {
     resource: `optionSets/${DHIS2_ROOMS_OPTION_SET_ID}.json`,
@@ -89,7 +89,7 @@ const supportingMetadataQuery: any = {
   },
 };
 
-const statsQuery: any = {
+const statsQuery: object = {
 
   participationSummary: {
     resource: `sqlViews/${DHIS2_DASHBOARD_PARTICIPATION_SUMMARY_SQL_VIEW}/data.json`,
@@ -138,7 +138,7 @@ class MetadataStore {
   }
 
   get retreatsMapWithIdKey(): Record<string, Retreat> {
-    let retreatsMap: Record<string, Retreat> = {};
+    const retreatsMap: Record<string, Retreat> = {};
     this.retreats?.forEach((retreat) => {
       retreatsMap[retreat.id] = retreat;
     });
@@ -146,7 +146,7 @@ class MetadataStore {
   }
 
   get retreatsMapWithCodeKey(): Record<string, Retreat> {
-    let retreatsMap: Record<string, Retreat> = {};
+    const retreatsMap: Record<string, Retreat> = {};
     this.retreats?.forEach((retreat) => {
       retreatsMap[retreat.code] = retreat;
     });
@@ -189,7 +189,7 @@ class MetadataStore {
   updateRetreatAttribute = async (
     retreat: Retreat,
     attributeId: string,
-    value: any,
+    value: string | number | boolean,
   ): Promise<boolean> => {
     try {
       const response = await this.engine.query({
@@ -231,13 +231,13 @@ class MetadataStore {
         ],
       };
 
-      const mutation: any = {
+      const mutation: object = {
         resource: "options",
         id: retreat.id,
         data: mutatedRetreat,
         type: "update",
       };
-      let result = await this.engine.mutate(mutation);
+      const result = await this.engine.mutate(mutation);
 
 
       return result.httpStatusCode === 200;

@@ -23,14 +23,14 @@ const GeneralRetreatStatsPanel = observer(({ store }: GeneralRetreatStatsPanelPr
         </NoticeBox>
       )}
       {(() => {
-        if (store.metadata!.requestStates.loadingStats) {
+        if (store.metadata.requestStates.loadingStats) {
           return (
             <div className="stats-panel-loader-wrapper">
               <CircularLoader small />
             </div>
           );
         }
-        const stats = store.metadata!.generalRetreatStats;
+        const stats = store.metadata.generalRetreatStats;
         if (!stats) return null;
 
         return (

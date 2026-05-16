@@ -17,7 +17,7 @@ const { Field, FormSpy } = ReactFinalForm;
 
 interface RetreatFormFieldsProps {
   values: RetreatFormValues;
-  form: any;
+  form: { change: (name: string, value: any) => void };
   store: RootStore;
 }
 
@@ -94,7 +94,7 @@ const RetreatFormFields = ({ values, form, store }: RetreatFormFieldsProps) => {
       </div>
       <div className="retreat-form-field-row">
         <Field name="location" label="Location" validate={hasValue} required>
-          {(props: { input: { onChange: (e: any) => void; value: any } }) => (
+          {(props: { input: { onChange: (e: object) => void; value: any } }) => (
             <div>
               <Label required>Location</Label>
               <OrganisationUnitTree
@@ -177,7 +177,7 @@ const RetreatFormFields = ({ values, form, store }: RetreatFormFieldsProps) => {
           label="Accommodation Not Provided (Travel from home)"
           defaultValue={false}
         >
-          {({ input, meta }: { input: any; meta: any }) => (
+          {({ input, meta }: { input: { onChange: (e: any) => void; value: any }; meta: object }) => (
             <SwitchFieldFF
               input={{
                 ...input,

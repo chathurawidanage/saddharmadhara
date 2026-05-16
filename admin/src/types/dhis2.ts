@@ -1,13 +1,13 @@
 export interface Dhis2Engine {
-  mutate: (mutation: any, options?: any) => Promise<any>;
-  query: (query: any, options?: any) => Promise<any>;
+  mutate: (mutation: object, options?: object) => Promise<any>;
+  query: (query: object, options?: object) => Promise<any>;
 }
 
 export interface Dhis2AttributeValue {
   attribute: {
     id: string;
   };
-  value: any;
+  value: string | number | boolean;
 }
 
 export interface Dhis2Option {
@@ -35,7 +35,7 @@ export interface Dhis2ListGrid {
     hidden: boolean;
     meta: boolean;
   }>;
-  rows: any[][];
+  rows: (string | number | boolean | null)[][];
 }
 
 export interface Dhis2SqlViewResponse {
@@ -59,7 +59,7 @@ export interface Dhis2TrackerEventsResponse {
 
 export interface Dhis2Enrollment {
   status: string;
-  notes: any[];
+  notes: Array<{ value: string; createdBy: { username: string } }>;
   events: Dhis2TrackerEvent[];
 }
 

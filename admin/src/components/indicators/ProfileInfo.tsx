@@ -34,7 +34,7 @@ export const PhoneProfileInfo = ({ phonesArray }: { phonesArray: (string | undef
 
 export const AgeProfileInfor = ({ birthday }: { birthday: string | undefined }) => {
   if (!birthday) return null;
-  let years = Math.floor(
+  const years = Math.floor(
     (Date.now() - new Date(birthday).getTime()) / 31557600000,
   );
   return <ProfileInfo image={AGE} tooltip="Age" text={years} />;

@@ -12,9 +12,9 @@
     "start": "d2-app-scripts start",
     "test": "d2-app-scripts test",
     "deploy": "d2-app-scripts deploy",
-    "lint": "eslint src --ext .js",
-    "lint:fix": "eslint src --ext .js --fix",
-    "format": "prettier --write \"src/**/*.{js,css,json}\"",
+    "lint": "eslint src --ext .js,.ts,.tsx",
+    "lint:fix": "eslint src --ext .js,.ts,.tsx --fix",
+    "format": "prettier --write \"src/**/*.{js,ts,tsx,css,json}\"",
     "type-check": "tsc --noEmit"
   },
   "devDependencies": {

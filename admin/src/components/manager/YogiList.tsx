@@ -36,15 +36,15 @@ export const getYogiSortScore = (yogiObj: Yogi) => {
 };
 
 export const selectionPrioritySorter = (y1: Yogi, y2: Yogi, retreat: Retreat) => {
-  let y1Score = getYogiSortScore(y1);
-  let y2Score = getYogiSortScore(y2);
+  const y1Score = getYogiSortScore(y1);
+  const y2Score = getYogiSortScore(y2);
 
   if (y1Score === y2Score) {
     // finally sort by applied date, lowest date comes first
-    let y1RegisteredDate = new Date(
+    const y1RegisteredDate = new Date(
       y1.expressionOfInterests[retreat.code].occurredAt,
     );
-    let y2RegisteredDate = new Date(
+    const y2RegisteredDate = new Date(
       y2.expressionOfInterests[retreat.code].occurredAt,
     );
     return y1RegisteredDate.getTime() - y2RegisteredDate.getTime();
@@ -55,8 +55,8 @@ export const selectionPrioritySorter = (y1: Yogi, y2: Yogi, retreat: Retreat) =>
 };
 
 export const ageSorter = (y1: Yogi, y2: Yogi, retreat: Retreat) => {
-  let dobY1 = new Date(y1.attributes.dob || "");
-  let dobY2 = new Date(y2.attributes.dob || "");
+  const dobY1 = new Date(y1.attributes.dob || "");
+  const dobY2 = new Date(y2.attributes.dob || "");
 
   let diff = dobY1.getTime() - dobY2.getTime();
 
@@ -114,7 +114,7 @@ const YogisList = observer(({ retreat }: YogisListProps) => {
 
   const countByState: Record<string, number> = {};
   yogiList.forEach((yogi) => {
-    let state = yogi.expressionOfInterests[retreat.code]?.state;
+    const state = yogi.expressionOfInterests[retreat.code]?.state;
     if (state) {
       if (!countByState[state]) {
         countByState[state] = 0;
@@ -153,7 +153,7 @@ const YogisList = observer(({ retreat }: YogisListProps) => {
   if (!yogisFetched)
     return <LinearLoader width="100%" amount={loadProgress} margin="0" />;
 
-  let filteredYogis = yogiList
+  const filteredYogis = yogiList
     .filter(
       (yogi) =>
         yogi.expressionOfInterests[retreat.code].state === selectionState,

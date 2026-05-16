@@ -11,7 +11,7 @@ describe("retreatUtils", () => {
       const startDate = new Date("2024-01-01T00:00:00Z");
       const noOfDays = 10;
       const result = getRetreatEndDate(startDate, noOfDays);
-      expect(result!.toISOString()).toBe("2024-01-11T00:00:00.000Z");
+      expect(result?.toISOString()).toBe("2024-01-11T00:00:00.000Z");
     });
 
     test("returns same date if noOfDays is missing", () => {

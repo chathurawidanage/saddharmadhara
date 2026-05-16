@@ -2,8 +2,10 @@ import { makeAutoObservable, runInAction } from "mobx";
 import MetadataStore from "./metadata";
 import YogiStore from "./yogi";
 
+import { Dhis2Engine } from "../types/dhis2";
+
 class RootStore {
-  engine: any = null;
+  engine: Dhis2Engine | null = null;
   initialized = false;
   initializing = false;
   initializationError: string | null = null;
@@ -14,7 +16,7 @@ class RootStore {
     makeAutoObservable(this);
   }
 
-  init = async (engine: any): Promise<void> => {
+  init = async (engine: Dhis2Engine): Promise<void> => {
     runInAction(() => {
       this.engine = engine;
       this.initializing = true;

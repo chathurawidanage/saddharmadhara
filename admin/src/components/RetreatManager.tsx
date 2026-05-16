@@ -57,7 +57,7 @@ const RetreatManager = observer(() => {
     if (!yogiIdList) return;
 
     const yogis = yogiIdList
-      .map((yogiId) => store.yogis!.yogiIdToObjectMap.get(yogiId))
+      .map((yogiId) => store.yogis?.yogiIdToObjectMap.get(yogiId))
       .filter((yogi): yogi is Yogi => !!yogi);
     sortYogiList(yogis, retreat);
 

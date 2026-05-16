@@ -151,7 +151,7 @@ class YogiStore {
 
   fetchExpressionOfInterests = async (retreatCode: string, retreatName?: string): Promise<string[] | null> => {
     if (this.expressionOfInterestsYogiIds.has(retreatCode)) {
-      return this.expressionOfInterestsYogiIds.get(retreatCode)!;
+      return this.expressionOfInterestsYogiIds.get(retreatCode) ?? null;
     }
 
     runInAction(() => {
@@ -200,7 +200,7 @@ class YogiStore {
 
   fetchYogi = async (yogiId: string, forceRefetch = false): Promise<Yogi | null> => {
     if (this.yogiIdToObjectMap.has(yogiId) && !forceRefetch) {
-      return this.yogiIdToObjectMap.get(yogiId)!;
+      return this.yogiIdToObjectMap.get(yogiId) ?? null;
     }
 
     runInAction(() => {
@@ -224,7 +224,7 @@ class YogiStore {
 
       const tei = response.trackedEntity as Dhis2TrackedEntityInstance;
 
-      let attributeIdToValueMap: YogiAttributes = {};
+      const attributeIdToValueMap: YogiAttributes = {};
       tei.attributes.forEach((attribute) => {
         attributeIdToValueMap[attribute.attribute] = attribute.value;
 
@@ -235,17 +235,17 @@ class YogiStore {
       });
 
       let active = false;
-      let expressionOfInterests: Record<string, ExpressionOfInterest> = {};
-      let specialComments: SpecialComment[] = [];
-      let participation: Record<string, Participation> = {};
-      let notes: Note[] = [];
+      const expressionOfInterests: Record<string, ExpressionOfInterest> = {};
+      const specialComments: SpecialComment[] = [];
+      const participation: Record<string, Participation> = {};
+      const notes: Note[] = [];
 
       if (tei.enrollments.length > 0) {
-        let enrollment = tei.enrollments[0];
+        const enrollment = tei.enrollments[0];
         active = enrollment.status === "ACTIVE";
 
         enrollment.events.forEach((event) => {
-          let dataElementIdToValueMap: Record<string, string> = {};
+          const dataElementIdToValueMap: Record<string, string> = {};
           event.dataValues.forEach((dv) => {
             dataElementIdToValueMap[dv.dataElement] = dv.value;
           });
@@ -307,7 +307,7 @@ class YogiStore {
         this.yogiIdToObjectMap.set(yogiId, observable(yogiObj));
       });
 
-      return this.yogiIdToObjectMap.get(yogiId)!;
+      return this.yogiIdToObjectMap.get(yogiId) ?? null;
     } catch (error) {
       runInAction(() => {
         this.requestStates.yogiErrors[yogiId] = `Failed to fetch yogi ${yogiId}.`;
@@ -406,7 +406,7 @@ class YogiStore {
   };
 
   applyMutation = async (
-    mutation: any,
+    mutation: object,
     localUpdate: (response: any) => void,
   ): Promise<boolean> => {
 
@@ -416,7 +416,7 @@ class YogiStore {
     });
 
     try {
-      const response: any = await this.engine.mutate(mutation);
+      const response = await this.engine.mutate(mutation as any);
       if (response.httpStatusCode === 200 || response.httpStatusCode === 201) {
         runInAction(() => {
           localUpdate(response);
@@ -438,7 +438,7 @@ class YogiStore {
   };
 
   deleteParticipationEvent = async (yogiId: string, retreat: Retreat): Promise<boolean> => {
-    let eventId =
+    const eventId =
       this.yogiIdToObjectMap.get(yogiId)?.participation[retreat.code]?.eventId;
     if (!eventId) return true;
 
@@ -449,12 +449,15 @@ class YogiStore {
     };
 
     return this.applyMutation(mutation, () => {
-      delete this.yogiIdToObjectMap.get(yogiId)!.participation[retreat.code];
+      const yogi = this.yogiIdToObjectMap.get(yogiId);
+      if (yogi) {
+        delete yogi.participation[retreat.code];
+      }
     });
   };
 
   markAttendance = async (yogiId: string, retreat: Retreat, attendance: string, specialComment?: string): Promise<boolean> => {
-    let eventId =
+    const eventId =
       this.yogiIdToObjectMap.get(yogiId)?.participation[retreat.code]?.eventId;
     const type = eventId ? ("update" as const) : ("create" as const);
     const data = eventId
@@ -494,7 +497,7 @@ class YogiStore {
   };
 
   assignRoom = async (yogiId: string, retreat: Retreat, roomCode: string): Promise<boolean> => {
-    let eventId =
+    const eventId =
       this.yogiIdToObjectMap.get(yogiId)?.participation[retreat.code]?.eventId;
     const type = eventId ? ("update" as const) : ("create" as const);
     const data = eventId
