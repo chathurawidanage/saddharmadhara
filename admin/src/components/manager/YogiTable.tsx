@@ -28,6 +28,8 @@ interface YogiTableProps {
   retreat: Retreat;
   selectionState: string;
   allYogis: Yogi[];
+  allRetreats: Retreat[];
+  eoiSummary: EoiSummary[];
 }
 
 const YogiTable = ({
@@ -38,6 +40,8 @@ const YogiTable = ({
   retreat,
   selectionState,
   allYogis,
+  allRetreats,
+  eoiSummary,
 }: YogiTableProps) => {
   const renderPagination = (total: number) => (
     <Pagination
@@ -83,6 +87,8 @@ const YogiTable = ({
                   trackedEntity={yogi}
                   key={yogi.id}
                   currentRetreat={retreat}
+                  allRetreats={allRetreats}
+                  eoiSummary={eoiSummary}
                   actions={
                     <>
                       <StateChangeButton

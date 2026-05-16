@@ -74,7 +74,13 @@ const YogisList = observer(({ retreat }: YogisListProps) => {
         },
       );
 
-      sortYogiList(loadedYogis, retreat, sortByRef.current);
+      sortYogiList(
+        loadedYogis,
+        retreat,
+        sortByRef.current,
+        store.metadata?.retreats || [],
+        store.metadata?.eoiSummary || [],
+      );
       setYogiList(loadedYogis);
       setYogisFetched(true);
     })();
@@ -149,7 +155,13 @@ const YogisList = observer(({ retreat }: YogisListProps) => {
           setSortBy(newSortBy);
           setYogiList((currentYogis) => {
             const sortedYogis = [...currentYogis];
-            sortYogiList(sortedYogis, retreat, newSortBy);
+            sortYogiList(
+              sortedYogis,
+              retreat,
+              newSortBy,
+              store.metadata?.retreats || [],
+              store.metadata?.eoiSummary || [],
+            );
             return sortedYogis;
           });
         }}
@@ -172,6 +184,8 @@ const YogisList = observer(({ retreat }: YogisListProps) => {
         retreat={retreat}
         selectionState={selectionState}
         allYogis={yogiList}
+        allRetreats={store.metadata?.retreats || []}
+        eoiSummary={store.metadata?.eoiSummary || []}
       />
     </div>
   );

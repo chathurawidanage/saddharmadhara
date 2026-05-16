@@ -24,16 +24,18 @@ import {
 } from "../indicators/ProfileInfo";
 import { BiLinkExternal } from "react-icons/bi";
 import NotesIndicator from "../indicators/NotesIndicator";
-import { Retreat, Yogi } from "../../types/domain";
+import { Retreat, Yogi, EoiSummary } from "../../types/domain";
 import { getYogiSortScore } from "../../utils/yogiUtils";
 
 interface YogiRowProps {
   trackedEntity: Yogi;
   currentRetreat: Retreat;
+  allRetreats?: Retreat[];
+  eoiSummary?: EoiSummary[];
   actions?: ReactNode;
 }
 
-const YogiRow = observer(({ trackedEntity, currentRetreat, actions }: YogiRowProps) => {
+const YogiRow = observer(({ trackedEntity, currentRetreat, allRetreats, eoiSummary, actions }: YogiRowProps) => {
     const { baseUrl } = useConfig();
 
     const rowClassNames = [];
@@ -49,7 +51,11 @@ const YogiRow = observer(({ trackedEntity, currentRetreat, actions }: YogiRowPro
         <TableCell className="yogi-row-td">
           <div className="yogi-name-row">
             {trackedEntity.attributes.fullName}
-            <span className="yogi-score">{getYogiSortScore(trackedEntity)}</span>
+            <span className="yogi-score">
+              {getYogiSortScore(trackedEntity, allRetreats, eoiSummary).toFixed(
+                2,
+              )}
+            </span>
             <Button
               small
               onClick={() => {
