@@ -5,7 +5,7 @@ import { Tooltip } from "@dhis2/ui";
 import React from "react";
 
 interface GenderIndicatorProps {
-  gender: string;
+  gender?: string;
 }
 
 const GenderIndicator = ({ gender }: GenderIndicatorProps) => {

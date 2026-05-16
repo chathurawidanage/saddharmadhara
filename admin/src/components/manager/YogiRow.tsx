@@ -4,21 +4,6 @@ import { observer } from "mobx-react";
 import React, { ReactNode } from "react";
 import {
   DHIS2_ROOT_ORG,
-  DHIS2_TEI_ATTRIBUTE_DOB,
-  DHIS2_TEI_ATTRIBUTE_FULL_NAME,
-  DHIS2_TEI_ATTRIBUTE_GENDER,
-  DHIS2_TEI_ATTRIBUTE_HAS_KIDS,
-  DHIS2_TEI_ATTRIBUTE_HAS_KIDS_COMMENT,
-  DHIS2_TEI_ATTRIBUTE_HAS_PERMISSION,
-  DHIS2_TEI_ATTRIBUTE_HAS_PERMISSION_COMMENT,
-  DHIS2_TEI_ATTRIBUTE_HAS_STRESS,
-  DHIS2_TEI_ATTRIBUTE_HAS_STRESS_COMMENT,
-  DHIS2_TEI_ATTRIBUTE_HAS_UNATTENDED_DEFORMITIES,
-  DHIS2_TEI_ATTRIBUTE_HAS_UNATTENDED_DEFORMITIES_COMMENT,
-  DHIS2_TEI_ATTRIBUTE_MARITAL_STATE,
-  DHIS2_TEI_ATTRIBUTE_MOBILE,
-  DHIS2_TEI_ATTRIBUTE_NIC,
-  DHIS2_TEI_ATTRIBUTE_PASSPORT,
   DHIS_PROGRAM,
 } from "../../dhis2";
 import ActiveApplicationIndicator from "../indicators/ActiveApplicationsIndicator";
@@ -53,7 +38,7 @@ const YogiRow = observer(({ trackedEntity, currentRetreat, actions }: YogiRowPro
     const rowClassNames = [];
 
     if (
-      trackedEntity.attributes[DHIS2_TEI_ATTRIBUTE_MARITAL_STATE] === "reverend"
+      trackedEntity.attributes.maritalState === "reverend"
     ) {
       rowClassNames.push("yogi-row-reverend");
     }
@@ -62,7 +47,7 @@ const YogiRow = observer(({ trackedEntity, currentRetreat, actions }: YogiRowPro
       <TableRow className={rowClassNames.join(" ")} key={trackedEntity.id}>
         <TableCell className="yogi-row-td">
           <div className="yogi-name-row">
-            {trackedEntity.attributes[DHIS2_TEI_ATTRIBUTE_FULL_NAME]}
+            {trackedEntity.attributes.fullName}
             <Button
               small
               onClick={() => {
@@ -83,17 +68,17 @@ const YogiRow = observer(({ trackedEntity, currentRetreat, actions }: YogiRowPro
           <div className="yogi-profile-info">
             <IdProfileInfo
               idArray={[
-                trackedEntity.attributes[DHIS2_TEI_ATTRIBUTE_NIC],
-                trackedEntity.attributes[DHIS2_TEI_ATTRIBUTE_PASSPORT],
+                trackedEntity.attributes.nic,
+                trackedEntity.attributes.passport,
               ]}
             />
             <PhoneProfileInfo
               phonesArray={[
-                trackedEntity.attributes[DHIS2_TEI_ATTRIBUTE_MOBILE],
+                trackedEntity.attributes.mobile,
               ]}
             />
             <AgeProfileInfor
-              birthday={trackedEntity.attributes[DHIS2_TEI_ATTRIBUTE_DOB]}
+              birthday={trackedEntity.attributes.dob}
             />
           </div>
           <div>
@@ -103,42 +88,36 @@ const YogiRow = observer(({ trackedEntity, currentRetreat, actions }: YogiRowPro
         <TableCell className="yogi-row-td">
           <div className="mini-indicators-container">
             <GenderIndicator
-              gender={trackedEntity.attributes[DHIS2_TEI_ATTRIBUTE_GENDER]}
+              gender={trackedEntity.attributes.gender}
             />
             <HasKidsIndicator
-              hasKids={trackedEntity.attributes[DHIS2_TEI_ATTRIBUTE_HAS_KIDS]}
+              hasKids={trackedEntity.attributes.hasKids}
               comment={
-                trackedEntity.attributes[DHIS2_TEI_ATTRIBUTE_HAS_KIDS_COMMENT]
+                trackedEntity.attributes.hasKidsComment
               }
             />
             <HasPermission
               hasPermission={
-                trackedEntity.attributes[DHIS2_TEI_ATTRIBUTE_HAS_PERMISSION]
+                trackedEntity.attributes.hasPermission
               }
               comment={
-                trackedEntity.attributes[
-                  DHIS2_TEI_ATTRIBUTE_HAS_PERMISSION_COMMENT
-                ]
+                trackedEntity.attributes.hasPermissionComment
               }
             />
             <HasUnattendedDeformities
               hasUnattendedDeformities={
-                trackedEntity.attributes[
-                  DHIS2_TEI_ATTRIBUTE_HAS_UNATTENDED_DEFORMITIES
-                ]
+                trackedEntity.attributes.hasUnattendedDeformities
               }
               comment={
-                trackedEntity.attributes[
-                  DHIS2_TEI_ATTRIBUTE_HAS_UNATTENDED_DEFORMITIES_COMMENT
-                ]
+                trackedEntity.attributes.hasUnattendedDeformitiesComment
               }
             />
             <HasStress
               hasStress={
-                trackedEntity.attributes[DHIS2_TEI_ATTRIBUTE_HAS_STRESS]
+                trackedEntity.attributes.hasStress
               }
               comment={
-                trackedEntity.attributes[DHIS2_TEI_ATTRIBUTE_HAS_STRESS_COMMENT]
+                trackedEntity.attributes.hasStressComment
               }
             />
             <SpecialCommentsIndicator trackedEntity={trackedEntity} />

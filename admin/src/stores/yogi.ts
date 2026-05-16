@@ -10,8 +10,24 @@ import {
   DHIS2_SPECIAL_COMMENT_DATA_ELEMENT,
   DHIS2_SPECIAL_COMMENT_PROGRAM_STAGE,
   DHIS_PROGRAM,
+  DHIS2_TEI_ATTRIBUTE_FULL_NAME,
+  DHIS2_TEI_ATTRIBUTE_GENDER,
+  DHIS2_TEI_ATTRIBUTE_MOBILE,
+  DHIS2_TEI_ATTRIBUTE_MARITAL_STATE,
+  DHIS2_TEI_ATTRIBUTE_NIC,
+  DHIS2_TEI_ATTRIBUTE_PASSPORT,
+  DHIS2_TEI_ATTRIBUTE_DOB,
+  DHIS2_TEI_ATTRIBUTE_YOGI_PRIORITY,
+  DHIS2_TEI_ATTRIBUTE_HAS_KIDS,
+  DHIS2_TEI_ATTRIBUTE_HAS_KIDS_COMMENT,
+  DHIS2_TEI_ATTRIBUTE_HAS_PERMISSION,
+  DHIS2_TEI_ATTRIBUTE_HAS_PERMISSION_COMMENT,
+  DHIS2_TEI_ATTRIBUTE_HAS_UNATTENDED_DEFORMITIES,
+  DHIS2_TEI_ATTRIBUTE_HAS_UNATTENDED_DEFORMITIES_COMMENT,
+  DHIS2_TEI_ATTRIBUTE_HAS_STRESS,
+  DHIS2_TEI_ATTRIBUTE_HAS_STRESS_COMMENT,
 } from "../dhis2";
-import { Yogi, Retreat, ExpressionOfInterest, Participation, SpecialComment, Note } from "../types/domain";
+import { Yogi, Retreat, ExpressionOfInterest, Participation, SpecialComment, Note, YogiAttributes } from "../types/domain";
 import { Dhis2Engine, DataMutation } from "../types/dhis2";
 
 
@@ -42,6 +58,26 @@ interface AttendanceEventDataParams {
   orgUnit?: string;
   eventDate?: Date;
 }
+
+const attributeUIDToNameMap: Record<string, keyof YogiAttributes> = {
+  [DHIS2_TEI_ATTRIBUTE_FULL_NAME]: "fullName",
+  [DHIS2_TEI_ATTRIBUTE_GENDER]: "gender",
+  [DHIS2_TEI_ATTRIBUTE_MOBILE]: "mobile",
+  [DHIS2_TEI_ATTRIBUTE_MARITAL_STATE]: "maritalState",
+  [DHIS2_TEI_ATTRIBUTE_NIC]: "nic",
+  [DHIS2_TEI_ATTRIBUTE_PASSPORT]: "passport",
+  [DHIS2_TEI_ATTRIBUTE_DOB]: "dob",
+  [DHIS2_TEI_ATTRIBUTE_YOGI_PRIORITY]: "priority",
+  [DHIS2_TEI_ATTRIBUTE_HAS_KIDS]: "hasKids",
+  [DHIS2_TEI_ATTRIBUTE_HAS_KIDS_COMMENT]: "hasKidsComment",
+  [DHIS2_TEI_ATTRIBUTE_HAS_PERMISSION]: "hasPermission",
+  [DHIS2_TEI_ATTRIBUTE_HAS_PERMISSION_COMMENT]: "hasPermissionComment",
+  [DHIS2_TEI_ATTRIBUTE_HAS_UNATTENDED_DEFORMITIES]: "hasUnattendedDeformities",
+  [DHIS2_TEI_ATTRIBUTE_HAS_UNATTENDED_DEFORMITIES_COMMENT]:
+    "hasUnattendedDeformitiesComment",
+  [DHIS2_TEI_ATTRIBUTE_HAS_STRESS]: "hasStress",
+  [DHIS2_TEI_ATTRIBUTE_HAS_STRESS_COMMENT]: "hasStressComment",
+};
 
 const attendanceEventData = ({
   retreat,
@@ -199,10 +235,14 @@ class YogiStore {
         },
       });
 
-      let attributeIdToValueMap: Record<string, string> = {};
+      let attributeIdToValueMap: YogiAttributes = {};
       response.trackedEntity.attributes.forEach((attribute) => {
-
         attributeIdToValueMap[attribute.attribute] = attribute.value;
+
+        const name = attributeUIDToNameMap[attribute.attribute];
+        if (name) {
+          attributeIdToValueMap[name] = attribute.value;
+        }
       });
 
       let active = false;
@@ -417,7 +457,7 @@ class YogiStore {
     const mutation = {
       resource: "events",
       id: eventId,
-      type: "delete",
+      type: "delete" as const,
     };
 
     return this.applyMutation(mutation, () => {
@@ -428,7 +468,7 @@ class YogiStore {
   markAttendance = async (yogiId: string, retreat: Retreat, attendance: string, specialComment?: string): Promise<boolean> => {
     let eventId =
       this.yogiIdToObjectMap[yogiId].participation[retreat.code]?.eventId;
-    const type = eventId ? "update" : "create";
+    const type = eventId ? ("update" as const) : ("create" as const);
     const data = eventId
       ? attendanceEventData({ attendance, specialComment, retreat })
       : attendanceEventData({
@@ -465,7 +505,7 @@ class YogiStore {
   assignRoom = async (yogiId: string, retreat: Retreat, roomCode: string): Promise<boolean> => {
     let eventId =
       this.yogiIdToObjectMap[yogiId].participation[retreat.code]?.eventId;
-    const type = eventId ? "update" : "create";
+    const type = eventId ? ("update" as const) : ("create" as const);
     const data = eventId
       ? attendanceEventData({ roomCode, retreat })
       : attendanceEventData({
@@ -527,7 +567,7 @@ class YogiStore {
         status: "COMPLETED",
         dataValues,
       },
-      type: "update",
+      type: "update" as const,
     };
 
     return this.applyMutation(mutation, () => {
@@ -560,7 +600,7 @@ class YogiStore {
           },
         ],
       },
-      type: "update",
+      type: "update" as const,
     };
 
     return this.applyMutation(mutation, () => {

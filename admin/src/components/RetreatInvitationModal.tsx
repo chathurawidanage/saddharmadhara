@@ -12,10 +12,6 @@ import {
 } from "@dhis2/ui";
 import { observer } from "mobx-react";
 import React, { useEffect, useState } from "react";
-import {
-  DHIS2_TEI_ATTRIBUTE_FULL_NAME,
-  DHIS2_TEI_ATTRIBUTE_MOBILE,
-} from "../dhis2";
 import { sendRetreatInvitations } from "../services/invitationService";
 import { useStore } from "../stores/StoreProvider";
 import MessagePreview from "./manager/invitation/MessagePreview";
@@ -113,8 +109,8 @@ const RetreatInvitationModal = observer(({ retreat, onCancel }: RetreatInvitatio
       yogis: finalYogisList.map((yogi) => ({
         id: yogi.id,
         eventId: yogi.expressionOfInterests[retreat.code].eventId,
-        fullName: yogi.attributes[DHIS2_TEI_ATTRIBUTE_FULL_NAME],
-        mobile: yogi.attributes[DHIS2_TEI_ATTRIBUTE_MOBILE],
+        fullName: yogi.attributes.fullName || "",
+        mobile: yogi.attributes.mobile || "",
       })),
       onResult: async ({ yogiId, sent }: { yogiId: string; sent: boolean }) => {
         await store.yogis!.changeInvitationSentState(

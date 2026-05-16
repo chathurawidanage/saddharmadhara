@@ -2,16 +2,6 @@ import { LinearLoader, NoticeBox } from "@dhis2/ui";
 import { computed } from "mobx";
 import { observer } from "mobx-react";
 import React, { useEffect, useState, useRef } from "react";
-import {
-  DHIS2_TEI_ATTRIBUTE_DOB,
-  DHIS2_TEI_ATTRIBUTE_FULL_NAME,
-  DHIS2_TEI_ATTRIBUTE_GENDER,
-  DHIS2_TEI_ATTRIBUTE_MARITAL_STATE,
-  DHIS2_TEI_ATTRIBUTE_MOBILE,
-  DHIS2_TEI_ATTRIBUTE_NIC,
-  DHIS2_TEI_ATTRIBUTE_PASSPORT,
-  DHIS2_TEI_ATTRIBUTE_YOGI_PRIORITY,
-} from "../../dhis2";
 import { useStore } from "../../stores/StoreProvider";
 import "./YogiList.css";
 import YogiListToolbar from "./YogiListToolbar";
@@ -25,19 +15,19 @@ export const AGE_SORT = "age";
 export const getYogiSortScore = (yogiObj: Yogi) => {
   // reverends comes first
   let score = 0;
-  if (yogiObj.attributes[DHIS2_TEI_ATTRIBUTE_MARITAL_STATE] === "reverend") {
+  if (yogiObj.attributes.maritalState === "reverend") {
     score += Math.pow(10, 5);
   }
 
   if (
-    yogiObj.attributes[DHIS2_TEI_ATTRIBUTE_YOGI_PRIORITY]?.toLowerCase() ===
+    yogiObj.attributes.priority?.toLowerCase() ===
     "trust_member"
   ) {
     score += Math.pow(10, 4);
   }
 
   if (
-    yogiObj.attributes[DHIS2_TEI_ATTRIBUTE_YOGI_PRIORITY]?.toLowerCase() ===
+    yogiObj.attributes.priority?.toLowerCase() ===
     "trust_members_family"
   ) {
     score += Math.pow(10, 3);
@@ -66,10 +56,12 @@ export const selectionPrioritySorter = (y1: Yogi, y2: Yogi, retreat: Retreat) =>
 };
 
 export const ageSorter = (y1: Yogi, y2: Yogi, retreat: Retreat) => {
-  let dobY1 = new Date(y1.attributes[DHIS2_TEI_ATTRIBUTE_DOB]);
-  let dobY2 = new Date(y2.attributes[DHIS2_TEI_ATTRIBUTE_DOB]);
+  let dobY1 = new Date(y1.attributes.dob || "");
+  let dobY2 = new Date(y2.attributes.dob || "");
 
   let diff = dobY1.getTime() - dobY2.getTime();
+
+  if (isNaN(diff)) diff = 0;
 
   if (diff === 0) {
     return selectionPrioritySorter(y1, y2, retreat);
@@ -173,29 +165,29 @@ const YogisList = observer(({ retreat }: YogisListProps) => {
     .filter(
       (yogi) =>
         filters.male ||
-        yogi.attributes[DHIS2_TEI_ATTRIBUTE_GENDER].toLowerCase() !== "male",
+        yogi.attributes.gender?.toLowerCase() !== "male",
     )
     .filter(
       (yogi) =>
         filters.female ||
-        yogi.attributes[DHIS2_TEI_ATTRIBUTE_GENDER].toLowerCase() !== "female",
+        yogi.attributes.gender?.toLowerCase() !== "female",
     )
     .filter(
       (yogi) =>
         filters.reverend ||
-        yogi.attributes[DHIS2_TEI_ATTRIBUTE_MARITAL_STATE].toLowerCase() !==
+        yogi.attributes.maritalState?.toLowerCase() !==
           "reverend",
     )
     .filter((yogi) => {
       if (!searchQuery) return true;
       const query = searchQuery.toLowerCase();
       const name =
-        yogi.attributes[DHIS2_TEI_ATTRIBUTE_FULL_NAME]?.toLowerCase() || "";
+        yogi.attributes.fullName?.toLowerCase() || "";
       const mobile =
-        yogi.attributes[DHIS2_TEI_ATTRIBUTE_MOBILE]?.toLowerCase() || "";
-      const nic = yogi.attributes[DHIS2_TEI_ATTRIBUTE_NIC]?.toLowerCase() || "";
+        yogi.attributes.mobile?.toLowerCase() || "";
+      const nic = yogi.attributes.nic?.toLowerCase() || "";
       const passport =
-        yogi.attributes[DHIS2_TEI_ATTRIBUTE_PASSPORT]?.toLowerCase() || "";
+        yogi.attributes.passport?.toLowerCase() || "";
 
       return (
         name.includes(query) ||

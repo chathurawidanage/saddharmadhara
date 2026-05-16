@@ -70,12 +70,57 @@ export interface Note {
   };
 }
 
+export type SelectionState =
+  | "selected"
+  | "reserved"
+  | "not_selected"
+  | "pending";
+
+export type InvitationState = "sent" | "pending";
+
+export interface ExpressionOfInterest {
+  eventId: string;
+  state: SelectionState | string;
+  invitationSent: InvitationState | string;
+  occurredAt: string;
+}
+
+export interface Participation {
+  eventId: string;
+  attendance?: string;
+  room?: string;
+  retreat: string;
+  specialComment?: string;
+  occurredAt: string;
+}
+
+export interface YogiAttributes extends Record<string, string | undefined> {
+  fullName?: string;
+  gender?: string;
+  mobile?: string;
+  maritalState?: string;
+  nic?: string;
+  passport?: string;
+  dob?: string;
+  priority?: string;
+  hasKids?: string;
+  hasKidsComment?: string;
+  hasPermission?: string;
+  hasPermissionComment?: string;
+  hasUnattendedDeformities?: string;
+  hasUnattendedDeformitiesComment?: string;
+  hasStress?: string;
+  hasStressComment?: string;
+}
+
 export interface Yogi {
   id: string;
   active: boolean;
-  attributes: Record<string, string>;
+  attributes: YogiAttributes;
+  /** Keyed by retreatCode */
   expressionOfInterests: Record<string, ExpressionOfInterest>;
   specialComments: SpecialComment[];
+  /** Keyed by retreatCode */
   participation: Record<string, Participation>;
   notes: Note[];
 }
@@ -90,5 +135,3 @@ export interface EoiSummary {
   retreatCode: string;
   invitationSent: boolean;
 }
-
-export type SelectionState = "SELECTED" | "RESERVED" | "NOT_SELECTED" | "PENDING";

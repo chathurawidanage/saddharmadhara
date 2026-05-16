@@ -18,7 +18,6 @@ import { observer } from "mobx-react";
 import React, { useState } from "react";
 import {
   DHIS2_RETREAT_SELECTION_STATE_SELECTED_CODE,
-  DHIS2_TEI_ATTRIBUTE_FULL_NAME,
 } from "../../dhis2";
 import { useStore } from "../../stores/StoreProvider";
 import { Retreat, Yogi } from "../../types/domain";
@@ -71,7 +70,7 @@ export const StateChangeButton = ({ currentState, yogi, retreat }: StateChangeBu
       toStateCode,
     );
     alertStateChangeStatus({
-      yogiName: yogi.attributes[DHIS2_TEI_ATTRIBUTE_FULL_NAME],
+      yogiName: yogi.attributes.fullName,
       toState: toStateCode,
       success,
     });
@@ -84,7 +83,7 @@ export const StateChangeButton = ({ currentState, yogi, retreat }: StateChangeBu
       yogi.participation[retreat.code]
     ) {
       changeFromSelectedStatePrompt({
-        yogiName: yogi.attributes[DHIS2_TEI_ATTRIBUTE_FULL_NAME],
+        yogiName: yogi.attributes.fullName,
         onMoveClicked: async () => {
           let success = await store.yogis!.deleteParticipationEvent(
             yogi.id,
@@ -167,7 +166,7 @@ export const RoomSelect = observer(({ yogi, retreat, allYogis }: RoomSelectProps
     if (!store.yogis) return;
     let success = await store.yogis.assignRoom(yogi.id, retreat, roomCode);
     alertStateChangeStatus({
-      yogiName: yogi.attributes[DHIS2_TEI_ATTRIBUTE_FULL_NAME],
+      yogiName: yogi.attributes.fullName,
       toRoomCode: roomCode,
       success,
     });
@@ -211,7 +210,7 @@ export const AttendanceButton = observer(({ yogi, retreat }: AttendanceButtonPro
     <div>
       <Modal hide={!showModal}>
         <ModalTitle>
-          Mark Attendance for {yogi.attributes[DHIS2_TEI_ATTRIBUTE_FULL_NAME]}
+          Mark Attendance for {yogi.attributes.fullName}
         </ModalTitle>
         <ModalContent className="attendance-fields">
           <SingleSelectField
