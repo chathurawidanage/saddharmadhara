@@ -182,7 +182,7 @@ export const RoomSelect = observer(({ yogi, retreat, allYogis }: RoomSelectProps
       prefix="Room"
       onChange={onRoomAssigned}
       selected={yogi.participation[retreat.code]?.room}
-      tabIndex={0}
+      tabIndex="0"
     >
       {roomOptions}
     </SingleSelectField>
@@ -221,7 +221,7 @@ export const AttendanceButton = observer(({ yogi, retreat }: AttendanceButtonPro
             onChange={(selection: { selected: string }) => {
               setStatus(selection.selected);
             }}
-            tabIndex={0}
+            tabIndex="0"
           >
             {attendanceOptions}
           </SingleSelectField>

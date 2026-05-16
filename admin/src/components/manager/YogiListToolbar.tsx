@@ -1,7 +1,7 @@
 import { InputField, SingleSelectField, SingleSelectOption } from "@dhis2/ui";
 import React from "react";
 import YogiListFilters from "./YogiListFilters";
-import { AGE_SORT, SELECTION_PRIORITY_SORT } from "./YogiList";
+import { AGE_SORT, SELECTION_PRIORITY_SORT } from "../../utils/yogiUtils";
 
 interface YogiListToolbarProps {
   filters: any;

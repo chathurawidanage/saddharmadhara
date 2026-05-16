@@ -25,6 +25,7 @@ import {
 import { BiLinkExternal } from "react-icons/bi";
 import NotesIndicator from "../indicators/NotesIndicator";
 import { Retreat, Yogi } from "../../types/domain";
+import { getYogiSortScore } from "../../utils/yogiUtils";
 
 interface YogiRowProps {
   trackedEntity: Yogi;
@@ -48,6 +49,7 @@ const YogiRow = observer(({ trackedEntity, currentRetreat, actions }: YogiRowPro
         <TableCell className="yogi-row-td">
           <div className="yogi-name-row">
             {trackedEntity.attributes.fullName}
+            <span className="yogi-score">{getYogiSortScore(trackedEntity)}</span>
             <Button
               small
               onClick={() => {

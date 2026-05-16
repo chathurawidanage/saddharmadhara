@@ -4,7 +4,7 @@ import {
   ageSorter,
   sortYogiList,
   SELECTION_PRIORITY_SORT,
-} from "./YogiList";
+} from "../../utils/yogiUtils";
 
 describe("YogiList Sorting Helpers", () => {
   const retreat = { code: "R1" } as any;

@@ -10,7 +10,8 @@ import {
   buildYogiExport,
   downloadTextFile,
 } from "../services/exportService";
-import YogisList, { sortYogiList } from "./manager/YogiList";
+import YogisList from "./manager/YogiList";
+import { sortYogiList } from "../utils/yogiUtils";
 import RetreatFinaliseModal from "./RetreatFinaliseModal";
 import RetreatInvitationModal from "./RetreatInvitationModal";
 import RetreatModal from "./RetreatModal";

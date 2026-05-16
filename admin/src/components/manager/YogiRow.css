@@ -39,3 +39,27 @@
 .invitation-tag-wrapper {
   margin-top: var(--spacing-m);
 }
+
+.yogi-score {
+  font-size: 0.7rem;
+  background: linear-gradient(135deg, #6e8efb, #a777e3);
+  color: white;
+  padding: 1px 8px;
+  border-radius: 10px;
+  font-weight: 700;
+  margin-left: var(--spacing-xs);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  line-height: 1;
+  transition: all 0.2s ease;
+  cursor: default;
+}
+
+.yogi-score:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  filter: brightness(1.1);
+}
