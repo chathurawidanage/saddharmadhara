@@ -79,7 +79,7 @@
             <h2 class="category-title" data-si="සද්ධර්මධාරා භාවනා වැඩසටහන්" data-en="Saddharmadhara meditation
                 retreats">සද්ධර්මධාරා භාවනා වැඩසටහන්</h2>
             <div class="links-grid">
-                <a href="https://application.srisambuddhamission.org/?utm_source=links-site" class="link-card" target="_blank"
+                <a id="app-link" href="https://application.srisambuddhamission.org/?utm_source=links-site" class="link-card" target="_blank"
                     rel="noopener noreferrer" aria-label="Saddharmadhara Application">
                     <div class="icon-wrapper"><i class="ph ph-device-mobile"></i></div>
                     <span class="link-text" data-si="සද්ධර්මධාරා භාවනා වැඩසටහන් සඳහා අයදුම්පත්‍රය"
@@ -244,6 +244,26 @@
         document.addEventListener('DOMContentLoaded', () => {
             // Set current year dynamically
             document.getElementById('current-year').textContent = new Date().getFullYear();
+
+            // Dynamic UTM Parameter Forwarding
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.toString()) {
+                const appLink = document.getElementById('app-link');
+                if (appLink) {
+                    const targetUrl = new URL(appLink.href);
+                    urlParams.forEach((value, key) => {
+                        if (key === 'utm_source') {
+                            // Combine the incoming utm_source with the existing 'links-site' source
+                            // E.g., if incoming utm_source is 'flyer', it becomes 'links-site-flyer'
+                            targetUrl.searchParams.set('utm_source', `links-site-${value}`);
+                        } else {
+                            // Forward all other UTM parameters (e.g. utm_medium, utm_campaign)
+                            targetUrl.searchParams.set(key, value);
+                        }
+                    });
+                    appLink.href = targetUrl.toString();
+                }
+            }
 
             // Language Switcher
             const langBtns = document.querySelectorAll('.lang-btn');
