@@ -18,7 +18,7 @@ import MessagePreview from "./manager/invitation/MessagePreview";
 import RecipientSelection from "./manager/invitation/RecipientSelection";
 import SendProgress from "./manager/invitation/SendProgress";
 import "./RetreatInvitationModal.css";
-import { Retreat, Yogi } from "../types/domain";
+import { Retreat, Yogi, SelectionState, InvitationState } from "../types/domain";
 
 interface RetreatInvitationModalProps {
   retreat: Retreat;
@@ -65,14 +65,14 @@ const RetreatInvitationModal = observer(({ retreat, onCancel }: RetreatInvitatio
       const toSendYogisArr: Yogi[] = [];
 
       yogis.forEach((yogi) => {
-        if (yogi.expressionOfInterests[retreat.code]?.state !== "PENDING") {
+        if (yogi.expressionOfInterests[retreat.code]?.state !== SelectionState.PENDING) {
           return;
         }
 
         const invitationStatus = yogi.expressionOfInterests[retreat.code].invitationSent;
-        if (invitationStatus === "SENT" || invitationStatus === "DELIVERED") {
+        if (invitationStatus === InvitationState.SENT || invitationStatus === InvitationState.DELIVERED) {
           sentYogisArr.push(yogi);
-        } else if (invitationStatus === "FAILED") {
+        } else if (invitationStatus === InvitationState.FAILED) {
           failedYogisArr.push(yogi);
         } else {
           toSendYogisArr.push(yogi);
@@ -117,7 +117,7 @@ const RetreatInvitationModal = observer(({ retreat, onCancel }: RetreatInvitatio
         await store.yogis?.changeInvitationSentState(
           yogiId,
           retreat.code,
-          sent ? "sent" : "failed",
+          sent ? InvitationState.SENT : InvitationState.FAILED,
         );
       },
       onProgress: ({ completed }: { completed: number }) => {
@@ -131,8 +131,8 @@ const RetreatInvitationModal = observer(({ retreat, onCancel }: RetreatInvitatio
   };
 
   const countToSend = (check[0] ? toSendYogis.length : 0) +
-                     (check[1] ? failedYogis.length : 0) +
-                     (check[2] ? sentYogis.length : 0);
+    (check[1] ? failedYogis.length : 0) +
+    (check[2] ? sentYogis.length : 0);
 
   return (
     <Modal>
@@ -149,10 +149,10 @@ const RetreatInvitationModal = observer(({ retreat, onCancel }: RetreatInvitatio
                 {store.yogis.requestStates.batchErrors[retreat.code]}
               </NoticeBox>
             )}
-            
+
             <h6>Please confirm the recipients of the invitations</h6>
-            
-            <RecipientSelection 
+
+            <RecipientSelection
               toSendCount={toSendYogis.length}
               failedCount={failedYogis.length}
               sentCount={sentYogis.length}
@@ -177,7 +177,7 @@ const RetreatInvitationModal = observer(({ retreat, onCancel }: RetreatInvitatio
               />
             </div>
 
-            <MessagePreview 
+            <MessagePreview
               retreat={retreat}
               confirmationDeadline={confirmationDeadline}
             />
@@ -185,9 +185,9 @@ const RetreatInvitationModal = observer(({ retreat, onCancel }: RetreatInvitatio
           <ModalActions>
             <div className="retreat-invitation-progress-wrapper">
               {isSending && (
-                <SendProgress 
-                  sentCount={sentCount} 
-                  totalToSend={totalToSend} 
+                <SendProgress
+                  sentCount={sentCount}
+                  totalToSend={totalToSend}
                 />
               )}
             </div>

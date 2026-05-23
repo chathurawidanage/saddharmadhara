@@ -6,7 +6,7 @@ import "./YogiList.css";
 import YogiListToolbar from "./YogiListToolbar";
 import YogiListTabs from "./YogiListTabs";
 import YogiTable from "./YogiTable";
-import { Retreat, Yogi } from "../../types/domain";
+import { Retreat, Yogi, Gender, MaritalState } from "../../types/domain";
 
 import {
   SELECTION_PRIORITY_SORT,
@@ -97,18 +97,17 @@ const YogisList = observer(({ retreat }: YogisListProps) => {
     .filter(
       (yogi) =>
         filters.male ||
-        yogi.attributes.gender?.toLowerCase() !== "male",
+        yogi.attributes.gender !== Gender.MALE,
     )
     .filter(
       (yogi) =>
         filters.female ||
-        yogi.attributes.gender?.toLowerCase() !== "female",
+        yogi.attributes.gender !== Gender.FEMALE,
     )
     .filter(
       (yogi) =>
         filters.reverend ||
-        yogi.attributes.maritalState?.toLowerCase() !==
-          "reverend",
+        yogi.attributes.maritalState !== MaritalState.REVEREND,
     )
     .filter((yogi) => {
       if (!searchQuery) return true;

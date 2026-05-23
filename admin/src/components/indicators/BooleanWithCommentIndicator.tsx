@@ -7,8 +7,8 @@ import STRESS from "./img/stressv3.png";
 import React from "react";
 
 interface BooleanWithCommentIndicatorProps {
-  bool: string | undefined;
-  showIf: string;
+  bool: boolean | undefined;
+  showIf: boolean;
   comment: string | undefined;
   img: string;
   className: string;
@@ -21,7 +21,7 @@ const BooleanWithCommentIndicator = ({
   img,
   className,
 }: BooleanWithCommentIndicatorProps) => {
-  if (!bool || bool !== showIf) {
+  if (bool === undefined || bool !== showIf) {
     return null;
   }
 
@@ -34,13 +34,11 @@ const BooleanWithCommentIndicator = ({
   );
 };
 
-
-
-export const HasKidsIndicator = ({ hasKids, comment }: { hasKids?: string; comment?: string }) => {
+export const HasKidsIndicator = ({ hasKids, comment }: { hasKids?: boolean; comment?: string }) => {
   return (
     <BooleanWithCommentIndicator
       bool={hasKids}
-      showIf="true"
+      showIf={true}
       comment={comment}
       img={KIDS}
       className="has-kids-indicator"
@@ -48,11 +46,11 @@ export const HasKidsIndicator = ({ hasKids, comment }: { hasKids?: string; comme
   );
 };
 
-export const HasPermission = ({ hasPermission, comment }: { hasPermission?: string; comment?: string }) => {
+export const HasPermission = ({ hasPermission, comment }: { hasPermission?: boolean; comment?: string }) => {
   return (
     <BooleanWithCommentIndicator
       bool={hasPermission}
-      showIf="false"
+      showIf={false}
       comment={comment}
       img={PERMISSION}
       className="has-permission-indicator"
@@ -63,11 +61,11 @@ export const HasPermission = ({ hasPermission, comment }: { hasPermission?: stri
 export const HasUnattendedDeformities = ({
   hasUnattendedDeformities,
   comment,
-}: { hasUnattendedDeformities?: string; comment?: string }) => {
+}: { hasUnattendedDeformities?: boolean; comment?: string }) => {
   return (
     <BooleanWithCommentIndicator
       bool={hasUnattendedDeformities}
-      showIf="true"
+      showIf={true}
       comment={comment}
       img={CROSS}
       className="has-unattended-deformities-indicator"
@@ -75,11 +73,11 @@ export const HasUnattendedDeformities = ({
   );
 };
 
-export const HasStress = ({ hasStress, comment }: { hasStress?: string; comment?: string }) => {
+export const HasStress = ({ hasStress, comment }: { hasStress?: boolean; comment?: string }) => {
   return (
     <BooleanWithCommentIndicator
       bool={hasStress}
-      showIf="true"
+      showIf={true}
       comment={comment}
       img={STRESS}
       className="has-stress-indicator"

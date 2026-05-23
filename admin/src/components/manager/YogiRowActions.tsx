@@ -20,7 +20,7 @@ import {
   DHIS2_RETREAT_SELECTION_STATE_SELECTED_CODE,
 } from "../../dhis2";
 import { useStore } from "../../stores/StoreProvider";
-import { Retreat, SelectionState, Yogi } from "../../types/domain";
+import { Retreat, SelectionState, InvitationState, Yogi } from "../../types/domain";
 
 interface StateChangeButtonProps {
   currentState: string;
@@ -270,11 +270,12 @@ interface InvitationIndicatorProps {
 
 export const InvitationIndicator = observer(({ yogi, retreat }: InvitationIndicatorProps) => {
   const status =
-    yogi.expressionOfInterests[retreat.code]?.invitationSent || "pending";
+    yogi.expressionOfInterests[retreat.code]?.invitationSent;
+  const isSent = status === InvitationState.SENT || status === InvitationState.DELIVERED;
   return (
     <div className="invitation-tag-wrapper">
-      <Tag positive={status === "sent"}>
-        {status === "sent" ? "Invitation Sent" : "Invitation Pending"}
+      <Tag positive={isSent}>
+        {isSent ? "Invitation Sent" : "Invitation Pending"}
       </Tag>
     </div>
   );

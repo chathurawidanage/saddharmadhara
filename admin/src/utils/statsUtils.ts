@@ -1,5 +1,5 @@
 import { isGeneralRetreat } from "./retreatUtils";
-import { Retreat, ParticipationSummary, EoiSummary } from "../types/domain";
+import { Retreat, ParticipationSummary, EoiSummary, InvitationState } from "../types/domain";
 
 export interface GeneralRetreatStats {
   totalParticipants: number;
@@ -73,7 +73,7 @@ export const calculateGeneralRetreatStats = (
   eoiSummary.forEach(({ yogiUid, retreatCode, invitationSent }) => {
     if (generalRetreatCodes.has(retreatCode)) {
       applicantUids.add(yogiUid);
-      if (invitationSent === "SENT") {
+      if (invitationSent === InvitationState.SENT) {
         invitedUids.add(yogiUid);
       }
     }

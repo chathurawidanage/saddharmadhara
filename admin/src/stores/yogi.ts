@@ -27,7 +27,7 @@ import {
   DHIS2_TEI_ATTRIBUTE_HAS_STRESS,
   DHIS2_TEI_ATTRIBUTE_HAS_STRESS_COMMENT,
 } from "../dhis2";
-import { Yogi, Retreat, ExpressionOfInterest, Participation, SpecialComment, Note, YogiAttributes, SelectionState, InvitationState } from "../types/domain";
+import { Yogi, Retreat, ExpressionOfInterest, Participation, SpecialComment, Note, YogiAttributes, SelectionState, InvitationState, AttendanceState } from "../types/domain";
 import {
   Dhis2Engine,
   Dhis2TrackerEventsResponse,
@@ -230,7 +230,13 @@ class YogiStore {
 
         const name = attributeUIDToNameMap[attribute.attribute];
         if (name) {
-          attributeIdToValueMap[name] = attribute.value;
+          let value = attribute.value;
+          if (name === "gender" || name === "maritalState" || name === "priority") {
+            value = (value || "").toLowerCase();
+          } else if (name === "hasKids" || name === "hasPermission" || name === "hasUnattendedDeformities" || name === "hasStress") {
+            value = value !== undefined && value !== null ? (String(value).toLowerCase() === "true" || value === true) : undefined as any;
+          }
+          attributeIdToValueMap[name] = value as any;
         }
       });
 
@@ -258,13 +264,13 @@ class YogiStore {
             ] = {
               eventId: event.event,
               state:
-                dataElementIdToValueMap[
+                (dataElementIdToValueMap[
                   DHIS2_RETREAT_SELECTION_STATE_DATA_ELEMENT
-                ] as SelectionState,
+                ] || "").toLowerCase() as SelectionState,
               invitationSent:
-                dataElementIdToValueMap[
+                (dataElementIdToValueMap[
                   DHIS2_RETREAT_INVITATION_SENT_DATA_ELEMENT
-                ] as InvitationState,
+                ] || "").toLowerCase() as InvitationState,
               occurredAt: event.occurredAt,
             };
           } else if (
@@ -281,7 +287,7 @@ class YogiStore {
               dataElementIdToValueMap[DHIS2_RETREAT_DATA_ELEMENT]
             ] = {
               eventId: event.event,
-              attendance: dataElementIdToValueMap[DHIS2_ATTENDANCE_DATA_ELEMENT],
+              attendance: (dataElementIdToValueMap[DHIS2_ATTENDANCE_DATA_ELEMENT] || "").toLowerCase() as AttendanceState,
               room: dataElementIdToValueMap[DHIS2_ROOM_ALLOCATION_DATA_ELEMENT],
               retreat: dataElementIdToValueMap[DHIS2_RETREAT_DATA_ELEMENT],
               specialComment:

@@ -24,7 +24,7 @@ import {
 } from "../indicators/ProfileInfo";
 import { BiLinkExternal } from "react-icons/bi";
 import NotesIndicator from "../indicators/NotesIndicator";
-import { Retreat, Yogi, EoiSummary } from "../../types/domain";
+import { Retreat, Yogi, EoiSummary, MaritalState } from "../../types/domain";
 import { getYogiSortScore } from "../../utils/yogiUtils";
 
 interface YogiRowProps {
@@ -41,7 +41,7 @@ const YogiRow = observer(({ trackedEntity, currentRetreat, allRetreats, eoiSumma
     const rowClassNames = [];
 
     if (
-      trackedEntity.attributes.maritalState?.toLowerCase() === "reverend"
+      trackedEntity.attributes.maritalState === MaritalState.REVEREND
     ) {
       rowClassNames.push("yogi-row-reverend");
     }

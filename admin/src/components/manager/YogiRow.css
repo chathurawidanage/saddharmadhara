@@ -1,6 +1,7 @@
 .yogi-row-reverend,
 .yogi-row-reverend td {
-  background-color: #fff9c4 !important; /* Keeping a light yellow for reverends, maybe add to variables later */
+  background-color: #fff9c4 !important;
+  /* Keeping a light yellow for reverends, maybe add to variables later */
 }
 
 .yogi-row-td {
@@ -35,6 +36,7 @@
   display: flex;
   gap: var(--spacing-xs);
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .invitation-tag-wrapper {

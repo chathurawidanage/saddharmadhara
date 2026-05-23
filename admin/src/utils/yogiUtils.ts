@@ -1,4 +1,4 @@
-import { Retreat, Yogi, EoiSummary } from "../types/domain";
+import { Retreat, Yogi, EoiSummary, MaritalState, SelectionState, YogiPriority, AttendanceState } from "../types/domain";
 import { isGeneralRetreat } from "./retreatUtils";
 
 export const SELECTION_PRIORITY_SORT = "selection-priority";
@@ -12,14 +12,11 @@ export const getYogiSortScore = (
 ) => {
   // 1. Status Score (S_status)
   let sStatus = 0;
-  let reverend = false;
-  if (yogiObj.attributes.maritalState?.toLowerCase() === "reverend") {
-    console.log("REVEREND FOUND")
-    reverend = true;
-    sStatus = 1000;
+  if (yogiObj.attributes.maritalState === MaritalState.REVEREND) {
+    sStatus = 9999;
   } else if (
-    yogiObj.attributes.priority?.toLowerCase() === "trust_member" ||
-    yogiObj.attributes.priority?.toLowerCase() === "trust_members_family"
+    yogiObj.attributes.priority === YogiPriority.TRUST_MEMBER ||
+    yogiObj.attributes.priority === YogiPriority.TRUST_MEMBERS_FAMILY
   ) {
     sStatus = 40;
   }
@@ -41,7 +38,7 @@ export const getYogiSortScore = (
   let nGeneral = 0;
   let nSilent = 0;
   Object.values(yogiObj.participation || {}).forEach((p) => {
-    if (p.attendance?.toLowerCase() === "attended") {
+    if (p.attendance === AttendanceState.ATTENDED) {
       const retreat = allRetreats.find((r) => r.code === p.retreat);
       if (retreat) {
         if (isGeneralRetreat(retreat)) {
@@ -70,8 +67,8 @@ export const getYogiSortScore = (
       const currentCount = eoiSummary.filter(
         (e) =>
           e.retreatCode === code &&
-          (e.state?.toLowerCase() === "selected" ||
-            e.state?.toLowerCase() === "reserved"),
+          (e.state === SelectionState.SELECTED ||
+            e.state === SelectionState.WAITING),
       ).length;
 
       if (currentCount < totalCapacity) {

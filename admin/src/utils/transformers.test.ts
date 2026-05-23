@@ -19,6 +19,7 @@ import {
   DHIS2_RETREAT_FINALIZED_ATTRIBUTE,
 } from "../dhis2";
 import { Dhis2SqlViewResponse, Dhis2OptionSetResponse } from "../types/dhis2";
+import { SelectionState, InvitationState } from "../types/domain";
 
 describe("transformers", () => {
   describe("transformRetreats", () => {
@@ -175,8 +176,8 @@ describe("transformers", () => {
       };
 
       expect(transformEoiSummary(mockResponse)).toEqual([
-        { yogiUid: "y1", retreatCode: "R1", state: "SELECTED", invitationSent: "SENT" },
-        { yogiUid: "y2", retreatCode: "R1", state: "PENDING", invitationSent: "NOT_SENT" },
+        { yogiUid: "y1", retreatCode: "R1", state: SelectionState.SELECTED, invitationSent: InvitationState.SENT },
+        { yogiUid: "y2", retreatCode: "R1", state: SelectionState.PENDING, invitationSent: InvitationState.NOT_SENT },
       ]);
     });
   });

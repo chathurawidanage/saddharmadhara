@@ -31,8 +31,12 @@ import {
   ParticipationSummary, 
   EoiSummary,
   MetadataOption,
-  Season
+  Season,
+  SelectionState,
+  Gender,
+  MaritalState
 } from "../types/domain";
+import { validateOptionSet } from "../utils/schemaValidation";
 import { Dhis2Engine, Dhis2SqlViewResponse, Dhis2OptionSetResponse, Dhis2Option } from "../types/dhis2";
 
 
@@ -99,6 +103,18 @@ const supportingMetadataQuery: object = {
   },
   attendance: {
     resource: `optionSets/${DHIS2_ATTENDANCE_OPTION_SET_ID}.json`,
+    params: {
+      fields: "options[code,name]",
+    },
+  },
+  genderOptions: {
+    resource: "optionSets/t4AsgOgvbi8.json",
+    params: {
+      fields: "options[code,name]",
+    },
+  },
+  maritalStateOptions: {
+    resource: "optionSets/Gv71emLnAwE.json",
     params: {
       fields: "options[code,name]",
     },
@@ -393,6 +409,17 @@ class MetadataStore {
         this.seasons = transformSeasons(response.seasons as Dhis2OptionSetResponse);
         this.retreats = transformRetreats(response.retreats as Dhis2SqlViewResponse);
         this.currentUser = response.me;
+
+        // Verify that SelectionState enum matches DHIS2 OptionSet
+        const selectionMismatches = validateOptionSet(
+          DHIS_RETREAT_SELECTION_STATE_OPTION_SET_ID,
+          "SelectionState",
+          this.selectionStates,
+          SelectionState as any
+        );
+        if (selectionMismatches.length > 0) {
+          console.error("SCHEMA MISMATCH: SelectionState enum deviates from DHIS2 option set!", selectionMismatches);
+        }
       });
     } catch (error) {
       runInAction(() => {
@@ -418,6 +445,32 @@ class MetadataStore {
         this.rooms = transformRooms(response.rooms as Dhis2OptionSetResponse);
         this.languages = transformLanguages(response.languages as Dhis2OptionSetResponse);
         this.attendance = transformAttendance(response.attendance as Dhis2OptionSetResponse);
+
+        // Verify that Gender enum matches DHIS2 OptionSet
+        if (response.genderOptions) {
+          const genderMismatches = validateOptionSet(
+            "t4AsgOgvbi8",
+            "Gender",
+            (response.genderOptions as Dhis2OptionSetResponse).options,
+            Gender as any
+          );
+          if (genderMismatches.length > 0) {
+            console.error("SCHEMA MISMATCH: Gender enum deviates from DHIS2 option set!", genderMismatches);
+          }
+        }
+
+        // Verify that MaritalState enum matches DHIS2 OptionSet
+        if (response.maritalStateOptions) {
+          const maritalMismatches = validateOptionSet(
+            "Gv71emLnAwE",
+            "MaritalState",
+            (response.maritalStateOptions as Dhis2OptionSetResponse).options,
+            MaritalState as any
+          );
+          if (maritalMismatches.length > 0) {
+            console.error("SCHEMA MISMATCH: MaritalState enum deviates from DHIS2 option set!", maritalMismatches);
+          }
+        }
       });
     } catch (error) {
       runInAction(() => {

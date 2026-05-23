@@ -16,7 +16,7 @@ import { DHIS2_RETREAT_SELECTION_STATE_SELECTED_CODE } from "../dhis2";
 import { useAlert } from "@dhis2/app-runtime";
 import { useStore } from "../stores/StoreProvider";
 import "./RetreatFinaliseModal.css";
-import { Retreat, Yogi } from "../types/domain";
+import { Retreat, Yogi, AttendanceState } from "../types/domain";
 
 interface RetreatFinaliseModalProps {
   retreat: Retreat;
@@ -77,7 +77,7 @@ const RetreatFinaliseModal = observer(({ retreat, onCancel }: RetreatFinaliseMod
     let markedCount = 0;
     for (const yogi of selectedYogiList) {
       if (!yogi.participation[retreat.code]?.attendance) {
-        await store.yogis.markAttendance(yogi.id, retreat, "attended");
+        await store.yogis.markAttendance(yogi.id, retreat, AttendanceState.ATTENDED);
         setMarkedCount(++markedCount);
       }
     }

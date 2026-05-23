@@ -3,9 +3,10 @@ import FEMALE from "./img/female.png";
 import "./indicators.css";
 import { Tooltip } from "@dhis2/ui";
 import React from "react";
+import { Gender } from "../../types/domain";
 
 interface GenderIndicatorProps {
-  gender?: string;
+  gender?: Gender;
 }
 
 const GenderIndicator = ({ gender }: GenderIndicatorProps) => {
@@ -16,7 +17,7 @@ const GenderIndicator = ({ gender }: GenderIndicatorProps) => {
   return (
     <Tooltip content={gender.toUpperCase()}>
       <div className="gender-indicator indicator">
-        <img src={gender.toLowerCase() === "male" ? MALE : FEMALE} alt={gender} />
+        <img src={gender === Gender.MALE ? MALE : FEMALE} alt={gender} />
       </div>
     </Tooltip>
   );

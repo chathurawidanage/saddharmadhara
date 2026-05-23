@@ -64,14 +64,46 @@ export interface Note {
   };
 }
 
-export type SelectionState =
-  | "SELECTED"
-  | "RESERVED"
-  | "NOT_SELECTED"
-  | "PENDING"
-  | string;
+export enum SelectionState {
+  SELECTED = "selected",
+  PENDING = "pending",
+  APPLIED = "applied",
+  WAITING = "waiting",
+  DESELECTED = "deselected",
+  UNATTENDING = "unattending",
+  UNCONFIRMED = "unconfirmed",
+}
 
-export type InvitationState = "SENT" | "NOT_SENT" | string;
+export enum InvitationState {
+  SENT = "sent",
+  NOT_SENT = "not_sent",
+  FAILED = "failed",
+  DELIVERED = "delivered",
+}
+
+export enum Gender {
+  MALE = "male",
+  FEMALE = "female",
+}
+
+export enum MaritalState {
+  REVEREND = "reverend",
+  SINGLE = "single",
+  MARRIED = "married",
+  WIDOWED = "widowed",
+  DIVORCED = "divorced",
+}
+
+export enum YogiPriority {
+  TRUST_MEMBER = "trust_member",
+  TRUST_MEMBERS_FAMILY = "trust_members_family",
+}
+
+export enum AttendanceState {
+  ATTENDED = "attended",
+  ABSENT = "absent",
+  NOSHOW = "noshow",
+}
 
 export interface ExpressionOfInterest {
   eventId: string;
@@ -82,29 +114,29 @@ export interface ExpressionOfInterest {
 
 export interface Participation {
   eventId: string;
-  attendance?: string;
+  attendance?: AttendanceState;
   room?: string;
   retreat: string;
   specialComment?: string;
   occurredAt: string;
 }
 
-export interface YogiAttributes extends Record<string, string | undefined> {
+export interface YogiAttributes extends Record<string, any> {
   fullName?: string;
-  gender?: string;
+  gender?: Gender;
   mobile?: string;
-  maritalState?: string;
+  maritalState?: MaritalState;
   nic?: string;
   passport?: string;
   dob?: string;
-  priority?: string;
-  hasKids?: string;
+  priority?: YogiPriority;
+  hasKids?: boolean;
   hasKidsComment?: string;
-  hasPermission?: string;
+  hasPermission?: boolean;
   hasPermissionComment?: string;
-  hasUnattendedDeformities?: string;
+  hasUnattendedDeformities?: boolean;
   hasUnattendedDeformitiesComment?: string;
-  hasStress?: string;
+  hasStress?: boolean;
   hasStressComment?: string;
 }
 

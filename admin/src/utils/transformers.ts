@@ -138,8 +138,8 @@ export const transformEoiSummary = (summaryResponse: Dhis2SqlViewResponse): EoiS
       ([yogiUid, retreatCode, state, invitationSent]) => ({
         yogiUid,
         retreatCode,
-        state: state as SelectionState,
-        invitationSent: invitationSent as InvitationState,
+        state: (state || "").toLowerCase() as SelectionState,
+        invitationSent: (invitationSent || "").toLowerCase() as InvitationState,
       }),
     ) || []
   );
