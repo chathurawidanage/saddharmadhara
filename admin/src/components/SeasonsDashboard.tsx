@@ -202,6 +202,7 @@ const SeasonsDashboard = observer(() => {
                             <th>Duration</th>
                             <th>Location</th>
                             <th>Yogis</th>
+                            {store.metadata.isAdmin && <th style={{ width: "180px" }}>Season</th>}
                             <th>Status</th>
                             <th>Actions</th>
                           </tr>
@@ -231,6 +232,22 @@ const SeasonsDashboard = observer(() => {
                                   <RetreatLocation locationId={retreat.location} />
                                 </td>
                                 <td>{retreat.totalYogis}</td>
+                                {store.metadata.isAdmin && (
+                                  <td>
+                                    <SingleSelectField
+                                      dense
+                                      selected={retreat.season || ""}
+                                      onChange={({ selected }: { selected: string }) => {
+                                        store.metadata?.assignSeasonToRetreat(retreat, selected);
+                                      }}
+                                    >
+                                      <SingleSelectOption label="Unassigned" value="" />
+                                      {(store.metadata?.seasons || []).map((s: Season) => (
+                                        <SingleSelectOption key={s.code} label={s.name} value={s.code} />
+                                      ))}
+                                    </SingleSelectField>
+                                  </td>
+                                )}
                                 <td>
                                   <div style={{ display: "flex", gap: "4px" }}>
                                     {retreat.finalized && (

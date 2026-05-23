@@ -75,6 +75,12 @@ const bootstrapQuery: object = {
       fields: "options[id,name,code,attributeValues[attribute[id],value]]",
     },
   },
+  me: {
+    resource: "me.json",
+    params: {
+      fields: "id,name,username,authorities,userRoles[id,name]",
+    },
+  },
 };
 
 const supportingMetadataQuery: object = {
@@ -120,6 +126,17 @@ class MetadataStore {
   retreats: Retreat[] = [];
   selectionStates: MetadataOption[] = [];
   rooms: Room[] = [];
+  currentUser: any = null;
+
+  get isAdmin(): boolean {
+    if (!this.currentUser) return false;
+    const hasAllAuthority = this.currentUser.authorities?.includes("ALL");
+    const hasAdminRole = this.currentUser.userRoles?.some((role: any) => 
+      role.name?.toLowerCase().includes("admin") || 
+      role.name?.toLowerCase().includes("superuser")
+    );
+    return !!(hasAllAuthority || hasAdminRole);
+  }
   languages: Language[] = [];
   attendance: Attendance[] = [];
   seasons: Season[] = [];
@@ -375,6 +392,7 @@ class MetadataStore {
         this.selectionStates = (response.selectionStates as Dhis2OptionSetResponse).options;
         this.seasons = transformSeasons(response.seasons as Dhis2OptionSetResponse);
         this.retreats = transformRetreats(response.retreats as Dhis2SqlViewResponse);
+        this.currentUser = response.me;
       });
     } catch (error) {
       runInAction(() => {
