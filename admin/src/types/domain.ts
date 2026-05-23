@@ -16,6 +16,15 @@ export interface Retreat {
   noOfDays: string;
   medium: RetreatMedium;
   finalized: boolean;
+  season?: string;
+}
+
+export interface Season {
+  id: string;
+  code: string;
+  name: string;
+  startDate: Date | null;
+  retreatType: string;
 }
 
 export interface Room {

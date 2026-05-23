@@ -10,6 +10,8 @@ import {
   DHIS2_RETREAT_ATTENDANCE_CONFIRMATION_DATE_ATTRIBUTE,
   DHIS2_DASHBOARD_PARTICIPATION_SUMMARY_SQL_VIEW,
   DHIS2_DASHBOARD_EOI_SUMMARY_SQL_VIEW,
+  DHIS2_SEASON_OPTION_SET_ID,
+  DHIS2_RETREAT_SEASON_ATTRIBUTE,
 } from "../dhis2";
 import {
   transformAttendance,
@@ -18,6 +20,7 @@ import {
   transformParticipationSummary,
   transformRetreats,
   transformRooms,
+  transformSeasons,
 } from "../utils/transformers";
 import { calculateGeneralRetreatStats, GeneralRetreatStats } from "../utils/statsUtils";
 import { 
@@ -27,7 +30,8 @@ import {
   Attendance, 
   ParticipationSummary, 
   EoiSummary,
-  MetadataOption
+  MetadataOption,
+  Season
 } from "../types/domain";
 import { Dhis2Engine, Dhis2SqlViewResponse, Dhis2OptionSetResponse, Dhis2Option } from "../types/dhis2";
 
@@ -63,6 +67,12 @@ const bootstrapQuery: object = {
     resource: `optionSets/${DHIS_RETREAT_SELECTION_STATE_OPTION_SET_ID}.json`,
     params: {
       fields: "options[code,name,style]",
+    },
+  },
+  seasons: {
+    resource: `optionSets/${DHIS2_SEASON_OPTION_SET_ID}.json`,
+    params: {
+      fields: "options[id,name,code,attributeValues[attribute[id],value]]",
     },
   },
 };
@@ -112,6 +122,7 @@ class MetadataStore {
   rooms: Room[] = [];
   languages: Language[] = [];
   attendance: Attendance[] = [];
+  seasons: Season[] = [];
   participationSummary: ParticipationSummary[] = [];
   eoiSummary: EoiSummary[] = [];
   smsCredits: { balance: number; currency: string } | null = null;
@@ -184,6 +195,42 @@ class MetadataStore {
       DHIS2_RETREAT_ATTENDANCE_CONFIRMATION_DATE_ATTRIBUTE,
       date,
     );
+  };
+
+  loadSeasons = async (): Promise<void> => {
+    try {
+      const response = await this.engine.query({
+        seasons: {
+          resource: `optionSets/${DHIS2_SEASON_OPTION_SET_ID}.json`,
+          params: {
+            fields: "options[id,name,code,attributeValues[attribute[id],value]]",
+          },
+        },
+      });
+      runInAction(() => {
+        this.seasons = transformSeasons(response.seasons as Dhis2OptionSetResponse);
+      });
+    } catch (error) {
+      console.error("Failed to load seasons", error);
+    }
+  };
+
+  assignSeasonToRetreat = async (retreat: Retreat, seasonCode: string): Promise<boolean> => {
+    const success = await this.updateRetreatAttribute(
+      retreat,
+      DHIS2_RETREAT_SEASON_ATTRIBUTE,
+      seasonCode || ""
+    );
+
+    if (success) {
+      runInAction(() => {
+        const retreatIndex = this.retreats.findIndex(r => r.id === retreat.id);
+        if (retreatIndex !== -1) {
+          this.retreats[retreatIndex].season = seasonCode || "";
+        }
+      });
+    }
+    return success;
   };
 
   updateRetreatAttribute = async (
@@ -326,6 +373,7 @@ class MetadataStore {
       runInAction(() => {
         this.retreatTypes = (response.retreatTypes as Dhis2OptionSetResponse).options;
         this.selectionStates = (response.selectionStates as Dhis2OptionSetResponse).options;
+        this.seasons = transformSeasons(response.seasons as Dhis2OptionSetResponse);
         this.retreats = transformRetreats(response.retreats as Dhis2SqlViewResponse);
       });
     } catch (error) {

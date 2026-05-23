@@ -9,6 +9,7 @@ import {
   DHIS2_ROOMS_FLOOR_ATTRIBUTE,
   DHIS2_RETREAT_MEDIUM_ATTRIBUTE,
   DHIS2_RETREAT_FINALIZED_ATTRIBUTE,
+  DHIS2_RETREAT_SEASON_ATTRIBUTE,
 } from "../dhis2";
 import { getRetreatEndDate } from "./retreatUtils";
 import { 
@@ -19,7 +20,8 @@ import {
   ParticipationSummary, 
   EoiSummary,
   SelectionState,
-  InvitationState
+  InvitationState,
+  Season
 } from "../types/domain";
 import { Dhis2SqlViewResponse, Dhis2OptionSetResponse, Dhis2Option } from "../types/dhis2";
 
@@ -52,12 +54,32 @@ export const transformRetreats = (retreatsResponse: Dhis2SqlViewResponse): Retre
       medium: attributeIdToValueMap[DHIS2_RETREAT_MEDIUM_ATTRIBUTE],
       finalized:
         attributeIdToValueMap[DHIS2_RETREAT_FINALIZED_ATTRIBUTE] === "true",
+      season: attributeIdToValueMap[DHIS2_RETREAT_SEASON_ATTRIBUTE],
     };
   });
 
   retreats?.sort((a: Retreat, b: Retreat) => a.date.getTime() - b.date.getTime());
 
   return retreats || [];
+};
+
+export const transformSeasons = (seasonsResponse: Dhis2OptionSetResponse): Season[] => {
+  const seasons = seasonsResponse?.options?.map((season: Dhis2Option) => {
+    const attributeIdToValueMap: Record<string, string> = {};
+    season.attributeValues?.forEach((attribute) => {
+      attributeIdToValueMap[attribute.attribute.id] = attribute.value;
+    });
+    return {
+      id: season.id,
+      code: season.code,
+      name: season.name,
+      startDate: attributeIdToValueMap[DHIS2_RETREAT_DATE_ATTRIBUTE] ? new Date(attributeIdToValueMap[DHIS2_RETREAT_DATE_ATTRIBUTE]) : null,
+      retreatType: attributeIdToValueMap[DHIS2_RETREAT_TYPE_ATTRIBUTE],
+    };
+  }) || [];
+
+  seasons.sort((a, b) => (b.startDate?.getTime() || 0) - (a.startDate?.getTime() || 0));
+  return seasons;
 };
 
 export const transformRooms = (roomResponse: Dhis2OptionSetResponse): Room[] => {

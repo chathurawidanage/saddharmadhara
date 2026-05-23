@@ -11,6 +11,7 @@ import {
   DHIS2_RETREAT_NO_OF_DAYS_ATTRIBUTE,
   DHIS2_RETREAT_TOTAL_YOGIS_ATTRIBUTE,
   DHIS2_RETREAT_TYPE_ATTRIBUTE,
+  DHIS2_RETREAT_SEASON_ATTRIBUTE,
 } from "../dhis2";
 import { Retreat } from "../types/domain";
 
@@ -40,6 +41,7 @@ export interface RetreatFormValues {
   accomodationNotProvided: boolean;
   accomodationOptional: boolean;
   disabled: boolean;
+  season?: string;
 }
 
 export const mapRetreatToInitialValues = (
@@ -85,6 +87,7 @@ export const mapRetreatToInitialValues = (
       DHIS2_RETREAT_ATTRIBUTE_ACCOMMODATION_OPTIONAL,
     ),
     disabled: getBoolValue(DHIS2_RETREAT_DISABLED_ATTRIBUTE),
+    season: getValue(DHIS2_RETREAT_SEASON_ATTRIBUTE) || "",
   };
 };
 
@@ -141,5 +144,9 @@ export const mapFormValuesToAttributeValues = (
       attribute: { id: DHIS2_RETREAT_ATTRIBUTE_ACCOMMODATION_OPTIONAL },
       value: values.accomodationOptional,
     },
+    ...(values.season ? [{
+      attribute: { id: DHIS2_RETREAT_SEASON_ATTRIBUTE },
+      value: values.season,
+    }] : []),
   ];
 };

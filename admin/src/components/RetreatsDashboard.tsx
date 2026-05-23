@@ -8,8 +8,11 @@ import DashboardStatsGrid from "./dashboard/DashboardStatsGrid";
 import GeneralRetreatStatsPanel from "./dashboard/GeneralRetreatStatsPanel";
 import RetreatSection from "./dashboard/RetreatSection";
 
+import { useNavigate } from "react-router-dom";
+
 const RetreatsDashboard = observer(() => {
   const store = useStore();
+  const navigate = useNavigate();
   const [hideRetreatModel, setHideRetreatModel] = useState(true);
 
   if (!store.metadata) return null;
@@ -17,8 +20,21 @@ const RetreatsDashboard = observer(() => {
   return (
     <div className="retreats-dashboard-container">
       <div className="dashboard-header-row">
-        <h2 className="dashboard-header-title">Dashboard</h2>
         <div>
+          <h2 className="dashboard-header-title">All Retreats List</h2>
+          <p style={{ margin: "4px 0 0 0", fontSize: "14px", color: "#6e7a8a" }}>
+            Flat view of all historical and active meditation retreats
+          </p>
+        </div>
+        <div style={{ display: "flex", gap: "12px" }}>
+          <Button
+            secondary
+            onClick={() => {
+              navigate("/");
+            }}
+          >
+            Back to Seasons Landing
+          </Button>
           <Button
             primary
             onClick={() => {

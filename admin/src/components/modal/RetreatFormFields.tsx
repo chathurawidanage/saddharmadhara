@@ -154,6 +154,20 @@ const RetreatFormFields = ({ values, form, store }: RetreatFormFieldsProps) => {
       </div>
       <div className="retreat-form-field-row">
         <Field
+          name="season"
+          label="Retreat Season"
+          component={SingleSelectFieldFF}
+          options={[
+            { label: "No Season", value: "" },
+            ...store.metadata.seasons.map((option) => ({
+              label: option.name,
+              value: option.code,
+            }))
+          ]}
+        />
+      </div>
+      <div className="retreat-form-field-row">
+        <Field
           type="checkbox"
           name="clergyOnly"
           label="Only for Clergy"
