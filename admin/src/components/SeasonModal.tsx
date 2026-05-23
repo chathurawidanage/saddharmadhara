@@ -84,7 +84,7 @@ const SeasonModal = ({ store, onCancel }: SeasonModalProps) => {
         );
         const mediumName = selectedMedium ? selectedMedium.name : values.medium;
 
-        const name = `${year} ${monthName} (${retreatTypeName}) - ${values.noOfDays} Days [${mediumName}]`;
+        const name = `${year} ${monthName} - ${retreatTypeName} - ${values.noOfDays} Days - ${mediumName}`;
         const code = `${year}_${monthNum}_${values.noOfDays}d_${values.medium}_${values.retreatType.toLowerCase()}`;
 
         const attributeValues = [
