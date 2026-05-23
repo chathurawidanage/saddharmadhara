@@ -41,7 +41,7 @@ const YogiRow = observer(({ trackedEntity, currentRetreat, allRetreats, eoiSumma
     const rowClassNames = [];
 
     if (
-      trackedEntity.attributes.maritalState === "reverend"
+      trackedEntity.attributes.maritalState?.toLowerCase() === "reverend"
     ) {
       rowClassNames.push("yogi-row-reverend");
     }
@@ -52,9 +52,12 @@ const YogiRow = observer(({ trackedEntity, currentRetreat, allRetreats, eoiSumma
           <div className="yogi-name-row">
             {trackedEntity.attributes.fullName}
             <span className="yogi-score">
-              {getYogiSortScore(trackedEntity, allRetreats, eoiSummary).toFixed(
-                2,
-              )}
+              {getYogiSortScore(
+                trackedEntity,
+                allRetreats,
+                eoiSummary,
+                currentRetreat,
+              ).toFixed(2)}
             </span>
             <Button
               small

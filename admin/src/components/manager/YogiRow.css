@@ -1,5 +1,6 @@
-.yogi-row-reverend {
-  background-color: #fff9c4; /* Keeping a light yellow for reverends, maybe add to variables later */
+.yogi-row-reverend,
+.yogi-row-reverend td {
+  background-color: #fff9c4 !important; /* Keeping a light yellow for reverends, maybe add to variables later */
 }
 
 .yogi-row-td {

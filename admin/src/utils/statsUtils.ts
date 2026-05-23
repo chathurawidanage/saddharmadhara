@@ -73,7 +73,7 @@ export const calculateGeneralRetreatStats = (
   eoiSummary.forEach(({ yogiUid, retreatCode, invitationSent }) => {
     if (generalRetreatCodes.has(retreatCode)) {
       applicantUids.add(yogiUid);
-      if (invitationSent) {
+      if (invitationSent === "SENT") {
         invitedUids.add(yogiUid);
       }
     }

@@ -26,6 +26,39 @@ describe("YogiList Sorting Helpers", () => {
     );
   });
 
+  test("getYogiSortScore dynamically calculates mFlex using actual retreat count in a season", () => {
+    // Yogi with 1 request in target season S1 and 1 request in another season S2
+    const yogi = {
+      attributes: { dob: "1990-01-01" }, // age score: 50
+      expressionOfInterests: {
+        R1: { state: "PENDING", occurredAt: "2024-01-01" },
+        R_other: { state: "PENDING", occurredAt: "2024-01-01" },
+      },
+      participation: {},
+    } as any;
+
+    const allRetreats = [
+      { code: "R1", season: "S1", totalYogis: "10" },
+      { code: "R2", season: "S1", totalYogis: "10" },
+      { code: "R3", season: "S1", totalYogis: "10" },
+      { code: "R4", season: "S1", totalYogis: "10" },
+      { code: "R5", season: "S1", totalYogis: "10" },
+      { code: "R6", season: "S1", totalYogis: "10" },
+      { code: "R_other", season: "S2", totalYogis: "10" },
+    ] as any[];
+
+    const eoiSummary = [] as any[]; // dEffective = 1 (R_other is in S2, which is ignored)
+
+    const currentRetreat = { code: "R1", season: "S1" } as any;
+
+    const scoreWithSeason = getYogiSortScore(yogi, allRetreats, eoiSummary, currentRetreat);
+    const scoreWithoutSeason = getYogiSortScore(yogi, allRetreats, eoiSummary);
+
+    expect(scoreWithSeason).toBe(225);
+    expect(scoreWithoutSeason).toBe(180);
+  });
+
+
   test("selectionPrioritySorter sorts by score then date", () => {
     const y1 = {
       attributes: { maritalState: "reverend" },

@@ -8,10 +8,14 @@ export const getYogiSortScore = (
   yogiObj: Yogi,
   allRetreats: Retreat[] = [],
   eoiSummary: EoiSummary[] = [],
+  currentRetreat?: Retreat,
 ) => {
   // 1. Status Score (S_status)
   let sStatus = 0;
-  if (yogiObj.attributes.maritalState === "reverend") {
+  let reverend = false;
+  if (yogiObj.attributes.maritalState?.toLowerCase() === "reverend") {
+    console.log("REVEREND FOUND")
+    reverend = true;
     sStatus = 1000;
   } else if (
     yogiObj.attributes.priority?.toLowerCase() === "trust_member" ||
@@ -36,7 +40,7 @@ export const getYogiSortScore = (
   // 3. Participation Score (S_participation)
   let nGeneral = 0;
   let nSilent = 0;
-  Object.values(yogiObj.participation).forEach((p) => {
+  Object.values(yogiObj.participation || {}).forEach((p) => {
     if (p.attendance?.toLowerCase() === "attended") {
       const retreat = allRetreats.find((r) => r.code === p.retreat);
       if (retreat) {
@@ -53,11 +57,14 @@ export const getYogiSortScore = (
   // 4. Dynamic Flexibility Multiplier (M_flex)
   // D_effective: count of retreats requested by the yogi that still have open capacity for their gender
   let dEffective = 0;
-  const requestedRetreatCodes = Object.keys(yogiObj.expressionOfInterests);
+  const requestedRetreatCodes = Object.keys(yogiObj.expressionOfInterests || {});
 
   requestedRetreatCodes.forEach((code) => {
     const retreat = allRetreats.find((r) => r.code === code);
     if (retreat) {
+      if (currentRetreat?.season && retreat.season !== currentRetreat.season) {
+        return;
+      }
       const totalCapacity = parseInt(retreat.totalYogis, 10) || 0;
       // We don't have gender-specific occupancy in eoiSummary, using total as proxy
       const currentCount = eoiSummary.filter(
@@ -73,8 +80,17 @@ export const getYogiSortScore = (
     }
   });
 
-  // todo 4 has to be the number of open retreats in this season
-  const mFlex = 1 + 0.1 * (4 - dEffective);
+  let seasonRetreatCount = 4;
+  if (currentRetreat?.season) {
+    const retreatsInSeason = allRetreats.filter(
+      (r) => r.season === currentRetreat?.season,
+    );
+    if (retreatsInSeason.length > 0) {
+      seasonRetreatCount = retreatsInSeason.length;
+    }
+  }
+
+  const mFlex = 1 + 0.1 * (seasonRetreatCount - dEffective);
 
   return Math.floor((sStatus + sAge + sParticipation) * mFlex);
 };
@@ -86,8 +102,8 @@ export const selectionPrioritySorter = (
   allRetreats: Retreat[] = [],
   eoiSummary: EoiSummary[] = [],
 ) => {
-  const y1Score = getYogiSortScore(y1, allRetreats, eoiSummary);
-  const y2Score = getYogiSortScore(y2, allRetreats, eoiSummary);
+  const y1Score = getYogiSortScore(y1, allRetreats, eoiSummary, retreat);
+  const y2Score = getYogiSortScore(y2, allRetreats, eoiSummary, retreat);
 
   if (y1Score === y2Score) {
     // finally sort by applied date, lowest date comes first
