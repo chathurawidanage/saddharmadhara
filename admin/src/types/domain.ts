@@ -25,6 +25,8 @@ export interface Season {
   name: string;
   startDate: Date | null;
   retreatType: string;
+  noOfDays?: string;
+  medium?: string;
 }
 
 export interface Room {

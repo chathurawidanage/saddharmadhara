@@ -17,6 +17,8 @@ import {
   DHIS2_RETREAT_DATE_ATTRIBUTE,
   DHIS2_RETREAT_TYPE_ATTRIBUTE,
   DHIS2_SEASON_OPTION_SET_ID,
+  DHIS2_RETREAT_NO_OF_DAYS_ATTRIBUTE,
+  DHIS2_RETREAT_MEDIUM_ATTRIBUTE,
 } from "../dhis2";
 
 import RootStore from "../stores/root";
@@ -48,6 +50,8 @@ interface SeasonModalProps {
 interface SeasonFormValues {
   startDate: string;
   retreatType: string;
+  noOfDays: string;
+  medium: string;
 }
 
 const SeasonModal = ({ store, onCancel }: SeasonModalProps) => {
@@ -75,8 +79,13 @@ const SeasonModal = ({ store, onCancel }: SeasonModalProps) => {
         );
         const retreatTypeName = selectedType ? selectedType.name : values.retreatType;
 
-        const name = `${year} ${monthName} (${retreatTypeName})`;
-        const code = `${year}_${monthNum}_${values.retreatType.toLowerCase()}`;
+        const selectedMedium = store.metadata?.languages?.find(
+          (l: any) => l.code === values.medium
+        );
+        const mediumName = selectedMedium ? selectedMedium.name : values.medium;
+
+        const name = `${year} ${monthName} (${retreatTypeName}) - ${values.noOfDays} Days [${mediumName}]`;
+        const code = `${year}_${monthNum}_${values.noOfDays}d_${values.medium}_${values.retreatType.toLowerCase()}`;
 
         const attributeValues = [
           {
@@ -86,6 +95,14 @@ const SeasonModal = ({ store, onCancel }: SeasonModalProps) => {
           {
             attribute: { id: DHIS2_RETREAT_TYPE_ATTRIBUTE },
             value: values.retreatType,
+          },
+          {
+            attribute: { id: DHIS2_RETREAT_NO_OF_DAYS_ATTRIBUTE },
+            value: values.noOfDays,
+          },
+          {
+            attribute: { id: DHIS2_RETREAT_MEDIUM_ATTRIBUTE },
+            value: values.medium,
           },
         ];
 
@@ -120,6 +137,32 @@ const SeasonModal = ({ store, onCancel }: SeasonModalProps) => {
                   component={SingleSelectFieldFF}
                   validate={hasValue}
                   options={(store.metadata?.retreatTypes || []).map((option: any) => ({
+                    label: option.name,
+                    value: option.code,
+                  }))}
+                />
+              </div>
+
+              <div style={styles.fieldRow}>
+                <Field
+                  required
+                  name="noOfDays"
+                  label="Number of Days"
+                  component={InputFieldFF}
+                  type="number"
+                  validate={hasValue}
+                />
+              </div>
+
+              <div style={styles.fieldRow}>
+                <Field
+                  required
+                  name="medium"
+                  label="Language (Retreat Medium)"
+                  component={SingleSelectFieldFF}
+                  validate={hasValue}
+                  defaultValue="sinhala"
+                  options={(store.metadata?.languages || []).map((option: any) => ({
                     label: option.name,
                     value: option.code,
                   }))}

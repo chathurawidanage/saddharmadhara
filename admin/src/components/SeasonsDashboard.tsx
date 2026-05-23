@@ -151,6 +151,12 @@ const SeasonsDashboard = observer(() => {
                   <span className="season-name">{season.name}</span>
                   <div className="season-tags">
                     <Tag>{season.retreatType?.toUpperCase()}</Tag>
+                    {season.noOfDays && <Tag neutral>{season.noOfDays} Days</Tag>}
+                    {season.medium && (
+                      <Tag neutral>
+                        🌐 {store.metadata?.languages?.find((l) => l.code === season.medium)?.name || season.medium}
+                      </Tag>
+                    )}
                     {season.startDate && (
                       <span className="season-date-badge">
                         <FiCalendar style={{ marginRight: "4px" }} />

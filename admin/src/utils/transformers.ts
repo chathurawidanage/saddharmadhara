@@ -75,6 +75,8 @@ export const transformSeasons = (seasonsResponse: Dhis2OptionSetResponse): Seaso
       name: season.name,
       startDate: attributeIdToValueMap[DHIS2_RETREAT_DATE_ATTRIBUTE] ? new Date(attributeIdToValueMap[DHIS2_RETREAT_DATE_ATTRIBUTE]) : null,
       retreatType: attributeIdToValueMap[DHIS2_RETREAT_TYPE_ATTRIBUTE],
+      noOfDays: attributeIdToValueMap[DHIS2_RETREAT_NO_OF_DAYS_ATTRIBUTE],
+      medium: attributeIdToValueMap[DHIS2_RETREAT_MEDIUM_ATTRIBUTE],
     };
   }) || [];
 
