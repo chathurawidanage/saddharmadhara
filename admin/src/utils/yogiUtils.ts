@@ -77,6 +77,9 @@ export const getYogiSortScore = (
     }
   });
 
+  // todo if yogi has been selected (pending or selected) 
+  // to a retreat in this season, that yogi should get a huge nerf like -500
+
   let seasonRetreatCount = 4;
   if (currentRetreat?.season) {
     const retreatsInSeason = allRetreats.filter(
