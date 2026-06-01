@@ -57,6 +57,7 @@ export const getYogiSortScore = (
   }
 
   // 3. Participation Score (S_participation)
+  // TODO do deductions only for retreats within last 3 years
   let nGeneral = 0;
   let nSilent = 0;
   Object.values(yogiObj.participation || {}).forEach((p) => {
@@ -116,12 +117,17 @@ export const getYogiSortScore = (
       }
       const retreat = allRetreats.find((r) => r.code === code);
       if (retreat && retreat.season === currentRetreat.season) {
-        if (
-          eoi.state === SelectionState.SELECTED ||
-          eoi.state === SelectionState.PENDING
-        ) {
+        if (eoi.state === SelectionState.SELECTED) {
           hasSelectionInSeason = true;
-          penaltyReasons.push(`${eoi.state?.toUpperCase()} for retreat: ${retreat.retreatCode}`);
+          penaltyReasons.push(`SELECTED for retreat: ${retreat.retreatCode}`);
+        } else if (eoi.state === SelectionState.PENDING) {
+          const isPastRetreat = retreat.date && new Date(retreat.date).getTime() < Date.now();
+          if (isPastRetreat) {
+            penaltyReasons.push(`PENDING (stale: retreat started/ended - no deduction) for retreat: ${retreat.retreatCode}`);
+          } else {
+            hasSelectionInSeason = true;
+            penaltyReasons.push(`PENDING for retreat: ${retreat.retreatCode}`);
+          }
         }
       }
     });
