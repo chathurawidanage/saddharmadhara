@@ -62,7 +62,7 @@ const ParticipationIndicator = observer(({ trackedEntity }: ParticipationIndicat
                       <div
                         className={`yogi-application-state participation-state-${p.attendance}`}
                       >
-                        {p.attendance || "Pending"}
+                        {p.attendance || "Mark Pending"}
                       </div>
                       {hasSpecialComment && (
                         <div className="yogi-application-special-comment">

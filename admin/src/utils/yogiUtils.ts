@@ -109,7 +109,7 @@ export const getYogiSortScore = (
     penaltyReasons.push("No-show within last year (-25)");
   }
 
-  let hasSelectionInSeason = false;
+  let selectionInSeasonCount = 0;
   if (currentRetreat?.season) {
     Object.entries(yogiObj.expressionOfInterests || {}).forEach(([code, eoi]) => {
       if (code === currentRetreat.code) {
@@ -118,14 +118,14 @@ export const getYogiSortScore = (
       const retreat = allRetreats.find((r) => r.code === code);
       if (retreat && retreat.season === currentRetreat.season) {
         if (eoi.state === SelectionState.SELECTED) {
-          hasSelectionInSeason = true;
+          selectionInSeasonCount++;
           penaltyReasons.push(`SELECTED for retreat: ${retreat.retreatCode}`);
         } else if (eoi.state === SelectionState.PENDING) {
           const isPastRetreat = retreat.date && new Date(retreat.date).getTime() < Date.now();
           if (isPastRetreat) {
             penaltyReasons.push(`PENDING (stale: retreat started/ended - no deduction) for retreat: ${retreat.retreatCode}`);
           } else {
-            hasSelectionInSeason = true;
+            selectionInSeasonCount++;
             penaltyReasons.push(`PENDING for retreat: ${retreat.retreatCode}`);
           }
         }
@@ -133,9 +133,10 @@ export const getYogiSortScore = (
     });
   }
 
-  if (hasSelectionInSeason) {
-    sPenalty += -50;
-    penaltyReasons.push("Already selected/pending in this season (-50)");
+  if (selectionInSeasonCount > 0) {
+    const seasonPenalty = -50 - 25 * (selectionInSeasonCount - 1);
+    sPenalty += seasonPenalty;
+    penaltyReasons.push(`Already selected/pending in this season (Occurrences: ${selectionInSeasonCount}, Penalty: ${seasonPenalty})`);
   }
 
   if (penaltyReasons.length > 0) {
@@ -143,7 +144,7 @@ export const getYogiSortScore = (
   }
 
   // 4. Dynamic Flexibility Multiplier (M_flex)
-  // D_effective: count of retreats requested by the yogi that still have open capacity for their gender
+  // D_effective: count of active/upcoming retreats requested by the yogi that still have open capacity for their gender
   let dEffective = 0;
   const requestedRetreatCodes = Object.keys(yogiObj.expressionOfInterests || {});
 
@@ -153,6 +154,13 @@ export const getYogiSortScore = (
       if (currentRetreat?.season && retreat.season !== currentRetreat.season) {
         return;
       }
+
+      // Exclude retreats already started or finished
+      const isPastRetreat = retreat.date && new Date(retreat.date).getTime() < Date.now();
+      if (isPastRetreat) {
+        return;
+      }
+
       let capacity = parseInt(retreat.totalYogis, 10) || 0;
       if (yogiObj.attributes.gender === Gender.FEMALE && retreat.femaleYogis) {
         capacity = parseInt(retreat.femaleYogis, 10) || 0;
@@ -183,14 +191,15 @@ export const getYogiSortScore = (
 
   if (currentRetreat?.season) {
     let seasonRetreatCount = 4;
-    const retreatsInSeason = allRetreats.filter(
-      (r) => r.season === currentRetreat.season,
+    // Exclude past retreats from the active retreats in the season
+    const activeRetreatsInSeason = allRetreats.filter(
+      (r) => r.season === currentRetreat.season && !(r.date && new Date(r.date).getTime() < Date.now()),
     );
-    if (retreatsInSeason.length > 0) {
-      seasonRetreatCount = retreatsInSeason.length;
+    if (activeRetreatsInSeason.length > 0) {
+      seasonRetreatCount = activeRetreatsInSeason.length;
     }
     mFlex = 1 + 0.1 * (seasonRetreatCount - dEffective);
-    mFlexReason = `Formula: 1 + 0.1 * (${seasonRetreatCount} season retreats - ${dEffective} open requests) = ${mFlex.toFixed(2)}`;
+    mFlexReason = `Formula: 1 + 0.1 * (${seasonRetreatCount} active season retreats - ${dEffective} open requests) = ${mFlex.toFixed(2)}`;
   }
 
   const total = Math.floor((sStatus + sAge + sParticipation + sPenalty) * mFlex);
