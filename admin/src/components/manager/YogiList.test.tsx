@@ -18,11 +18,11 @@ describe("YogiList Sorting Helpers", () => {
     } as any;
     const normal = { attributes: {} } as any;
 
-    expect(getYogiSortScore(reverend)).toBeGreaterThan(
-      getYogiSortScore(trustMember),
+    expect(getYogiSortScore(reverend).total).toBeGreaterThan(
+      getYogiSortScore(trustMember).total,
     );
-    expect(getYogiSortScore(trustMember)).toBeGreaterThan(
-      getYogiSortScore(normal),
+    expect(getYogiSortScore(trustMember).total).toBeGreaterThan(
+      getYogiSortScore(normal).total,
     );
   });
 
@@ -51,11 +51,11 @@ describe("YogiList Sorting Helpers", () => {
 
     const currentRetreat = { code: "R1", season: "S1" } as any;
 
-    const scoreWithSeason = getYogiSortScore(yogi, allRetreats, eoiSummary, currentRetreat);
-    const scoreWithoutSeason = getYogiSortScore(yogi, allRetreats, eoiSummary);
+    const scoreWithSeason = getYogiSortScore(yogi, allRetreats, eoiSummary, currentRetreat).total;
+    const scoreWithoutSeason = getYogiSortScore(yogi, allRetreats, eoiSummary).total;
 
     expect(scoreWithSeason).toBe(225);
-    expect(scoreWithoutSeason).toBe(180);
+    expect(scoreWithoutSeason).toBe(150);
   });
 
 

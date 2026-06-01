@@ -1,5 +1,5 @@
 import { useConfig } from "@dhis2/app-runtime";
-import { Button, TableRow, TableCell } from "@dhis2/ui";
+import { Button, TableRow, TableCell, Tooltip } from "@dhis2/ui";
 import { observer } from "mobx-react";
 import React, { ReactNode } from "react";
 import {
@@ -51,14 +51,55 @@ const YogiRow = observer(({ trackedEntity, currentRetreat, allRetreats, eoiSumma
         <TableCell className="yogi-row-td">
           <div className="yogi-name-row">
             {trackedEntity.attributes.fullName}
-            <span className="yogi-score">
-              {getYogiSortScore(
+            {(() => {
+              const scoreObj = getYogiSortScore(
                 trackedEntity,
                 allRetreats,
                 eoiSummary,
                 currentRetreat,
-              ).toFixed(2)}
-            </span>
+              );
+              const { total, breakdown } = scoreObj;
+              return (
+                <Tooltip
+                  content={
+                    <div className="yogi-score-tooltip">
+                      <div className="yogi-score-tooltip-title">Score Breakdown</div>
+                      <div className="yogi-score-tooltip-row">
+                        <span className="yogi-score-tooltip-label">Status Score:</span>
+                        <span className="yogi-score-tooltip-value">+{breakdown.statusScore}</span>
+                      </div>
+                      <div className="yogi-score-tooltip-reason">{breakdown.statusReason}</div>
+                      
+                      <div className="yogi-score-tooltip-row">
+                        <span className="yogi-score-tooltip-label">Age Score:</span>
+                        <span className="yogi-score-tooltip-value">+{breakdown.ageScore.toFixed(1)}</span>
+                      </div>
+                      <div className="yogi-score-tooltip-reason">{breakdown.ageReason}</div>
+                      
+                      <div className="yogi-score-tooltip-row">
+                        <span className="yogi-score-tooltip-label">Participation:</span>
+                        <span className="yogi-score-tooltip-value">+{breakdown.participationScore}</span>
+                      </div>
+                      <div className="yogi-score-tooltip-reason">{breakdown.participationReason}</div>
+                      
+                      <div className="yogi-score-tooltip-row">
+                        <span className="yogi-score-tooltip-label">Flexibility Multiplier:</span>
+                        <span className="yogi-score-tooltip-value">x{breakdown.mFlex.toFixed(2)}</span>
+                      </div>
+                      <div className="yogi-score-tooltip-reason">{breakdown.mFlexReason}</div>
+                      
+                      <div className="yogi-score-tooltip-formula">
+                        Total: ({breakdown.statusScore} + {breakdown.ageScore.toFixed(1)} + {breakdown.participationScore}) * {breakdown.mFlex.toFixed(2)} = {total}
+                      </div>
+                    </div>
+                  }
+                >
+                  <span className="yogi-score">
+                    {total.toFixed(2)}
+                  </span>
+                </Tooltip>
+              );
+            })()}
             <Button
               small
               onClick={() => {

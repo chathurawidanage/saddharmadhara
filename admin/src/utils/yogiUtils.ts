@@ -4,33 +4,53 @@ import { isGeneralRetreat } from "./retreatUtils";
 export const SELECTION_PRIORITY_SORT = "selection-priority";
 export const AGE_SORT = "age";
 
+export interface YogiSortScoreBreakdown {
+  statusScore: number;
+  statusReason: string;
+  ageScore: number;
+  ageReason: string;
+  participationScore: number;
+  participationReason: string;
+  mFlex: number;
+  mFlexReason: string;
+}
+
 export const getYogiSortScore = (
   yogiObj: Yogi,
   allRetreats: Retreat[] = [],
   eoiSummary: EoiSummary[] = [],
   currentRetreat?: Retreat,
-) => {
+): { total: number; breakdown: YogiSortScoreBreakdown } => {
   // 1. Status Score (S_status)
   let sStatus = 0;
+  let statusReason = "Normal Status";
   if (yogiObj.attributes.maritalState === MaritalState.REVEREND) {
     sStatus = 9999;
+    statusReason = "Reverend Status";
   } else if (
     yogiObj.attributes.priority === YogiPriority.TRUST_MEMBER ||
     yogiObj.attributes.priority === YogiPriority.TRUST_MEMBERS_FAMILY
   ) {
     sStatus = 40;
+    statusReason = `Trust Member / Trust Member's Family`;
   }
 
   // 2. Age Score (S_age)
   let sAge = 0;
+  let ageReason = "Date of Birth not provided";
   if (yogiObj.attributes.dob) {
     const age = Math.floor(
       (Date.now() - new Date(yogiObj.attributes.dob).getTime()) / 31557600000,
     );
     if (age >= 20 && age <= 40) {
       sAge = 50;
+      ageReason = `Age ${age} (Young adult: 20-40)`;
     } else if (age > 40 && age <= 70) {
       sAge = 30 + 1.33 * Math.abs(55 - age);
+      ageReason = `Age ${age} (Formula: 30 + 1.33 * |55 - age| = ${sAge.toFixed(2)})`;
+    } else {
+      sAge = 0;
+      ageReason = `Age ${age} (Outside priority range)`;
     }
   }
 
@@ -50,6 +70,7 @@ export const getYogiSortScore = (
     }
   });
   const sParticipation = 100 - 20 * nGeneral + 10 * nSilent;
+  const participationReason = `Attended: ${nGeneral} General (-20 each), ${nSilent} Silent (+10 each) with base 100`;
 
   // 4. Dynamic Flexibility Multiplier (M_flex)
   // D_effective: count of retreats requested by the yogi that still have open capacity for their gender
@@ -80,19 +101,36 @@ export const getYogiSortScore = (
   // todo if yogi has been selected (pending or selected) 
   // to a retreat in this season, that yogi should get a huge nerf like -500
 
-  let seasonRetreatCount = 4;
+  let mFlex = 1;
+  let mFlexReason = "Not applicable (Season not defined)";
+
   if (currentRetreat?.season) {
+    let seasonRetreatCount = 4;
     const retreatsInSeason = allRetreats.filter(
-      (r) => r.season === currentRetreat?.season,
+      (r) => r.season === currentRetreat.season,
     );
     if (retreatsInSeason.length > 0) {
       seasonRetreatCount = retreatsInSeason.length;
     }
+    mFlex = 1 + 0.1 * (seasonRetreatCount - dEffective);
+    mFlexReason = `Formula: 1 + 0.1 * (${seasonRetreatCount} season retreats - ${dEffective} open requests) = ${mFlex.toFixed(2)}`;
   }
 
-  const mFlex = 1 + 0.1 * (seasonRetreatCount - dEffective);
+  const total = Math.floor((sStatus + sAge + sParticipation) * mFlex);
 
-  return Math.floor((sStatus + sAge + sParticipation) * mFlex);
+  return {
+    total,
+    breakdown: {
+      statusScore: sStatus,
+      statusReason,
+      ageScore: sAge,
+      ageReason,
+      participationScore: sParticipation,
+      participationReason,
+      mFlex,
+      mFlexReason,
+    },
+  };
 };
 
 export const selectionPrioritySorter = (
@@ -102,8 +140,8 @@ export const selectionPrioritySorter = (
   allRetreats: Retreat[] = [],
   eoiSummary: EoiSummary[] = [],
 ) => {
-  const y1Score = getYogiSortScore(y1, allRetreats, eoiSummary, retreat);
-  const y2Score = getYogiSortScore(y2, allRetreats, eoiSummary, retreat);
+  const y1Score = getYogiSortScore(y1, allRetreats, eoiSummary, retreat).total;
+  const y2Score = getYogiSortScore(y2, allRetreats, eoiSummary, retreat).total;
 
   if (y1Score === y2Score) {
     // finally sort by applied date, lowest date comes first
