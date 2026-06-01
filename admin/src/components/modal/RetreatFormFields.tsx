@@ -8,7 +8,12 @@ import {
   hasValue,
   SwitchFieldFF,
 } from "@dhis2/ui";
-import { DHIS2_ROOT_ORG } from "../../dhis2";
+import { useDataEngine } from "@dhis2/app-runtime";
+import {
+  DHIS2_ROOT_ORG,
+  DHIS2_RETREAT_FEMALE_YOGIS_ATTRIBUTE,
+  DHIS2_RETREAT_MALE_YOGIS_ATTRIBUTE,
+} from "../../dhis2";
 import { RetreatFormValues, generateRetreatName } from "../../utils/retreatFormMapping";
 import RootStore from "../../stores/root";
 import { Season } from "../../types/domain";
@@ -25,6 +30,7 @@ interface RetreatFormFieldsProps {
 }
 
 const RetreatFormFields = ({ values, form, store, isSeasonLocked, preconfiguredSeason }: RetreatFormFieldsProps) => {
+  const dataEngine = useDataEngine();
   if (!store.metadata) return null;
 
   const currentSeason = store.metadata.seasons.find(s => s.code === values.season) || preconfiguredSeason;
@@ -51,6 +57,13 @@ const RetreatFormFields = ({ values, form, store, isSeasonLocked, preconfiguredS
             if (values.name !== generatedName) {
               form.change("name", generatedName);
             }
+          }
+
+          const femaleCount = parseInt(values.femaleYogis || "0", 10) || 0;
+          const maleCount = parseInt(values.maleYogis || "0", 10) || 0;
+          const derivedTotal = String(femaleCount + maleCount);
+          if (values.noOfYogis !== derivedTotal) {
+            form.change("noOfYogis", derivedTotal);
           }
         }}
       />
@@ -113,8 +126,31 @@ const RetreatFormFields = ({ values, form, store, isSeasonLocked, preconfiguredS
               <Label required>Location</Label>
               <OrganisationUnitTree
                 roots={[DHIS2_ROOT_ORG]}
-                onChange={(e: { path: string; displayName: string; id: string }) => {
+                onChange={async (e: { path: string; displayName: string; id: string }) => {
                   props.input.onChange(e);
+                  try {
+                    const data: any = await dataEngine.query({
+                      orgUnit: {
+                        resource: `organisationUnits/${e.id}.json`,
+                        params: {
+                          fields: "attributeValues[attribute[id],value]",
+                        },
+                      },
+                    });
+
+                    const attrs = data?.orgUnit?.attributeValues || [];
+                    const femaleCount = attrs.find((a: any) => a.attribute?.id === DHIS2_RETREAT_FEMALE_YOGIS_ATTRIBUTE)?.value;
+                    const maleCount = attrs.find((a: any) => a.attribute?.id === DHIS2_RETREAT_MALE_YOGIS_ATTRIBUTE)?.value;
+
+                    if (femaleCount) {
+                      form.change("femaleYogis", femaleCount);
+                    }
+                    if (maleCount) {
+                      form.change("maleYogis", maleCount);
+                    }
+                  } catch (err) {
+                    console.error("Failed to fetch org unit attributes", err);
+                  }
                 }}
 
                 autoExpandLoadingError={true}
@@ -127,11 +163,32 @@ const RetreatFormFields = ({ values, form, store, isSeasonLocked, preconfiguredS
       <div className="retreat-form-field-row">
         <Field
           required
+          name="femaleYogis"
+          label="Female Yogis Count"
+          component={InputFieldFF}
+          type="number"
+          validate={hasValue}
+        />
+      </div>
+      <div className="retreat-form-field-row">
+        <Field
+          required
+          name="maleYogis"
+          label="Male Yogis Count"
+          component={InputFieldFF}
+          type="number"
+          validate={hasValue}
+        />
+      </div>
+      <div className="retreat-form-field-row">
+        <Field
+          required
           name="noOfYogis"
           label="No of Yogis"
           component={InputFieldFF}
           type="number"
           validate={hasValue}
+          disabled={true}
         />
       </div>
       <div className="retreat-form-field-row">

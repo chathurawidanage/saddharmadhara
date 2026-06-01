@@ -10,6 +10,8 @@ import {
   DHIS2_RETREAT_MEDIUM_ATTRIBUTE,
   DHIS2_RETREAT_NO_OF_DAYS_ATTRIBUTE,
   DHIS2_RETREAT_TOTAL_YOGIS_ATTRIBUTE,
+  DHIS2_RETREAT_FEMALE_YOGIS_ATTRIBUTE,
+  DHIS2_RETREAT_MALE_YOGIS_ATTRIBUTE,
   DHIS2_RETREAT_TYPE_ATTRIBUTE,
   DHIS2_RETREAT_SEASON_ATTRIBUTE,
 } from "../dhis2";
@@ -33,6 +35,8 @@ export interface RetreatFormValues {
   date: string;
   noOfDays: string;
   noOfYogis: string;
+  femaleYogis: string;
+  maleYogis: string;
   retreatType: string;
   location: { id: string; displayName: string };
   medium: string;
@@ -75,6 +79,8 @@ export const mapRetreatToInitialValues = (
     date: getValue(DHIS2_RETREAT_DATE_ATTRIBUTE)?.split("T")[0],
     noOfDays: getValue(DHIS2_RETREAT_NO_OF_DAYS_ATTRIBUTE),
     noOfYogis: getValue(DHIS2_RETREAT_TOTAL_YOGIS_ATTRIBUTE),
+    femaleYogis: getValue(DHIS2_RETREAT_FEMALE_YOGIS_ATTRIBUTE) || "",
+    maleYogis: getValue(DHIS2_RETREAT_MALE_YOGIS_ATTRIBUTE) || "",
     retreatType: getValue(DHIS2_RETREAT_TYPE_ATTRIBUTE),
     location: editData.orgUnit,
     medium: getValue(DHIS2_RETREAT_MEDIUM_ATTRIBUTE),
@@ -111,6 +117,14 @@ export const mapFormValuesToAttributeValues = (
     {
       attribute: { id: DHIS2_RETREAT_TOTAL_YOGIS_ATTRIBUTE },
       value: values.noOfYogis,
+    },
+    {
+      attribute: { id: DHIS2_RETREAT_FEMALE_YOGIS_ATTRIBUTE },
+      value: values.femaleYogis,
+    },
+    {
+      attribute: { id: DHIS2_RETREAT_MALE_YOGIS_ATTRIBUTE },
+      value: values.maleYogis,
     },
     {
       attribute: { id: DHIS2_RETREAT_TYPE_ATTRIBUTE },

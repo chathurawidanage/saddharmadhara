@@ -12,6 +12,8 @@ export interface Retreat {
   disabled: boolean;
   location: string;
   totalYogis: string;
+  femaleYogis?: string;
+  maleYogis?: string;
   retreatType: RetreatType;
   noOfDays: string;
   medium: RetreatMedium;
