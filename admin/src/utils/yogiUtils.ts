@@ -134,7 +134,7 @@ export const getYogiSortScore = (
   }
 
   if (selectionInSeasonCount > 0) {
-    const seasonPenalty = -50 - 25 * (selectionInSeasonCount - 1);
+    const seasonPenalty = -25 - 50 * (selectionInSeasonCount - 1);
     sPenalty += seasonPenalty;
     penaltyReasons.push(`Already selected/pending in this season (Occurrences: ${selectionInSeasonCount}, Penalty: ${seasonPenalty})`);
   }
