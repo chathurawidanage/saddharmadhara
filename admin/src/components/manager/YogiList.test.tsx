@@ -103,4 +103,47 @@ describe("YogiList Sorting Helpers", () => {
     sortYogiList(list, retreat, SELECTION_PRIORITY_SORT);
     expect(list[0]).toBe(y2);
   });
+
+  test("getYogiSortScore applies a -25 penalty for a no-show within the last year", () => {
+    const today = new Date();
+    const sixMonthsAgo = new Date();
+    sixMonthsAgo.setMonth(today.getMonth() - 6);
+    const twoYearsAgo = new Date();
+    twoYearsAgo.setFullYear(today.getFullYear() - 2);
+
+    const yogiWithRecentNoShow = {
+      attributes: { dob: "1990-01-01" }, // age score: 50
+      participation: {
+        R1: { retreat: "R1", attendance: "noshow" },
+      },
+    } as any;
+
+    const yogiWithOldNoShow = {
+      attributes: { dob: "1990-01-01" }, // age score: 50
+      participation: {
+        R2: { retreat: "R2", attendance: "noshow" },
+      },
+    } as any;
+
+    const allRetreats = [
+      { code: "R1", date: sixMonthsAgo },
+      { code: "R2", date: twoYearsAgo },
+    ] as any[];
+
+    const currentRetreat = { code: "R3" } as any;
+
+    const scoreRecent = getYogiSortScore(yogiWithRecentNoShow, allRetreats, [], currentRetreat);
+    const scoreOld = getYogiSortScore(yogiWithOldNoShow, allRetreats, [], currentRetreat);
+
+    // base score: status(0) + age(50) + participation(100) + penalty(-25) = 125.
+    // without recent penalty: 150.
+    expect(scoreRecent.total).toBe(125);
+    expect(scoreRecent.breakdown.participationScore).toBe(100);
+    expect(scoreRecent.breakdown.penaltyScore).toBe(-25);
+    expect(scoreRecent.breakdown.penaltyReason).toContain("No-show within last year (-25)");
+
+    expect(scoreOld.total).toBe(150);
+    expect(scoreOld.breakdown.participationScore).toBe(100);
+    expect(scoreOld.breakdown.penaltyScore).toBe(0);
+  });
 });

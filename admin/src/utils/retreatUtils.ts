@@ -14,7 +14,7 @@ export const getRetreatEndDate = (startDate: Date | null, noOfDays: number | str
   if (!startDate || !noOfDays) return startDate;
   const days = typeof noOfDays === "string" ? parseInt(noOfDays, 10) : noOfDays;
   if (isNaN(days)) return startDate;
-  
+
   const endDate = new Date(startDate.getTime() + days * 24 * 60 * 60 * 1000);
   return endDate;
 };
@@ -38,7 +38,13 @@ export const canFinalizeRetreat = (retreat: Retreat | null): boolean => {
 export const isGeneralRetreat = (retreat: Partial<Retreat> | null): boolean => {
   return (
     retreat?.retreatType?.toLowerCase().includes("general") ||
-    retreat?.retreatType?.toLowerCase().includes("වැඩසටහන") ||
+    false
+  );
+};
+
+export const isSilentRetreat = (retreat: Partial<Retreat> | null): boolean => {
+  return (
+    retreat?.retreatType?.toLowerCase().includes("silent") ||
     false
   );
 };

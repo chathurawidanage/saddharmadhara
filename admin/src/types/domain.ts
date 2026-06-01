@@ -1,4 +1,4 @@
-export type RetreatType = "residential" | "online" | string;
+export type RetreatType = "silent" | "general" | string;
 export type RetreatMedium = "sinhala" | "english" | string;
 
 export interface Retreat {

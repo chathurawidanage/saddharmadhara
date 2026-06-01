@@ -1,5 +1,5 @@
 import { Retreat, Yogi, EoiSummary, MaritalState, SelectionState, YogiPriority, AttendanceState } from "../types/domain";
-import { isGeneralRetreat } from "./retreatUtils";
+import { isGeneralRetreat, isSilentRetreat } from "./retreatUtils";
 
 export const SELECTION_PRIORITY_SORT = "selection-priority";
 export const AGE_SORT = "age";
@@ -11,6 +11,8 @@ export interface YogiSortScoreBreakdown {
   ageReason: string;
   participationScore: number;
   participationReason: string;
+  penaltyScore: number;
+  penaltyReason: string;
   mFlex: number;
   mFlexReason: string;
 }
@@ -69,8 +71,41 @@ export const getYogiSortScore = (
       }
     }
   });
-  const sParticipation = 100 - 20 * nGeneral + 10 * nSilent;
-  const participationReason = `Attended: ${nGeneral} General (-20 each), ${nSilent} Silent (+10 each) with base 100`;
+
+  let sParticipation = 100;
+  let participationReason = `Base 100`;
+  if (currentRetreat && isGeneralRetreat(currentRetreat)) {
+    sParticipation = 100 - 20 * nGeneral + 10 * nSilent;
+    participationReason = `Attended: ${nGeneral} General (${-20} each), ${nSilent} Silent (${10} each) with base 100`;
+  } else if (currentRetreat && isSilentRetreat(currentRetreat)) {
+    sParticipation = 100 - 10 * nSilent;
+    participationReason = `Attended: ${nSilent} Silent (${-10} each) with base 100`;
+  }
+
+  // 3b. Penalties (S_penalty)
+  let sPenalty = 0;
+  let penaltyReason = "No penalties";
+
+  let hasNoShowLastYear = false;
+  const oneYearAgo = new Date();
+  oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+
+  Object.values(yogiObj.participation || {}).forEach((p) => {
+    if (p.attendance === AttendanceState.NOSHOW) {
+      const retreat = allRetreats.find((r) => r.code === p.retreat);
+      if (retreat && retreat.date) {
+        const retreatDate = new Date(retreat.date);
+        if (retreatDate >= oneYearAgo) {
+          hasNoShowLastYear = true;
+        }
+      }
+    }
+  });
+
+  if (hasNoShowLastYear) {
+    sPenalty = -25;
+    penaltyReason = "No-show within last year (-25)";
+  }
 
   // 4. Dynamic Flexibility Multiplier (M_flex)
   // D_effective: count of retreats requested by the yogi that still have open capacity for their gender
@@ -116,7 +151,7 @@ export const getYogiSortScore = (
     mFlexReason = `Formula: 1 + 0.1 * (${seasonRetreatCount} season retreats - ${dEffective} open requests) = ${mFlex.toFixed(2)}`;
   }
 
-  const total = Math.floor((sStatus + sAge + sParticipation) * mFlex);
+  const total = Math.floor((sStatus + sAge + sParticipation + sPenalty) * mFlex);
 
   return {
     total,
@@ -127,6 +162,8 @@ export const getYogiSortScore = (
       ageReason,
       participationScore: sParticipation,
       participationReason,
+      penaltyScore: sPenalty,
+      penaltyReason,
       mFlex,
       mFlexReason,
     },

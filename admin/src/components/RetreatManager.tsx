@@ -89,7 +89,7 @@ const RetreatManager = observer(() => {
               navigate("/");
             }}
           >
-            Back to Seasons Landing
+            Back to Seasons
           </Button>
         </div>
 

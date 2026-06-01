@@ -81,6 +81,12 @@ const YogiRow = observer(({ trackedEntity, currentRetreat, allRetreats, eoiSumma
                         <span className="yogi-score-tooltip-value">+{breakdown.participationScore}</span>
                       </div>
                       <div className="yogi-score-tooltip-reason">{breakdown.participationReason}</div>
+
+                      <div className="yogi-score-tooltip-row">
+                        <span className="yogi-score-tooltip-label">Penalties:</span>
+                        <span className="yogi-score-tooltip-value">{breakdown.penaltyScore}</span>
+                      </div>
+                      <div className="yogi-score-tooltip-reason">{breakdown.penaltyReason}</div>
                       
                       <div className="yogi-score-tooltip-row">
                         <span className="yogi-score-tooltip-label">Flexibility Multiplier:</span>
@@ -89,7 +95,7 @@ const YogiRow = observer(({ trackedEntity, currentRetreat, allRetreats, eoiSumma
                       <div className="yogi-score-tooltip-reason">{breakdown.mFlexReason}</div>
                       
                       <div className="yogi-score-tooltip-formula">
-                        Total: ({breakdown.statusScore} + {breakdown.ageScore.toFixed(1)} + {breakdown.participationScore}) * {breakdown.mFlex.toFixed(2)} = {total}
+                        Total: ({breakdown.statusScore} + {breakdown.ageScore.toFixed(1)} + {breakdown.participationScore} + ({breakdown.penaltyScore})) * {breakdown.mFlex.toFixed(2)} = {total}
                       </div>
                     </div>
                   }

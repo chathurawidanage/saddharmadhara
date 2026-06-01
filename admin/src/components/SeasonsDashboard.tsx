@@ -52,7 +52,7 @@ const SeasonsDashboard = observer(() => {
 
   // Group retreats by season
   const seasonsMap: Record<string, GroupedSeason> = {};
-  
+
   store.metadata.seasons.forEach((season: Season) => {
     seasonsMap[season.code] = {
       ...season,
@@ -76,7 +76,7 @@ const SeasonsDashboard = observer(() => {
     <div className="seasons-dashboard-container">
       <div className="dashboard-header-row">
         <div>
-          <h2 className="dashboard-header-title">Seasons Landing</h2>
+          <h2 className="dashboard-header-title">Saddharmadara Seasons</h2>
           <p className="dashboard-header-subtitle">
             Manage your meditation seasons and retreats
           </p>
