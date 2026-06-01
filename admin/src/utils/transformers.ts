@@ -23,7 +23,8 @@ import {
   EoiSummary,
   SelectionState,
   InvitationState,
-  Season
+  Season,
+  Gender
 } from "../types/domain";
 import { Dhis2SqlViewResponse, Dhis2OptionSetResponse, Dhis2Option } from "../types/dhis2";
 
@@ -139,11 +140,12 @@ export const transformParticipationSummary = (summaryResponse: Dhis2SqlViewRespo
 export const transformEoiSummary = (summaryResponse: Dhis2SqlViewResponse): EoiSummary[] => {
   return (
     summaryResponse?.listGrid?.rows?.map(
-      ([yogiUid, retreatCode, state, invitationSent]) => ({
+      ([yogiUid, retreatCode, state, invitationSent, gender]) => ({
         yogiUid,
         retreatCode,
         state: (state || "").toLowerCase() as SelectionState,
         invitationSent: (invitationSent || "").toLowerCase() as InvitationState,
+        gender: (gender || "").toLowerCase() as Gender,
       }),
     ) || []
   );

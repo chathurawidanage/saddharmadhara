@@ -96,3 +96,25 @@
   font-weight: bold;
   color: var(--color-grey-500);
 }
+
+.yogi-applications-container {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.yogi-applications-section-title {
+  font-size: 9px;
+  font-weight: bold;
+  color: #78909c;
+  text-transform: uppercase;
+  margin-bottom: 2px;
+  letter-spacing: 0.5px;
+}
+
+.yogi-applications-section-list {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 4px;
+}

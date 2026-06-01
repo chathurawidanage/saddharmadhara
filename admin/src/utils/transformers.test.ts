@@ -21,7 +21,7 @@ import {
   DHIS2_RETREAT_FINALIZED_ATTRIBUTE,
 } from "../dhis2";
 import { Dhis2SqlViewResponse, Dhis2OptionSetResponse } from "../types/dhis2";
-import { SelectionState, InvitationState } from "../types/domain";
+import { SelectionState, InvitationState, Gender } from "../types/domain";
 
 describe("transformers", () => {
   describe("transformRetreats", () => {
@@ -175,15 +175,15 @@ describe("transformers", () => {
         listGrid: {
           headers: [],
           rows: [
-            ["y1", "R1", "SELECTED", "SENT"], 
-            ["y2", "R1", "PENDING", "NOT_SENT"]
+            ["y1", "R1", "SELECTED", "SENT", "FEMALE"], 
+            ["y2", "R1", "PENDING", "NOT_SENT", "MALE"]
           ],
         },
       };
 
       expect(transformEoiSummary(mockResponse)).toEqual([
-        { yogiUid: "y1", retreatCode: "R1", state: SelectionState.SELECTED, invitationSent: InvitationState.SENT },
-        { yogiUid: "y2", retreatCode: "R1", state: SelectionState.PENDING, invitationSent: InvitationState.NOT_SENT },
+        { yogiUid: "y1", retreatCode: "R1", state: SelectionState.SELECTED, invitationSent: InvitationState.SENT, gender: Gender.FEMALE },
+        { yogiUid: "y2", retreatCode: "R1", state: SelectionState.PENDING, invitationSent: InvitationState.NOT_SENT, gender: Gender.MALE },
       ]);
     });
   });

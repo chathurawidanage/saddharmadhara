@@ -164,4 +164,5 @@ export interface EoiSummary {
   retreatCode: string;
   state: SelectionState;
   invitationSent: InvitationState;
+  gender?: Gender;
 }

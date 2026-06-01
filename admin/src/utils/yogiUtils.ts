@@ -1,4 +1,4 @@
-import { Retreat, Yogi, EoiSummary, MaritalState, SelectionState, YogiPriority, AttendanceState } from "../types/domain";
+import { Retreat, Yogi, EoiSummary, MaritalState, SelectionState, YogiPriority, AttendanceState, Gender } from "../types/domain";
 import { isGeneralRetreat, isSilentRetreat } from "./retreatUtils";
 
 export const SELECTION_PRIORITY_SORT = "selection-priority";
@@ -102,9 +102,38 @@ export const getYogiSortScore = (
     }
   });
 
+  const penaltyReasons: string[] = [];
   if (hasNoShowLastYear) {
-    sPenalty = -25;
-    penaltyReason = "No-show within last year (-25)";
+    sPenalty += -25;
+    penaltyReasons.push("No-show within last year (-25)");
+  }
+
+  let hasSelectionInSeason = false;
+  if (currentRetreat?.season) {
+    Object.entries(yogiObj.expressionOfInterests || {}).forEach(([code, eoi]) => {
+      if (code === currentRetreat.code) {
+        return;
+      }
+      const retreat = allRetreats.find((r) => r.code === code);
+      if (retreat && retreat.season === currentRetreat.season) {
+        if (
+          eoi.state === SelectionState.SELECTED ||
+          eoi.state === SelectionState.PENDING
+        ) {
+          hasSelectionInSeason = true;
+          penaltyReasons.push(`${eoi.state?.toUpperCase()} for retreat: ${retreat.retreatCode}`);
+        }
+      }
+    });
+  }
+
+  if (hasSelectionInSeason) {
+    sPenalty += -50;
+    penaltyReasons.push("Already selected/pending in this season (-50)");
+  }
+
+  if (penaltyReasons.length > 0) {
+    penaltyReason = penaltyReasons.join(", ");
   }
 
   // 4. Dynamic Flexibility Multiplier (M_flex)
@@ -118,16 +147,23 @@ export const getYogiSortScore = (
       if (currentRetreat?.season && retreat.season !== currentRetreat.season) {
         return;
       }
-      const totalCapacity = parseInt(retreat.totalYogis, 10) || 0;
-      // We don't have gender-specific occupancy in eoiSummary, using total as proxy
+      let capacity = parseInt(retreat.totalYogis, 10) || 0;
+      if (yogiObj.attributes.gender === Gender.FEMALE && retreat.femaleYogis) {
+        capacity = parseInt(retreat.femaleYogis, 10) || 0;
+      } else if (yogiObj.attributes.gender === Gender.MALE && retreat.maleYogis) {
+        capacity = parseInt(retreat.maleYogis, 10) || 0;
+      }
+
+      // Filter by the current yogi's gender to calculate gender-specific occupancy
       const currentCount = eoiSummary.filter(
         (e) =>
           e.retreatCode === code &&
+          e.gender === yogiObj.attributes.gender &&
           (e.state === SelectionState.SELECTED ||
-            e.state === SelectionState.WAITING),
+            e.state === SelectionState.PENDING),
       ).length;
 
-      if (currentCount < totalCapacity) {
+      if (currentCount < capacity) {
         dEffective++;
       }
     }
