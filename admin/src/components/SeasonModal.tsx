@@ -11,6 +11,7 @@ import {
   ReactFinalForm,
   SingleSelectFieldFF,
   hasValue,
+  CircularLoader,
 } from "@dhis2/ui";
 import React from "react";
 import {
@@ -61,6 +62,19 @@ const SeasonModal = ({ store, onCancel }: SeasonModalProps) => {
       onCancel();
     },
   });
+
+  if (!store.metadata || store.metadata.languages.length === 0 || store.metadata.requestStates.loadingSupporting) {
+    return (
+      <Modal onClose={onCancel}>
+        <ModalTitle>New Season</ModalTitle>
+        <ModalContent>
+          <div style={{ display: "flex", justifyContent: "center", alignItems: "center", padding: "40px" }}>
+            <CircularLoader />
+          </div>
+        </ModalContent>
+      </Modal>
+    );
+  }
 
   return (
     <Form

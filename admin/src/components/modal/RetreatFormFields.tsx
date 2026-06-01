@@ -11,6 +11,7 @@ import {
 import { DHIS2_ROOT_ORG } from "../../dhis2";
 import { RetreatFormValues, generateRetreatName } from "../../utils/retreatFormMapping";
 import RootStore from "../../stores/root";
+import { Season } from "../../types/domain";
 
 
 const { Field, FormSpy } = ReactFinalForm;
@@ -19,10 +20,21 @@ interface RetreatFormFieldsProps {
   values: RetreatFormValues;
   form: { change: (name: string, value: any) => void };
   store: RootStore;
+  isSeasonLocked?: boolean;
+  preconfiguredSeason?: Season;
 }
 
-const RetreatFormFields = ({ values, form, store }: RetreatFormFieldsProps) => {
+const RetreatFormFields = ({ values, form, store, isSeasonLocked, preconfiguredSeason }: RetreatFormFieldsProps) => {
   if (!store.metadata) return null;
+
+  const currentSeason = store.metadata.seasons.find(s => s.code === values.season) || preconfiguredSeason;
+  const minDate = currentSeason?.startDate ? (() => {
+    const d = currentSeason.startDate;
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  })() : undefined;
 
   return (
     <>
@@ -80,6 +92,7 @@ const RetreatFormFields = ({ values, form, store }: RetreatFormFieldsProps) => {
           component={InputFieldFF}
           type="date"
           validate={hasValue}
+          min={minDate}
         />
       </div>
       <div className="retreat-form-field-row">
@@ -90,6 +103,7 @@ const RetreatFormFields = ({ values, form, store }: RetreatFormFieldsProps) => {
           component={InputFieldFF}
           type="number"
           validate={hasValue}
+          disabled={isSeasonLocked}
         />
       </div>
       <div className="retreat-form-field-row">
@@ -129,6 +143,7 @@ const RetreatFormFields = ({ values, form, store }: RetreatFormFieldsProps) => {
           type="number"
           defaultValue="sinhala"
           validate={hasValue}
+          disabled={isSeasonLocked}
           options={store.metadata.languages.map((option) => {
             return {
               label: option.name,
@@ -144,6 +159,7 @@ const RetreatFormFields = ({ values, form, store }: RetreatFormFieldsProps) => {
           label="Retreat Type"
           component={SingleSelectFieldFF}
           validate={hasValue}
+          disabled={isSeasonLocked}
           options={store.metadata.retreatTypes.map((option) => {
             return {
               label: option.name,
@@ -157,6 +173,7 @@ const RetreatFormFields = ({ values, form, store }: RetreatFormFieldsProps) => {
           name="season"
           label="Retreat Season"
           component={SingleSelectFieldFF}
+          disabled={isSeasonLocked}
           options={[
             { label: "No Season", value: "" },
             ...store.metadata.seasons.map((option) => ({

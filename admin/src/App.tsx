@@ -1,7 +1,6 @@
 import React from "react";
 import { createHashRouter, RouterProvider } from "react-router-dom";
 import SeasonsDashboard from "./components/SeasonsDashboard";
-import RetreatsDashboard from "./components/RetreatsDashboard";
 import RetreatManager from "./components/RetreatManager";
 import { observer } from "mobx-react";
 import { Button, CircularLoader, NoticeBox } from "@dhis2/ui";
@@ -14,10 +13,6 @@ const router = createHashRouter([
   {
     path: "/",
     element: <SeasonsDashboard />,
-  },
-  {
-    path: "/retreats",
-    element: <RetreatsDashboard />,
   },
   {
     path: "/retreats/:retreatId",

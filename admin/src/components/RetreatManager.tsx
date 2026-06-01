@@ -86,10 +86,10 @@ const RetreatManager = observer(() => {
             small
             icon={<IconArrowLeft16 />}
             onClick={() => {
-              navigate("/retreats");
+              navigate("/");
             }}
           >
-            Back to Retreats List
+            Back to Seasons Landing
           </Button>
         </div>
 

@@ -24,7 +24,7 @@ import {
 
 import RetreatFormFields from "./modal/RetreatFormFields";
 import "./modal/RetreatModal.css";
-import { Retreat } from "../types/domain";
+import { Retreat, Season } from "../types/domain";
 
 const { Form } = ReactFinalForm;
 
@@ -78,9 +78,10 @@ const editDataQuery: object = {
 interface RetreatModalProps {
   onCancel: () => void;
   retreat?: Retreat;
+  preconfiguredSeason?: Season;
 }
 
-const RetreatModal = observer(({ onCancel, retreat }: RetreatModalProps) => {
+const RetreatModal = observer(({ onCancel, retreat, preconfiguredSeason }: RetreatModalProps) => {
   const store = useStore();
 
   const { data: editData, loading: editLoading } = useDataQuery(editDataQuery, {
@@ -109,8 +110,18 @@ const RetreatModal = observer(({ onCancel, retreat }: RetreatModalProps) => {
   );
 
   const initialValues = useMemo(() => {
-    return mapRetreatToInitialValues(retreat || null, editData);
-  }, [editData, retreat]);
+    const mapped = mapRetreatToInitialValues(retreat || null, editData);
+    if (preconfiguredSeason && !retreat) {
+      return {
+        ...mapped,
+        season: preconfiguredSeason.code,
+        retreatType: preconfiguredSeason.retreatType,
+        noOfDays: preconfiguredSeason.noOfDays || "",
+        medium: preconfiguredSeason.medium || "sinhala",
+      };
+    }
+    return mapped;
+  }, [editData, retreat, preconfiguredSeason]);
 
   const loading = creating || updating || editLoading;
 
@@ -160,7 +171,7 @@ const RetreatModal = observer(({ onCancel, retreat }: RetreatModalProps) => {
     >
       {({ handleSubmit, form, submitting, values }: {
         handleSubmit: () => void;
-        form: object;
+        form: any;
         submitting: boolean;
         values: RetreatFormValues;
       }) => (
@@ -173,6 +184,8 @@ const RetreatModal = observer(({ onCancel, retreat }: RetreatModalProps) => {
                 values={values} 
                 form={form} 
                 store={store} 
+                isSeasonLocked={!!preconfiguredSeason}
+                preconfiguredSeason={preconfiguredSeason}
               />
               
               {store.metadata?.requestStates.supportingError && (
@@ -211,6 +224,7 @@ const RetreatModal = observer(({ onCancel, retreat }: RetreatModalProps) => {
                   type="submit"
                   loading={submitting || loading}
                   disabled={submitting || loading}
+                  onClick={handleSubmit}
                 >
                   {retreat ? "Update" : "Create"}
                 </Button>

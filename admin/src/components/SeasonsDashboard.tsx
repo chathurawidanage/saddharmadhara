@@ -18,6 +18,8 @@ import {
 import { useStore } from "../stores/StoreProvider";
 import RetreatLocation from "./RetreatLocation";
 import SeasonModal from "./SeasonModal";
+import RetreatModal from "./RetreatModal";
+import GeneralRetreatStatsPanel from "./dashboard/GeneralRetreatStatsPanel";
 import "./SeasonsDashboard.css";
 import { Retreat, Season } from "../types/domain";
 
@@ -36,6 +38,7 @@ const SeasonsDashboard = observer(() => {
   const store = useStore();
   const navigate = useNavigate();
   const [showSeasonModal, setShowSeasonModal] = useState(false);
+  const [createRetreatSeason, setCreateRetreatSeason] = useState<Season | null>(null);
   const [expandedSeasons, setExpandedSeasons] = useState<Record<string, boolean>>({});
 
   if (!store.metadata) return null;
@@ -79,9 +82,6 @@ const SeasonsDashboard = observer(() => {
           </p>
         </div>
         <div style={{ display: "flex", gap: "12px" }}>
-          <Button secondary onClick={() => navigate("/retreats")}>
-            View All Retreats
-          </Button>
           <Button primary onClick={() => setShowSeasonModal(true)}>
             <FiPlus style={{ marginRight: "4px" }} /> Create Season
           </Button>
@@ -92,6 +92,13 @@ const SeasonsDashboard = observer(() => {
         <SeasonModal
           store={store}
           onCancel={() => setShowSeasonModal(false)}
+        />
+      )}
+
+      {createRetreatSeason && (
+        <RetreatModal
+          preconfiguredSeason={createRetreatSeason}
+          onCancel={() => setCreateRetreatSeason(null)}
         />
       )}
 
@@ -122,6 +129,8 @@ const SeasonsDashboard = observer(() => {
           <FiAlertCircle className="stat-icon text-danger-custom" />
         </div>
       </div>
+
+      <GeneralRetreatStatsPanel store={store} />
 
       <h3 className="dashboard-section-title">Retreat Seasons</h3>
 
@@ -189,8 +198,13 @@ const SeasonsDashboard = observer(() => {
 
               {isExpanded && (
                 <div className="season-card-content">
+                  <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "12px" }}>
+                    <Button primary onClick={() => setCreateRetreatSeason(season)}>
+                      <FiPlus style={{ marginRight: "4px" }} /> Create Retreat
+                    </Button>
+                  </div>
                   {season.retreats.length === 0 ? (
-                    <p className="no-retreats-msg">No retreats linked to this season yet.</p>
+                    <p className="no-retreats-msg">No retreats linked to this season yet. Click above to create one!</p>
                   ) : (
                     <div className="retreats-table-container">
                       <table className="retreats-table">
