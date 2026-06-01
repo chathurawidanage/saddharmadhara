@@ -1,80 +1,98 @@
 .yogi-applications {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 5px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 5px;
 }
 
 .yogi-application {
-    text-align: center;
-    border-radius: 10px;
-    background-color: #546E7A;
-    display: flex;
-    align-items: center;
-    flex-direction: row;
-    color: white;
-    font-size: 12px;
-    cursor: default;
+  text-align: center;
+  border-radius: 10px;
+  background-color: #546e7a;
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  color: white;
+  font-size: 12px;
+  cursor: default;
 }
 
 .yogi-application-special-comment {
-    padding: 5px;
+  padding: 5px;
 }
 
 .yogi-application-retreat {
-    font-weight: bold;
-    padding: 5px;
+  font-weight: bold;
+  padding: 5px;
 }
 
 .yogi-application-state {
-    border-top-right-radius: 10px;
-    border-bottom-right-radius: 10px;
-    text-transform: uppercase;
-    padding: 5px;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+  text-transform: uppercase;
+  padding: 5px;
 }
 
 .yogi-application-state + .yogi-application-special-comment,
 .yogi-application-state:has(+ .yogi-application-special-comment) {
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
 }
 
 .active-application-state-applied {
-    background-color: #F9A825;
+  background-color: #f9a825;
 }
 
 .active-application-state-waiting {
-    background-color: #AFB42B;
+  background-color: #afb42b;
 }
 
 .active-application-state-selected {
-    background-color: #2E7D32;
+  background-color: #2e7d32;
 }
 
 .active-application-state-deselected {
-    background-color: #8D6E63;
+  background-color: #8d6e63;
 }
 
 .active-application-state-unattending {
-    background-color: #8D6E63;
+  background-color: #8d6e63;
 }
 
 .active-application-state-unconfirmed {
-    background-color: #E53935;
+  background-color: #e53935;
 }
 
 .active-application-state-pending {
-    background-color: #81C784;
+  background-color: #81c784;
 }
 
 .participation-state-attended {
-    background-color: #2E7D32;
+  background-color: #2e7d32;
 }
 
 .participation-state-noshow {
-    background-color: #E53935;
+  background-color: #e53935;
 }
 
 .participation-state-absent {
-    background-color: #2196F3;
+  background-color: #2196f3;
+}
+
+.participation-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-m);
+}
+
+.participation-year-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.participation-year-label {
+  font-size: 10px;
+  font-weight: bold;
+  color: var(--color-grey-500);
 }

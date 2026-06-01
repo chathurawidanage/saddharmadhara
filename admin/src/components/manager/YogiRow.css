@@ -1,33 +1,119 @@
-.yogi-row-reverend {
-    background-color: #FFF59D;
+.yogi-row-reverend,
+.yogi-row-reverend td {
+  background-color: #fff9c4 !important;
+  /* Keeping a light yellow for reverends, maybe add to variables later */
 }
 
 .yogi-row-td {
-    background-color: transparent !important;
-    overflow: hidden;
-    /* Prevent spillover */
+  background-color: transparent !important;
+  overflow: hidden;
 }
 
 .yogi-row-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
 }
 
 .yogi-profile-info {
-    padding-top: 5px;
-    padding-bottom: 5px;
-    display: flex;
-    column-gap: 15px;
-    row-gap: 5px;
-    flex-wrap: wrap;
-    /* Allow wrapping on small screens */
+  padding-top: var(--spacing-xs);
+  padding-bottom: var(--spacing-xs);
+  display: flex;
+  column-gap: var(--spacing-m);
+  row-gap: var(--spacing-xs);
+  flex-wrap: wrap;
 }
 
 .yogi-name-row {
-    display: flex;
-    flex-direction: row;
-    gap: 5px;
-    align-items: center;
-    font-weight: 600;
+  display: flex;
+  flex-direction: row;
+  gap: var(--spacing-xs);
+  align-items: center;
+  font-weight: 600;
+}
+
+.mini-indicators-container {
+  display: flex;
+  gap: var(--spacing-xs);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.invitation-tag-wrapper {
+  margin-top: var(--spacing-m);
+}
+
+.yogi-score {
+  font-size: 0.7rem;
+  background: linear-gradient(135deg, #6e8efb, #a777e3);
+  color: white;
+  padding: 1px 8px;
+  border-radius: 10px;
+  font-weight: 700;
+  margin-left: var(--spacing-xs);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  line-height: 1;
+  transition: all 0.2s ease;
+  cursor: default;
+}
+
+.yogi-score:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  filter: brightness(1.1);
+}
+
+.yogi-score-tooltip {
+  padding: 8px;
+  font-family: inherit;
+  font-size: 12px;
+  line-height: 1.4;
+  color: #fff;
+  max-width: 280px;
+}
+
+.yogi-score-tooltip-title {
+  font-weight: 700;
+  font-size: 13px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  margin-bottom: 8px;
+  padding-bottom: 4px;
+}
+
+.yogi-score-tooltip-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 2px;
+}
+
+.yogi-score-tooltip-label {
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.yogi-score-tooltip-value {
+  font-weight: 700;
+  color: #fff;
+}
+
+.yogi-score-tooltip-reason {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 6px;
+  padding-left: 6px;
+  border-left: 2px solid rgba(255, 255, 255, 0.15);
+}
+
+.yogi-score-tooltip-formula {
+  margin-top: 6px;
+  padding-top: 4px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  font-weight: bold;
+  font-size: 12px;
+  text-align: right;
 }

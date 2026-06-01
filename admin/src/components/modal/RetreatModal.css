@@ -1,0 +1,14 @@
+.retreat-modal-loader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+}
+
+.retreat-modal-notice-box {
+  margin-bottom: var(--spacing-s);
+}
+
+.retreat-form-field-row {
+  margin-bottom: var(--spacing-s);
+}

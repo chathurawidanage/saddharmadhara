@@ -1,0 +1,71 @@
+:root {
+  /* Colors */
+  --color-white: #ffffff;
+  --color-grey-050: #fbfcfd;
+  --color-grey-100: #f3f5f7;
+  --color-grey-200: #e8edf2;
+  --color-grey-300: #d5dde5;
+  --color-grey-400: #a0adba;
+  --color-grey-500: #6e7a8a;
+  --color-grey-600: #404b5a;
+  --color-grey-700: #212934;
+  --color-grey-800: #1d2125;
+  --color-grey-900: #111821;
+
+  --color-primary-500: #2c6693;
+  --color-primary-600: #235175;
+  --color-primary-700: #1a3d58;
+
+  --color-error-100: #fff5f5;
+  --color-error-500: #e53935;
+  --color-error-600: #b92b27;
+
+  --color-success-100: #e6fffa;
+  --color-success-500: #28a745;
+  --color-success-600: #218838;
+
+  --color-info-100: #e3f2fd;
+  --color-info-500: #2196f3;
+  --color-info-600: #1e88e5;
+
+  --color-warning-100: #fffef0;
+  --color-warning-500: #f9a825;
+  --color-warning-600: #f57f17;
+
+  --color-purple-100: #f3e8ff;
+  --color-purple-500: #6610f2;
+  --color-purple-600: #520dc2;
+
+  /* Spacing */
+  --spacing-xs: 4px;
+  --spacing-s: 8px;
+  --spacing-m: 16px;
+  --spacing-l: 24px;
+  --spacing-xl: 32px;
+  --spacing-xxl: 48px;
+
+  /* Border Radius */
+  --radius-s: 3px;
+  --radius-m: 4px;
+  --radius-l: 8px;
+  --radius-full: 500px;
+
+  /* Typography */
+  --font-family: Roboto, sans-serif;
+  --font-size-s: 13px;
+  --font-size-m: 14px;
+  --font-size-l: 16px;
+  --font-size-xl: 18px;
+  --font-size-xxl: 24px;
+  --font-size-giant: 32px;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-family);
+  background-color: var(--color-grey-100);
+  color: var(--color-grey-800);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
