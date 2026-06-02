@@ -194,29 +194,35 @@ export const sendRetreatInvitations = async ({
   try {
     for (let index = 0; index < yogis.length; index++) {
       const yogi = yogis[index];
-      const sentResponse = await sendInvitationSms(
-        getInvitationMessage(
-          yogi.id,
-          yogi.fullName,
-          retreat.code,
-          retreat.date,
-          retreat.endDate,
-          confirmationDeadline,
-          retreat.retreatType,
-        ),
-        yogi.mobile,
-        token,
-      );
-
-      const sent = sentResponse?.ok;
-
-      if (sent) {
-        const sentResponseJson = await sentResponse.json();
-        await recordSmsCampaign(
-          engine,
-          sentResponseJson.campaignId,
-          yogi.eventId,
+      let sent = false;
+      try {
+        const sentResponse = await sendInvitationSms(
+          getInvitationMessage(
+            yogi.id,
+            yogi.fullName,
+            retreat.code,
+            retreat.date,
+            retreat.endDate,
+            confirmationDeadline,
+            retreat.retreatType,
+          ),
+          yogi.mobile,
+          token,
         );
+
+        sent = !!sentResponse?.ok;
+
+        if (sent) {
+          const sentResponseJson = await sentResponse.json();
+          await recordSmsCampaign(
+            engine,
+            sentResponseJson.campaignId,
+            yogi.eventId,
+          );
+        }
+      } catch (error) {
+        console.error(`Failed to send invitation to yogi ${yogi.id}:`, error);
+        sent = false;
       }
 
       await onResult?.({

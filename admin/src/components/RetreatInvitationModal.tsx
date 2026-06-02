@@ -36,6 +36,7 @@ const RetreatInvitationModal = observer(({ retreat, onCancel }: RetreatInvitatio
 
   const [loading, setLoading] = useState(false);
   const [isSending, setIsSending] = useState(false);
+  const [sendError, setSendError] = useState<string | null>(null);
 
   const [sentYogis, setSentYogis] = useState<Yogi[]>([]);
   const [failedYogis, setFailedYogis] = useState<Yogi[]>([]);
@@ -89,45 +90,55 @@ const RetreatInvitationModal = observer(({ retreat, onCancel }: RetreatInvitatio
   const onFinaliseClicked = async () => {
     if (!store.metadata || !store.yogis) return;
     setIsSending(true);
+    setSendError(null);
 
-    await store.metadata.setRetreatAttendanceConfirmationDate(
-      retreat,
-      confirmationDeadline,
-    );
+    try {
+      await store.metadata.setRetreatAttendanceConfirmationDate(
+        retreat,
+        confirmationDeadline,
+      );
 
-    const finalYogisList: Yogi[] = [];
-    if (check[0]) finalYogisList.push(...toSendYogis);
-    if (check[1]) finalYogisList.push(...failedYogis);
-    if (check[2]) finalYogisList.push(...sentYogis);
+      const finalYogisList: Yogi[] = [];
+      if (check[0]) finalYogisList.push(...toSendYogis);
+      if (check[1]) finalYogisList.push(...failedYogis);
+      if (check[2]) finalYogisList.push(...sentYogis);
 
-    setSentCount(0);
-    setTotalToSend(finalYogisList.length);
+      setSentCount(0);
+      setTotalToSend(finalYogisList.length);
 
-    await sendRetreatInvitations({
-      engine: dataEngine,
-      retreat,
-      confirmationDeadline,
-      yogis: finalYogisList.map((yogi) => ({
-        id: yogi.id,
-        eventId: yogi.expressionOfInterests[retreat.code].eventId,
-        fullName: yogi.attributes.fullName || "",
-        mobile: yogi.attributes.mobile || "",
-      })),
-      onResult: async ({ yogiId, sent }: { yogiId: string; sent: boolean }) => {
-        await store.yogis?.changeInvitationSentState(
-          yogiId,
-          retreat.code,
-          sent ? InvitationState.SENT : InvitationState.FAILED,
-        );
-      },
-      onProgress: ({ completed }: { completed: number }) => {
-        setSentCount(completed);
-      },
-    });
+      await sendRetreatInvitations({
+        engine: dataEngine,
+        retreat,
+        confirmationDeadline,
+        yogis: finalYogisList.map((yogi) => ({
+          id: yogi.id,
+          eventId: yogi.expressionOfInterests[retreat.code].eventId,
+          fullName: yogi.attributes.fullName || "",
+          mobile: yogi.attributes.mobile || "",
+        })),
+        onResult: async ({ yogiId, sent }: { yogiId: string; sent: boolean }) => {
+          await store.yogis?.changeInvitationSentState(
+            yogiId,
+            retreat.code,
+            sent ? InvitationState.SENT : InvitationState.FAILED,
+          );
+        },
+        onProgress: ({ completed }: { completed: number }) => {
+          setSentCount(completed);
+        },
+      });
 
-    setIsSending(false);
-    show();
-    onCancel();
+      show();
+      onCancel();
+    } catch (error: any) {
+      console.error("Failed to finalise invitation campaign:", error);
+      setSendError(
+        error?.message ||
+          "Failed to send invitations. Please verify that your SMS gateway and DHIS2 server permissions are correct."
+      );
+    } finally {
+      setIsSending(false);
+    }
   };
 
   const countToSend = (check[0] ? toSendYogis.length : 0) +
@@ -147,6 +158,12 @@ const RetreatInvitationModal = observer(({ retreat, onCancel }: RetreatInvitatio
             {store.yogis?.requestStates.batchErrors[retreat.code] && (
               <NoticeBox error title="Some yogi records could not be loaded">
                 {store.yogis.requestStates.batchErrors[retreat.code]}
+              </NoticeBox>
+            )}
+
+            {sendError && (
+              <NoticeBox error title="Failed to send invitations">
+                {sendError}
               </NoticeBox>
             )}
 
