@@ -5,6 +5,7 @@ import {
   sortYogiList,
   SELECTION_PRIORITY_SORT,
 } from "../../utils/yogiUtils";
+import { SelectionState } from "../../types/domain";
 
 describe("YogiList Sorting Helpers", () => {
   const retreat = { code: "R1" } as any;
@@ -145,5 +146,42 @@ describe("YogiList Sorting Helpers", () => {
     expect(scoreOld.total).toBe(150);
     expect(scoreOld.breakdown.participationScore).toBe(100);
     expect(scoreOld.breakdown.penaltyScore).toBe(0);
+  });
+
+  test("getYogiSortScore reduces marks for every occurrence of hasSelectionInSeason (50 for first, 25 for subsequent)", () => {
+    const yogiWithOneOccurrence = {
+      attributes: { dob: "1990-01-01" }, // age score: 50
+      expressionOfInterests: {
+        R1: { state: SelectionState.SELECTED, occurredAt: "2024-01-01" },
+        R2: { state: SelectionState.PENDING, occurredAt: "2024-01-01" }, // Current retreat being graded is R2, so it's ignored for penalty
+      },
+      participation: {},
+    } as any;
+
+    const yogiWithThreeOccurrences = {
+      attributes: { dob: "1990-01-01" }, // age score: 50
+      expressionOfInterests: {
+        R1: { state: SelectionState.SELECTED, occurredAt: "2024-01-01" },
+        R2: { state: SelectionState.SELECTED, occurredAt: "2024-01-01" },
+        R3: { state: SelectionState.PENDING, occurredAt: "2024-01-01" },
+        R4: { state: SelectionState.PENDING, occurredAt: "2024-01-01" }, // Current retreat being graded is R4, so it's ignored
+      },
+      participation: {},
+    } as any;
+
+    const allRetreats = [
+      { code: "R1", season: "S1", date: "2026-06-15" },
+      { code: "R2", season: "S1", date: "2026-06-20" },
+      { code: "R3", season: "S1", date: "2026-06-25" },
+      { code: "R4", season: "S1", date: "2026-06-30" },
+    ] as any[];
+
+    // 1 occurrence penalty: -25
+    const resOne = getYogiSortScore(yogiWithOneOccurrence, allRetreats, [], allRetreats[1]);
+    expect(resOne.breakdown.penaltyScore).toBe(-25);
+
+    // 3 occurrences penalty: -25 - 50 * 2 = -125
+    const resThree = getYogiSortScore(yogiWithThreeOccurrences, allRetreats, [], allRetreats[3]);
+    expect(resThree.breakdown.penaltyScore).toBe(-125);
   });
 });
