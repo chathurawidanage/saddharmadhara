@@ -200,7 +200,7 @@ export const sendRetreatInvitations = async ({
           getInvitationMessage(
             yogi.id,
             yogi.fullName,
-            retreat.code,
+            retreat.retreatCode,
             retreat.date,
             retreat.endDate,
             confirmationDeadline,

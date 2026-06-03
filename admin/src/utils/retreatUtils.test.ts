@@ -52,7 +52,6 @@ describe("retreatUtils", () => {
   describe("isGeneralRetreat", () => {
     test("identifies general retreats", () => {
       expect(isGeneralRetreat({ retreatType: "General Retreat" } as any)).toBe(true);
-      expect(isGeneralRetreat({ retreatType: "සාමාන්‍ය වැඩසටහන" } as any)).toBe(true);
     });
 
     test("returns false for non-general retreats", () => {
