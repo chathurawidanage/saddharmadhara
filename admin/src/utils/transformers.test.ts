@@ -43,8 +43,8 @@ describe("transformers", () => {
                 [DHIS2_RETREAT_TOTAL_YOGIS_ATTRIBUTE]: 50,
                 [DHIS2_RETREAT_FEMALE_YOGIS_ATTRIBUTE]: 30,
                 [DHIS2_RETREAT_MALE_YOGIS_ATTRIBUTE]: 20,
-                [DHIS2_RETREAT_TYPE_ATTRIBUTE]: "General",
-                [DHIS2_RETREAT_MEDIUM_ATTRIBUTE]: "Sinhala",
+                [DHIS2_RETREAT_TYPE_ATTRIBUTE]: "general",
+                [DHIS2_RETREAT_MEDIUM_ATTRIBUTE]: "sinhala",
                 [DHIS2_RETREAT_FINALIZED_ATTRIBUTE]: "false",
               }),
               "true", // current
@@ -67,8 +67,8 @@ describe("transformers", () => {
           totalYogis: 50,
           femaleYogis: 30,
           maleYogis: 20,
-          retreatType: "General",
-          medium: "Sinhala",
+          retreatType: "general",
+          medium: "sinhala",
           finalized: false,
         }),
       );

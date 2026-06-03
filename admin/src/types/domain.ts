@@ -1,5 +1,5 @@
-export type RetreatType = "silent" | "general" | string;
-export type RetreatMedium = "sinhala" | "english" | string;
+export type RetreatType = "silent" | "general";
+export type RetreatMedium = "sinhala" | "english";
 
 export interface Retreat {
   id: string;

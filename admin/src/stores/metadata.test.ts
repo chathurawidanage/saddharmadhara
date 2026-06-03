@@ -77,13 +77,13 @@ describe("MetadataStore.generalRetreatStats", () => {
         id: "r1",
         code: "R1",
         name: "Retreat 1",
-        retreatType: "General Retreat",
+        retreatType: "general",
       } as any,
       {
         id: "r2",
         code: "R2",
         name: "Retreat 2",
-        retreatType: "General Retreat",
+        retreatType: "general",
       } as any,
     ];
 

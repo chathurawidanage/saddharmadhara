@@ -51,11 +51,11 @@ describe("retreatUtils", () => {
 
   describe("isGeneralRetreat", () => {
     test("identifies general retreats", () => {
-      expect(isGeneralRetreat({ retreatType: "General Retreat" } as any)).toBe(true);
+      expect(isGeneralRetreat({ retreatType: "general" })).toBe(true);
     });
 
     test("returns false for non-general retreats", () => {
-      expect(isGeneralRetreat({ retreatType: "Advanced" } as any)).toBe(false);
+      expect(isGeneralRetreat({ retreatType: "silent" })).toBe(false);
     });
   });
 

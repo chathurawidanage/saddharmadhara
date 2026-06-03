@@ -30,23 +30,12 @@ export const canFinalizeRetreat = (retreat: Retreat | null): boolean => {
   return !!endDate && Date.now() >= endDate.getTime();
 };
 
-/**
- * Checks if a retreat is a general retreat
- * @param {Retreat} retreat
- * @returns {boolean}
- */
 export const isGeneralRetreat = (retreat: Partial<Retreat> | null): boolean => {
-  return (
-    retreat?.retreatType?.toLowerCase().includes("general") ||
-    false
-  );
+  return retreat?.retreatType?.toLowerCase() === "general";
 };
 
 export const isSilentRetreat = (retreat: Partial<Retreat> | null): boolean => {
-  return (
-    retreat?.retreatType?.toLowerCase().includes("silent") ||
-    false
-  );
+  return retreat?.retreatType?.toLowerCase() === "silent";
 };
 
 /**
