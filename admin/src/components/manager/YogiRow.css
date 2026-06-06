@@ -117,3 +117,134 @@
   font-size: 12px;
   text-align: right;
 }
+
+.yogi-special-comments-subrow {
+  margin-top: var(--spacing-xs);
+  margin-bottom: var(--spacing-xs);
+  padding: 10px 14px;
+  background: rgba(240, 244, 248, 0.5);
+  border-left: 3px solid #6e8efb;
+  border-radius: 6px;
+  width: 100%;
+  box-sizing: border-box;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.yogi-special-comments-subrow:hover {
+  background: rgba(240, 244, 248, 0.8);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
+}
+
+.yogi-comment-container {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.yogi-comment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+}
+
+.yogi-comment-title-section {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.yogi-comment-badge {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background-color: #e8f0fe;
+  color: #1a73e8;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 700;
+}
+
+.yogi-comment-date {
+  font-size: 0.75rem;
+  color: #5f6368;
+  font-weight: 500;
+}
+
+.yogi-comment-nav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.yogi-comment-counter {
+  font-size: 0.75rem;
+  color: #70757a;
+  min-width: 45px;
+  text-align: center;
+  font-weight: 600;
+}
+
+.yogi-comment-nav button {
+  height: 24px !important;
+  width: 24px !important;
+  padding: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 4px !important;
+  transition: all 0.2s ease !important;
+}
+
+.yogi-comment-nav button:hover:not(:disabled) {
+  background-color: #f1f3f4 !important;
+  transform: scale(1.05);
+}
+
+.yogi-comment-body {
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: #3c4043;
+  margin-top: 4px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.yogi-staff-notes-subrow {
+  margin-top: var(--spacing-xs);
+  margin-bottom: var(--spacing-xs);
+  padding: 10px 14px;
+  background: rgba(230, 244, 234, 0.4);
+  border-left: 3px solid #34a853;
+  border-radius: 6px;
+  width: 100%;
+  box-sizing: border-box;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.yogi-staff-notes-subrow:hover {
+  background: rgba(230, 244, 234, 0.6);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
+}
+
+.yogi-staff-note-badge {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background-color: #e6f4ea;
+  color: #137333;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 700;
+}
+
+.yogi-comment-author {
+  font-size: 0.75rem;
+  color: #5f6368;
+  font-weight: 500;
+}

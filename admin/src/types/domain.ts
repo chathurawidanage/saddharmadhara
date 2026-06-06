@@ -61,6 +61,7 @@ export interface SpecialComment {
 
 export interface Note {
   value: string;
+  storedAt?: string;
   createdBy: {
     username: string;
   };

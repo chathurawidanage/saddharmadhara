@@ -59,7 +59,7 @@ export interface Dhis2TrackerEventsResponse {
 
 export interface Dhis2Enrollment {
   status: string;
-  notes: Array<{ value: string; createdBy: { username: string } }>;
+  notes: Array<{ value: string; storedAt?: string; createdBy: { username: string } }>;
   events: Dhis2TrackerEvent[];
 }
 

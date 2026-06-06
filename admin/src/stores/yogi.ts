@@ -216,7 +216,7 @@ class YogiStore {
           params: {
             inactive: false,
             fields:
-              "attributes[attribute,value],enrollments[status,notes[value,createdBy[username]],events[programStage,event,occurredAt,dataValues[dataElement,value]]]",
+              "attributes[attribute,value],enrollments[status,notes[value,storedAt,createdBy[username]],events[programStage,event,occurredAt,dataValues[dataElement,value]]]",
             program: DHIS_PROGRAM,
           },
         },
