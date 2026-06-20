@@ -122,7 +122,7 @@ const SeasonsDashboard = observer(() => {
           <FiLayers className="stat-icon" />
         </div>
         <div className="stat-card-wrapper bg-danger-light">
-          <div className="stat-title text-danger-custom">Unfinalized Retreats</div>
+          <div className="stat-title text-danger-custom">Non finalized Retreats</div>
           <div className="stat-value text-danger-custom">
             {store.metadata.retreats.filter((r) => !r.finalized).length}
           </div>

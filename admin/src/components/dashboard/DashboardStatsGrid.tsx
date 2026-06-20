@@ -11,7 +11,7 @@ interface DashboardStatsGridProps {
 
 const DashboardStatsGrid = observer(({ store }: DashboardStatsGridProps) => {
   if (!store.metadata) return null;
-  
+
   return (
     <div className="stats-grid">
       <div className="stat-card-wrapper">
@@ -68,7 +68,7 @@ const DashboardStatsGrid = observer(({ store }: DashboardStatsGridProps) => {
       </div>
 
       <div className="stat-card-wrapper bg-danger-light">
-        <div className="stat-title text-danger-custom">Unfinalized</div>
+        <div className="stat-title text-danger-custom">Non finalized</div>
         <div className="stat-value text-danger-custom">
           {store.metadata.retreats.filter((r: Retreat) => !r.finalized).length}
         </div>
