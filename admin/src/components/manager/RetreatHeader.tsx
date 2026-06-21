@@ -1,4 +1,12 @@
-import { Button, DropdownButton, FlyoutMenu, IconMore16, MenuItem, Tag } from "@dhis2/ui";
+import { useAlert } from "@dhis2/app-runtime";
+import {
+  Button,
+  DropdownButton,
+  FlyoutMenu,
+  IconMore16,
+  MenuItem,
+  Tag,
+} from "@dhis2/ui";
 import React, { ReactNode } from "react";
 import { canFinalizeRetreat } from "../../utils/retreatUtils";
 import { Retreat } from "../../types/domain";
@@ -11,13 +19,30 @@ interface RetreatHeaderProps {
   downloadMenu: ReactNode;
 }
 
-const RetreatHeader = ({ 
-  retreat, 
-  onSendInvitations, 
-  onFinalise, 
-  onEdit, 
-  downloadMenu 
+const RetreatHeader = ({
+  retreat,
+  onSendInvitations,
+  onFinalise,
+  onEdit,
+  downloadMenu,
 }: RetreatHeaderProps) => {
+  const { show: showAlert } = useAlert("Private link copied to clipboard", {
+    duration: 2000,
+    success: true,
+  });
+
+  const handleCopyLink = () => {
+    const link = `https://application.srisambuddhamission.org/?retreat=${retreat.retreatCode}`;
+    navigator.clipboard
+      .writeText(link)
+      .then(() => {
+        showAlert();
+      })
+      .catch((err) => {
+        console.error("Failed to copy link:", err);
+      });
+  };
+
   return (
     <div className="retreat-header-container">
       <div className="retreat-header-title-row">
@@ -32,10 +57,8 @@ const RetreatHeader = ({
         </Tag>
       </div>
       <div className="retreat-header-actions">
-        <Button onClick={onSendInvitations}>
-          Send Invitations
-        </Button>
-        
+        <Button onClick={onSendInvitations}>Send Invitations</Button>
+
         {downloadMenu}
 
         <Button
@@ -50,10 +73,8 @@ const RetreatHeader = ({
           icon={<IconMore16 />}
           component={
             <FlyoutMenu>
-              <MenuItem
-                label="Edit Retreat"
-                onClick={onEdit}
-              />
+              <MenuItem label="Edit Retreat" onClick={onEdit} />
+              <MenuItem label="Copy Link" onClick={handleCopyLink} />
             </FlyoutMenu>
           }
         />

@@ -21,6 +21,18 @@ import { Season } from "../../types/domain";
 
 const { Field, FormSpy } = ReactFinalForm;
 
+export const validateRetreatCode = (value: any) => {
+  const presenceError = hasValue(value);
+  if (presenceError) {
+    return presenceError;
+  }
+  const regex = /^[A-Z0-9]+$/;
+  if (!regex.test(value)) {
+    return "Code must contain only uppercase letters (A-Z) and numbers (0-9)";
+  }
+  return undefined;
+};
+
 interface RetreatFormFieldsProps {
   values: RetreatFormValues;
   form: { change: (name: string, value: any) => void };
@@ -94,7 +106,7 @@ const RetreatFormFields = ({ values, form, store, isSeasonLocked, preconfiguredS
           placeholder="5GS1"
           component={InputFieldFF}
           type="text"
-          validate={hasValue}
+          validate={validateRetreatCode}
         />
       </div>
       <div className="retreat-form-field-row">
