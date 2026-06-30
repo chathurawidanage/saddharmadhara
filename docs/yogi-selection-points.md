@@ -9,7 +9,7 @@ This document explains the point system and sorting algorithm used to select and
 When yogis apply for a retreat, the system ranks them based on a **Total Score** calculated dynamically for each applicant. 
 
 The primary goals of the system are to:
-1. Prioritize Reverends and Trust Members.
+1. Prioritize Reverends and Trust/Saddharma Sena Members.
 2. Fairly distribute opportunities among young adults and other age groups.
 3. Balance participation between general and silent retreats.
 4. Penalize last-minute no-shows and multiple bookings in a single season.

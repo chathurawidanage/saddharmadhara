@@ -1,4 +1,4 @@
-import { InputField, SingleSelectField, SingleSelectOption } from "@dhis2/ui";
+import { Button, InputField, SingleSelectField, SingleSelectOption } from "@dhis2/ui";
 import React from "react";
 import YogiListFilters from "./YogiListFilters";
 import { AGE_SORT, SELECTION_PRIORITY_SORT } from "../../utils/yogiUtils";
@@ -10,6 +10,9 @@ interface YogiListToolbarProps {
   onSortChange: (sortBy: string) => void;
   searchQuery: string;
   onSearchChange: (query: string) => void;
+  isAdmin?: boolean;
+  showBulkMove?: boolean;
+  onBulkMoveClick?: () => void;
 }
 
 const YogiListToolbar = ({ 
@@ -18,7 +21,10 @@ const YogiListToolbar = ({
   sortBy, 
   onSortChange, 
   searchQuery, 
-  onSearchChange 
+  onSearchChange,
+  isAdmin,
+  showBulkMove,
+  onBulkMoveClick
 }: YogiListToolbarProps) => {
   return (
     <div className="yogi-list-top-bar">
@@ -44,6 +50,13 @@ const YogiListToolbar = ({
         onChange={({ value }: any) => onSearchChange(value)}
         type="search"
       />
+      {isAdmin && showBulkMove && (
+        <div style={{ marginLeft: "auto" }}>
+          <Button onClick={onBulkMoveClick}>
+            Move All to Selected
+          </Button>
+        </div>
+      )}
     </div>
   );
 };

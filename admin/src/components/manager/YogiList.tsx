@@ -6,6 +6,7 @@ import "./YogiList.css";
 import YogiListToolbar from "./YogiListToolbar";
 import YogiListTabs from "./YogiListTabs";
 import YogiTable from "./YogiTable";
+import BulkMoveModal from "./BulkMoveModal";
 import { Retreat, Yogi, Gender, MaritalState } from "../../types/domain";
 
 import {
@@ -41,6 +42,8 @@ const YogisList = observer(({ retreat }: YogisListProps) => {
 
   const [sortBy, setSortBy] = useState(SELECTION_PRIORITY_SORT);
   const sortByRef = useRef(sortBy);
+
+  const [showBulkMoveModal, setShowBulkMoveModal] = useState(false);
 
   const countByState: Record<string, number> = {};
   yogiList.forEach((yogi) => {
@@ -166,6 +169,9 @@ const YogisList = observer(({ retreat }: YogisListProps) => {
         }}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
+        isAdmin={store.metadata?.isAdmin}
+        showBulkMove={!retreat.finalized && (selectionState === "applied" || selectionState === "pending")}
+        onBulkMoveClick={() => setShowBulkMoveModal(true)}
       />
 
       <YogiListTabs
@@ -186,6 +192,15 @@ const YogisList = observer(({ retreat }: YogisListProps) => {
         allRetreats={store.metadata?.retreats || []}
         eoiSummary={store.metadata?.eoiSummary || []}
       />
+
+      {showBulkMoveModal && (
+        <BulkMoveModal
+          retreat={retreat}
+          fromState={selectionState}
+          allYogis={yogiList}
+          onCancel={() => setShowBulkMoveModal(false)}
+        />
+      )}
     </div>
   );
 });
