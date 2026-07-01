@@ -27,6 +27,38 @@ export const normalizePhoneNumber = (phone: string): string => {
 };
 
 /**
+ * Formats a date into a modern Sinhala date string (e.g. "2026 මැයි 15")
+ * to avoid inconsistencies in system locales (such as lunar months returned on iOS/Safari).
+ * @param {string | Date} dateInput
+ * @returns {string}
+ */
+export const formatSinhalaDate = (dateInput: string | Date): string => {
+  const date = new Date(dateInput);
+  if (isNaN(date.getTime())) return "";
+
+  const year = date.getFullYear();
+  const month = date.getMonth(); // 0-11
+  const day = date.getDate();
+
+  const sinhalaMonths = [
+    "ජනවාරි",
+    "පෙබරවාරි",
+    "මාර්තු",
+    "අප්‍රේල්",
+    "මැයි",
+    "ජූනි",
+    "ජූලි",
+    "අගෝස්තු",
+    "සැප්තැම්බර්",
+    "ඔක්තෝබර්",
+    "නොවැම්බර්",
+    "දෙසැම්බර්",
+  ];
+
+  return `${year} ${sinhalaMonths[month]} ${day}`;
+};
+
+/**
  * Generates the invitation message in Sinhala
  * @param {string} teiId
  * @param {string} teiFullName
@@ -51,21 +83,11 @@ export const getInvitationMessage = (
 
   const retreatPrefix = retreatType === "silent" ? "ස්වයං " : "";
 
-  return `ඔබ ${new Date(retreatFrom).toLocaleDateString("si-LK", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  })} සිට ${plusDateTo.toLocaleDateString("si-LK", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  })} දක්වා පැවැත්වෙන සද්ධර්මධාරා ${retreatPrefix}භාවනා වැඩසටහන හා සම්බන්ධවීමට තේරී පත් ව ඇත. ${new Date(
+  return `ඔබ ${formatSinhalaDate(retreatFrom)} සිට ${formatSinhalaDate(
+    plusDateTo,
+  )} දක්වා පැවැත්වෙන සද්ධර්මධාරා ${retreatPrefix}භාවනා වැඩසටහන හා සම්බන්ධවීමට තේරී පත් ව ඇත. ${formatSinhalaDate(
     deadLine,
-  ).toLocaleDateString("si-LK", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  })} දිනට පෙර පහත යොමුව (Link එක) මගින් ඔබගේ සහභාගි වීම/නොවීම තහවුරු කරන්න.
+  )} දිනට පෙර පහත යොමුව (Link එක) මගින් ඔබගේ සහභාගි වීම/නොවීම තහවුරු කරන්න.
 
 https://application.srisambuddhamission.org/confirm/${retreatCode}/${teiId}
 

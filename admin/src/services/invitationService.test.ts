@@ -1,5 +1,6 @@
 import {
   normalizePhoneNumber,
+  formatSinhalaDate,
   getInvitationMessage,
   sendRetreatInvitations,
 } from "./invitationService";
@@ -15,8 +16,21 @@ describe("invitationService", () => {
     });
   });
 
+  describe("formatSinhalaDate", () => {
+    test("formats Gregorian date into modern Sinhala date correctly", () => {
+      expect(formatSinhalaDate("2026-05-15")).toBe("2026 මැයි 15");
+      expect(formatSinhalaDate("2026-06-01")).toBe("2026 ජූනි 1");
+      expect(formatSinhalaDate("2026-07-25")).toBe("2026 ජූලි 25");
+      expect(formatSinhalaDate(new Date(2024, 0, 10))).toBe("2024 ජනවාරි 10");
+    });
+
+    test("returns empty string for invalid dates", () => {
+      expect(formatSinhalaDate("invalid-date")).toBe("");
+    });
+  });
+
   describe("getInvitationMessage", () => {
-    test("generates correct message structure", () => {
+    test("generates correct message structure with modern Sinhala month names", () => {
       const message = getInvitationMessage(
         "y1",
         "John Doe",
@@ -29,6 +43,8 @@ describe("invitationService", () => {
 
       expect(message).toContain("John Doe");
       expect(message).toContain("RC1");
+      expect(message).toContain("2024 ජනවාරි 1 සිට 2024 ජනවාරි 6"); // plusDateTo = 01-05 + 1 day = 01-06
+      expect(message).toContain("2023 දෙසැම්බර් 25 දිනට පෙර");
       expect(message).toContain("ස්වයං"); // silent retreat prefix
       expect(message).toContain("https://application.srisambuddhamission.org/confirm/RC1/y1");
     });
