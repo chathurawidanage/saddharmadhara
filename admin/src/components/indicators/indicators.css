@@ -40,6 +40,22 @@
   background-color: #0277bd;
 }
 
+.has-alcohol-and-drugs-indicator {
+  background-color: #ef6c00;
+}
+
+.has-litigations-indicator {
+  background-color: #37474f;
+}
+
+.has-diseases-indicator {
+  background-color: #004d40;
+}
+
+.has-deformities-indicator {
+  background-color: #4e342e;
+}
+
 .special-comments {
   display: flex;
   column-gap: 2px;

@@ -280,3 +280,63 @@ export const InvitationIndicator = observer(({ yogi, retreat }: InvitationIndica
     </div>
   );
 });
+
+interface ProposedActionsProps {
+  yogi: Yogi;
+  retreat: Retreat;
+}
+
+export const ProposedActions = observer(({ yogi, retreat }: ProposedActionsProps) => {
+  const store = useStore();
+  const [loading, setLoading] = useState(false);
+
+  const { show: alertStateChangeStatus } = useAlert(
+    ({ yogiName, toState, success }: { yogiName: string; toState: string; success: boolean }) =>
+      success
+        ? `${yogiName} moved to ${toState}`
+        : `Failed to move ${yogiName}`,
+    ({ success }: { success: boolean }) => {
+      return {
+        success,
+        critical: !success,
+        duration: 2000,
+      };
+    },
+  );
+
+  const handleAction = async (toStateCode: SelectionState) => {
+    if (!store.yogis) return;
+    setLoading(true);
+    const success = await store.yogis.changeRetreatState(
+      yogi.id,
+      retreat.code,
+      toStateCode,
+    );
+    setLoading(false);
+    alertStateChangeStatus({
+      yogiName: yogi.attributes.fullName,
+      toState: toStateCode,
+      success,
+    });
+  };
+
+  return (
+    <ButtonStrip>
+      <Button
+        primary
+        loading={loading}
+        onClick={() => handleAction(SelectionState.PENDING)}
+      >
+        Accept
+      </Button>
+      <Button
+        destructive
+        loading={loading}
+        onClick={() => handleAction(SelectionState.DESELECTED)}
+      >
+        Deny
+      </Button>
+    </ButtonStrip>
+  );
+});
+

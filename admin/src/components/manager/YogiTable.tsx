@@ -5,6 +5,8 @@ import {
   TableHead,
   TableCellHead,
   TableRowHead,
+  TableRow,
+  TableCell,
 } from "@dhis2/ui";
 import React from "react";
 import YogiRow from "./YogiRow";
@@ -17,8 +19,9 @@ import {
   InvitationIndicator,
   RoomSelect,
   StateChangeButton,
+  ProposedActions,
 } from "./YogiRowActions";
-import { Retreat, Yogi } from "../../types/domain";
+import { Retreat, Yogi, EoiSummary } from "../../types/domain";
 
 interface YogiTableProps {
   filteredYogis: Yogi[];
@@ -57,7 +60,7 @@ const YogiTable = ({
 
   return (
     <div>
-      {renderPagination(filteredYogis.length)}
+      {selectionState !== "proposed" && renderPagination(filteredYogis.length)}
       <div className="yogi-table-container">
         <Table className="yogi-table">
           <TableHead>
@@ -72,58 +75,73 @@ const YogiTable = ({
             </TableRowHead>
           </TableHead>
           <TableBody>
-            {filteredYogis.map((yogi, index) => {
-              if (
-                !(
-                  index >= (currentPage - 1) * pageSize &&
-                  index < currentPage * pageSize
-                )
-              ) {
-                return null;
-              }
+            {filteredYogis.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={5} align="center">
+                  <div style={{ padding: "30px", color: "var(--color-grey-600)" }}>
+                    No proposed yogi available for this gender selection.
+                  </div>
+                </TableCell>
+              </TableRow>
+            ) : (
+              filteredYogis.map((yogi, index) => {
+                if (
+                  selectionState !== "proposed" &&
+                  !(
+                    index >= (currentPage - 1) * pageSize &&
+                    index < currentPage * pageSize
+                  )
+                ) {
+                  return null;
+                }
 
-              return (
-                <YogiRow
-                  trackedEntity={yogi}
-                  key={yogi.id}
-                  currentRetreat={retreat}
-                  allRetreats={allRetreats}
-                  eoiSummary={eoiSummary}
-                  actions={
-                    <>
-                      <StateChangeButton
-                        yogi={yogi}
-                        currentState={selectionState}
-                        retreat={retreat}
-                      />
-                      {selectionState ===
-                      DHIS2_RETREAT_SELECTION_STATE_SELECTED_CODE ? (
-                        <RoomSelect
-                          retreat={retreat}
-                          yogi={yogi}
-                          allYogis={allYogis}
-                        />
-                      ) : null}
-                      {selectionState ===
-                      DHIS2_RETREAT_SELECTION_STATE_SELECTED_CODE ? (
-                        <AttendanceButton retreat={retreat} yogi={yogi} />
-                      ) : null}
-                      {selectionState ===
-                      DHIS2_RETREAT_SELECTION_STATE_PENDING_CONFIRMATION_CODE ? (
-                        <InvitationIndicator
-                          retreat={retreat}
-                          yogi={yogi}
-                        />
-                      ) : null}
-                    </>
-                  }
-                />
-              );
-            })}
+                return (
+                  <YogiRow
+                    trackedEntity={yogi}
+                    key={yogi.id}
+                    currentRetreat={retreat}
+                    allRetreats={allRetreats}
+                    eoiSummary={eoiSummary}
+                    actions={
+                      selectionState === "proposed" ? (
+                        <ProposedActions yogi={yogi} retreat={retreat} />
+                      ) : (
+                        <>
+                          <StateChangeButton
+                            yogi={yogi}
+                            currentState={selectionState}
+                            retreat={retreat}
+                          />
+                          {selectionState ===
+                          DHIS2_RETREAT_SELECTION_STATE_SELECTED_CODE ? (
+                            <RoomSelect
+                              retreat={retreat}
+                              yogi={yogi}
+                              allYogis={allYogis}
+                            />
+                          ) : null}
+                          {selectionState ===
+                          DHIS2_RETREAT_SELECTION_STATE_SELECTED_CODE ? (
+                            <AttendanceButton retreat={retreat} yogi={yogi} />
+                          ) : null}
+                          {selectionState ===
+                          DHIS2_RETREAT_SELECTION_STATE_PENDING_CONFIRMATION_CODE ? (
+                            <InvitationIndicator
+                              retreat={retreat}
+                              yogi={yogi}
+                            />
+                          ) : null}
+                        </>
+                      )
+                    }
+                  />
+                );
+              })
+            )}
           </TableBody>
         </Table>
       </div>
-      {renderPagination(filteredYogis.length)}
+      {selectionState !== "proposed" && renderPagination(filteredYogis.length)}
     </div>
   );
 };

@@ -111,3 +111,69 @@
   min-width: 300px;
   height: 40px;
 }
+
+/* Selection tab styling (light blue theme) */
+.proposed-tab {
+  background-color: #e1f5fe !important;
+  color: #0288d1 !important;
+  font-weight: 600 !important;
+  transition: all 0.2s ease !important;
+}
+
+.proposed-tab:hover {
+  background-color: #b3e5fc !important;
+}
+
+.proposed-tab.selected {
+  background-color: #b3e5fc !important;
+  color: #01579b !important;
+}
+
+.proposed-gender-switch-container {
+  display: flex;
+  background: #e2e8f0;
+  padding: 4px;
+  border-radius: 30px;
+  width: fit-content;
+  margin: var(--spacing-m) 0;
+  border: 1px solid var(--color-grey-300);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+
+.gender-switch-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: none;
+  background: transparent;
+  padding: 8px 24px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-grey-600);
+  border-radius: 25px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  outline: none;
+}
+
+.gender-switch-btn:hover {
+  color: var(--color-grey-900);
+}
+
+.gender-switch-btn.active {
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.gender-switch-btn.active.male {
+  color: #0288d1;
+}
+
+.gender-switch-btn.active.female {
+  color: #d81b60;
+}
+
+.gender-icon {
+  font-size: 16px;
+}
+

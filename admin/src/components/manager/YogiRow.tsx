@@ -12,6 +12,10 @@ import {
   HasPermission,
   HasStress,
   HasUnattendedDeformities,
+  HasAlcoholAndDrugs,
+  HasLitigations,
+  HasDiseases,
+  HasDeformities,
 } from "../indicators/BooleanWithCommentIndicator";
 import GenderIndicator from "../indicators/GenderIndicator";
 import ParticipationIndicator from "../indicators/ParticipationIndicator";
@@ -284,6 +288,38 @@ const YogiRow = observer(({ trackedEntity, currentRetreat, allRetreats, eoiSumma
               }
               comment={
                 trackedEntity.attributes.hasStressComment
+              }
+            />
+            <HasAlcoholAndDrugs
+              hasAlcoholAndDrugs={
+                trackedEntity.attributes.fyV0EfY0dnR
+              }
+              comment={
+                trackedEntity.attributes.la4960WBUC3
+              }
+            />
+            <HasLitigations
+              hasLitigations={
+                trackedEntity.attributes.g1QmlpA14bX
+              }
+              comment={
+                trackedEntity.attributes.GL9bAKX2wl3
+              }
+            />
+            <HasDiseases
+              hasDiseases={
+                trackedEntity.attributes.iaW1GDx6k3P
+              }
+              comment={
+                trackedEntity.attributes.nOm8SVX2VbC
+              }
+            />
+            <HasDeformities
+              hasDeformities={
+                trackedEntity.attributes.nwItPNW72se
+              }
+              comment={
+                trackedEntity.attributes.aHZ7BJDzntQ
               }
             />
           </div>

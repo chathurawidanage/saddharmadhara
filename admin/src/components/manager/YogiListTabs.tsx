@@ -15,20 +15,39 @@ const YogiListTabs = observer(({
   onStateChange, 
   countByState 
 }: YogiListTabsProps) => {
+  const renderTabs = () => {
+    const tabsList: React.ReactNode[] = [];
+    selectionStates.forEach((state) => {
+      tabsList.push(
+        <Tab
+          key={state.code}
+          selected={selectionState === state.code}
+          onClick={() => onStateChange(state.code)}
+        >
+          {state.name} [{countByState[state.code] || "0"}]
+        </Tab>
+      );
+
+      if (state.code === "applied") {
+        tabsList.push(
+          <Tab
+            key="proposed"
+            selected={selectionState === "proposed"}
+            onClick={() => onStateChange("proposed")}
+            className={`proposed-tab ${selectionState === "proposed" ? "selected" : ""}`}
+          >
+            Selection
+          </Tab>
+        );
+      }
+    });
+    return tabsList;
+  };
+
   return (
     <div>
       <TabBar>
-        {selectionStates.map((state) => {
-          return (
-            <Tab
-              key={state.code}
-              selected={selectionState === state.code}
-              onClick={() => onStateChange(state.code)}
-            >
-              {state.name} [{countByState[state.code] || "0"}]
-            </Tab>
-          );
-        })}
+        {renderTabs()}
       </TabBar>
     </div>
   );
