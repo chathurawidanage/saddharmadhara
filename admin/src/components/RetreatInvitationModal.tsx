@@ -59,6 +59,7 @@ const RetreatInvitationModal = observer(({ retreat, onCancel }: RetreatInvitatio
         retreat.code,
         retreat.name,
         noop,
+        retreat.retreatCode,
       );
 
       const sentYogisArr: Yogi[] = [];

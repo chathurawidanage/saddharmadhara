@@ -50,6 +50,7 @@ const RetreatFinaliseModal = observer(({ retreat, onCancel }: RetreatFinaliseMod
         retreat.code,
         retreat.name,
         noop,
+        retreat.retreatCode,
       );
 
       let alreadyMarkedCount = 0;

@@ -13,6 +13,7 @@ import {
   SingleSelectOption,
   Tag,
   TextAreaField,
+  Radio,
 } from "@dhis2/ui";
 import { observer } from "mobx-react";
 import React, { useState } from "react";
@@ -289,6 +290,9 @@ interface ProposedActionsProps {
 export const ProposedActions = observer(({ yogi, retreat }: ProposedActionsProps) => {
   const store = useStore();
   const [loading, setLoading] = useState(false);
+  const [showDenyModal, setShowDenyModal] = useState(false);
+  const [selectedReason, setSelectedReason] = useState("");
+  const [comment, setComment] = useState("");
 
   const { show: alertStateChangeStatus } = useAlert(
     ({ yogiName, toState, success }: { yogiName: string; toState: string; success: boolean }) =>
@@ -304,9 +308,22 @@ export const ProposedActions = observer(({ yogi, retreat }: ProposedActionsProps
     },
   );
 
+  const { show: alertError } = useAlert(
+    (message: string) => message,
+    { critical: true, duration: 4000 }
+  );
+
   const handleAction = async (toStateCode: SelectionState) => {
     if (!store.yogis) return;
     setLoading(true);
+
+    if (toStateCode === SelectionState.PENDING) {
+      await store.yogis.deleteProposedDenyFeedback(
+        retreat.retreatCode,
+        yogi.id,
+      );
+    }
+
     const success = await store.yogis.changeRetreatState(
       yogi.id,
       retreat.code,
@@ -320,6 +337,58 @@ export const ProposedActions = observer(({ yogi, retreat }: ProposedActionsProps
     });
   };
 
+  const handleOpenDenyModal = () => {
+    setSelectedReason("");
+    setComment("");
+    setShowDenyModal(true);
+  };
+
+  const handleDenyConfirm = async () => {
+    if (!selectedReason) return;
+    if (selectedReason === "OTHER" && !comment.trim()) return;
+
+    setLoading(true);
+    const feedbackSaved = await store.yogis?.saveProposedDenyFeedback(
+      retreat.retreatCode,
+      yogi.id,
+      selectedReason,
+      comment,
+      store.metadata?.currentUser?.username,
+    );
+
+    if (!feedbackSaved) {
+      setLoading(false);
+      alertError("Failed to save deny feedback to DHIS2 datastore. Please try again.");
+      return;
+    }
+
+    const success = await store.yogis?.changeRetreatState(
+      yogi.id,
+      retreat.code,
+      SelectionState.DESELECTED,
+    );
+
+    setLoading(false);
+    setShowDenyModal(false);
+
+    alertStateChangeStatus({
+      yogiName: yogi.attributes.fullName,
+      toState: SelectionState.DESELECTED,
+      success,
+    });
+  };
+
+  const OPTIONS = [
+    { label: "Based on past staff review (eg: inappropriate behavior)", value: "PAST_REVIEW" },
+    { label: "Possible disciplinary or behavioral concerns", value: "DISCIPLINARY_CONCERNS" },
+    { label: "Too many no shows across past years", value: "TOO_MANY_NO_SHOWS" },
+    { label: "Already known to be not attending based on outside communication", value: "OUTSIDE_COMMUNICATION" },
+    { label: "Based on the answers to the questions Physical & Psychological Readiness.", value: "READINESS_ANSWERS" },
+    { label: "Health issues", value: "HEALTH_ISSUES" },
+    { label: "Age concerns", value: "AGE_CONCERNS" },
+    { label: "Other", value: "OTHER" },
+  ];
+
   return (
     <ButtonStrip>
       <Button
@@ -332,10 +401,60 @@ export const ProposedActions = observer(({ yogi, retreat }: ProposedActionsProps
       <Button
         destructive
         loading={loading}
-        onClick={() => handleAction(SelectionState.DESELECTED)}
+        onClick={handleOpenDenyModal}
       >
         Deny
       </Button>
+
+      {showDenyModal && (
+        <Modal hide={!showDenyModal}>
+          <ModalTitle>Deny System Proposal for {yogi.attributes.fullName}</ModalTitle>
+          <ModalContent>
+            <p style={{ margin: "0 0 15px 0", fontSize: "14px", color: "var(--color-grey-700)" }}>
+              Please tell us why you think this system proposal is invalid. This feedback will be used to improve the scoring algorithm.
+            </p>
+            <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginBottom: "20px" }}>
+              {OPTIONS.map((opt) => (
+                <Radio
+                  key={opt.value}
+                  label={opt.label}
+                  value={opt.value}
+                  checked={selectedReason === opt.value}
+                  onChange={() => setSelectedReason(opt.value)}
+                  dense
+                />
+              ))}
+            </div>
+            <TextAreaField
+              label="Comment"
+              value={comment}
+              onChange={({ value }: { value: string }) => setComment(value)}
+              required={selectedReason === "OTHER"}
+              validationText={
+                selectedReason === "OTHER" && !comment.trim()
+                  ? "Comment is required when 'Other' is selected"
+                  : undefined
+              }
+              error={selectedReason === "OTHER" && !comment.trim()}
+            />
+          </ModalContent>
+          <ModalActions>
+            <ButtonStrip>
+              <Button onClick={() => setShowDenyModal(false)} secondary disabled={loading}>
+                Cancel
+              </Button>
+              <Button
+                destructive
+                loading={loading}
+                disabled={!selectedReason || (selectedReason === "OTHER" && !comment.trim())}
+                onClick={handleDenyConfirm}
+              >
+                Deny
+              </Button>
+            </ButtonStrip>
+          </ModalActions>
+        </Modal>
+      )}
     </ButtonStrip>
   );
 });

@@ -129,6 +129,7 @@ interface RequestStates {
 class YogiStore {
   yogiIdToObjectMap = new Map<string, Yogi>();
   expressionOfInterestsYogiIds = new Map<string, string[]>();
+  denyFeedbacks = new Map<string, { reason: string; comment: string; yogiId: string; retreatCode: string; deniedBy?: string; submittedAt: string }>();
   engine: Dhis2Engine;
 
 
@@ -327,7 +328,12 @@ class YogiStore {
     }
   };
 
-  fetchYogiBatch = async (retreatCode: string, retreatName?: string, onProgress?: (progress: { completed: number; total: number; failed: number }) => void): Promise<Yogi[]> => {
+  fetchYogiBatch = async (
+    retreatCode: string,
+    retreatName?: string,
+    onProgress?: (progress: { completed: number; total: number; failed: number }) => void,
+    retreatShortCode?: string,
+  ): Promise<Yogi[]> => {
     runInAction(() => {
       this.requestStates.loadingBatch[retreatCode] = true;
       this.requestStates.batchErrors[retreatCode] = null;
@@ -395,6 +401,8 @@ class YogiStore {
           return yogi;
         }),
       );
+
+      await this.loadDenyFeedbacks(retreatCode, retreatShortCode);
 
       if (failed > 0) {
         runInAction(() => {
@@ -618,6 +626,135 @@ class YogiStore {
         yogi.expressionOfInterests[retreatCode].invitationSent = invitationState;
       }
     });
+  };
+
+  saveProposedDenyFeedback = async (
+    retreatCode: string,
+    yogiId: string,
+    reason: string,
+    comment: string,
+    deniedBy?: string,
+  ): Promise<boolean> => {
+    const key = `${retreatCode}_${yogiId}`;
+    let exists = false;
+    try {
+      await this.engine.query({
+        feedback: {
+          resource: `dataStore/yogi-proposal-denials/${key}`,
+        },
+      });
+      exists = true;
+    } catch (e) {
+      exists = false;
+    }
+
+    const mutation = {
+      resource: `dataStore/yogi-proposal-denials/${key}`,
+      type: exists ? ("update" as const) : ("create" as const),
+      data: {
+        reason,
+        comment,
+        yogiId,
+        retreatCode,
+        deniedBy: deniedBy || null,
+        submittedAt: new Date().toISOString(),
+      },
+    };
+
+    try {
+      await this.engine.mutate(mutation);
+      runInAction(() => {
+        this.denyFeedbacks.set(key, {
+          reason,
+          comment,
+          yogiId,
+          retreatCode,
+          deniedBy: deniedBy || undefined,
+          submittedAt: mutation.data.submittedAt,
+        });
+      });
+      return true;
+    } catch (error) {
+      console.error("Failed to save feedback to DHIS2 datastore:", error);
+      return false;
+    }
+  };
+
+  deleteProposedDenyFeedback = async (
+    retreatCode: string,
+    yogiId: string,
+  ): Promise<boolean> => {
+    const key = `${retreatCode}_${yogiId}`;
+    let exists = false;
+    try {
+      await this.engine.query({
+        feedback: {
+          resource: `dataStore/yogi-proposal-denials/${key}`,
+        },
+      });
+      exists = true;
+    } catch (e) {
+      exists = false;
+    }
+
+    if (!exists) {
+      runInAction(() => {
+        this.denyFeedbacks.delete(key);
+      });
+      return true;
+    }
+
+    try {
+      await this.engine.mutate({
+        type: "delete" as const,
+        resource: `dataStore/yogi-proposal-denials`,
+        id: key,
+      });
+      runInAction(() => {
+        this.denyFeedbacks.delete(key);
+      });
+      return true;
+    } catch (error) {
+      console.error("Failed to delete feedback from DHIS2 datastore:", error);
+      return false;
+    }
+  };
+
+  loadDenyFeedbacks = async (retreatCode: string, retreatShortCode?: string): Promise<void> => {
+    try {
+      const response = await this.engine.query({
+        keys: {
+          resource: "dataStore/yogi-proposal-denials",
+        },
+      });
+      const keys = (response.keys as string[]) || [];
+      const filterPrefix = retreatShortCode || retreatCode;
+      const retreatKeys = keys.filter((k) => k.startsWith(`${filterPrefix}_`));
+
+      const feedbacks = await Promise.all(
+        retreatKeys.map(async (key) => {
+          try {
+            const data = await this.engine.query({
+              val: {
+                resource: `dataStore/yogi-proposal-denials/${key}`,
+              },
+            });
+            return data.val;
+          } catch (e) {
+            return null;
+          }
+        }),
+      );
+
+      runInAction(() => {
+        feedbacks.filter(Boolean).forEach((fb) => {
+          this.denyFeedbacks.set(`${fb.retreatCode}_${fb.yogiId}`, fb);
+        });
+      });
+    } catch (error) {
+      // Namespace might not exist, which is fine
+      console.log("No deny feedback found or namespace not initialized:", error);
+    }
   };
 }
 

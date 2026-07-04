@@ -21,7 +21,6 @@ export const YOGI_EXPORT_DEFINITIONS = [
   { label: "Applied", selectionState: "applied" },
   { label: "Pending Confirmation", selectionState: "pending" },
   { label: "Selected", selectionState: "selected" },
-  { label: "Waiting", selectionState: "waiting" },
 ];
 
 /**

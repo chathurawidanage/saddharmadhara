@@ -420,6 +420,11 @@ class MetadataStore {
         if (selectionMismatches.length > 0) {
           console.error("SCHEMA MISMATCH: SelectionState enum deviates from DHIS2 option set!", selectionMismatches);
         }
+
+        // Filter out WAITING selection state from active selectionStates to hide it from the UI entirely
+        this.selectionStates = this.selectionStates.filter(
+          (state) => state.code !== SelectionState.WAITING
+        );
       });
     } catch (error) {
       runInAction(() => {

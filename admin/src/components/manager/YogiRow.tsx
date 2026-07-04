@@ -7,6 +7,7 @@ import {
   DHIS_PROGRAM,
 } from "../../dhis2";
 import ActiveApplicationIndicator from "../indicators/ActiveApplicationsIndicator";
+import { useStore } from "../../stores/StoreProvider";
 import {
   HasKidsIndicator,
   HasPermission,
@@ -37,8 +38,32 @@ interface YogiRowProps {
   actions?: ReactNode;
 }
 
+const getReasonLabel = (reason: string) => {
+  switch (reason) {
+    case "PAST_REVIEW":
+      return "Based on past staff review (eg: inappropriate behavior)";
+    case "DISCIPLINARY_CONCERNS":
+      return "Possible disciplinary or behavioral concerns";
+    case "TOO_MANY_NO_SHOWS":
+      return "Too many no shows across past years";
+    case "OUTSIDE_COMMUNICATION":
+      return "Already known to be not attending based on outside communication";
+    case "READINESS_ANSWERS":
+      return "Based on the answers to the questions Physical & Psychological Readiness.";
+    case "HEALTH_ISSUES":
+      return "Health issues";
+    case "AGE_CONCERNS":
+      return "Age concerns";
+    case "OTHER":
+      return "Other";
+    default:
+      return reason;
+  }
+};
+
 const YogiRow = observer(({ trackedEntity, currentRetreat, allRetreats, eoiSummary, actions }: YogiRowProps) => {
     const { baseUrl } = useConfig();
+    const store = useStore();
     const [currentCommentIndex, setCurrentCommentIndex] = useState(0);
     const [currentNoteIndex, setCurrentNoteIndex] = useState(0);
 
@@ -53,6 +78,10 @@ const YogiRow = observer(({ trackedEntity, currentRetreat, allRetreats, eoiSumma
         .filter((note) => note.value?.trim().length > 0)
         .reverse();
     }, [trackedEntity.notes]);
+
+    const denyFeedback = store.yogis?.denyFeedbacks.get(
+      `${currentRetreat.retreatCode}_${trackedEntity.id}`,
+    );
 
     const rowClassNames = [];
 
@@ -250,6 +279,34 @@ const YogiRow = observer(({ trackedEntity, currentRetreat, allRetreats, eoiSumma
                 </div>
                 <div className="yogi-comment-body">
                   {staffNotes[currentNoteIndex].value}
+                </div>
+              </div>
+            </div>
+          )}
+          {denyFeedback && (
+            <div className="yogi-deny-feedback-subrow">
+              <div className="yogi-comment-container">
+                <div className="yogi-comment-header">
+                  <div className="yogi-comment-title-section">
+                    <span className="yogi-deny-badge">System Proposal Denied</span>
+                    {denyFeedback.submittedAt && (
+                      <span className="yogi-comment-date">
+                        {new Date(denyFeedback.submittedAt).toLocaleDateString("en-US", {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                        })}
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <div className="yogi-comment-body">
+                  System proposal denied by <strong>{denyFeedback.deniedBy || "unknown"}</strong> due to: <strong>{getReasonLabel(denyFeedback.reason)}</strong>
+                  {denyFeedback.comment && (
+                    <div style={{ marginTop: "6px", fontStyle: "italic", color: "var(--color-grey-600)" }}>
+                      "{denyFeedback.comment}"
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

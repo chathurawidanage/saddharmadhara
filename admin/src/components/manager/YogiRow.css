@@ -248,3 +248,33 @@
   color: #5f6368;
   font-weight: 500;
 }
+
+.yogi-deny-feedback-subrow {
+  margin-top: var(--spacing-xs);
+  margin-bottom: var(--spacing-xs);
+  padding: 10px 14px;
+  background: rgba(253, 237, 237, 0.5);
+  border-left: 3px solid #d32f2f;
+  border-radius: 6px;
+  width: 100%;
+  box-sizing: border-box;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.yogi-deny-feedback-subrow:hover {
+  background: rgba(253, 237, 237, 0.8);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
+}
+
+.yogi-deny-badge {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background-color: #fde8e8;
+  color: #c53030;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 700;
+}

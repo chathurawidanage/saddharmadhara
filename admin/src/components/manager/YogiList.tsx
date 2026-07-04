@@ -103,6 +103,7 @@ const YogisList = observer(({ retreat }: YogisListProps) => {
         ({ completed, total }) => {
           setLoadProgress(total === 0 ? 100 : (completed * 100) / total);
         },
+        retreat.retreatCode,
       );
 
       sortYogiList(
