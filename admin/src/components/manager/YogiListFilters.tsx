@@ -10,11 +10,13 @@ interface YogiListFiltersProps {
     reverend: boolean;
   };
   setFilters: (filters: any) => void;
+  disabled?: boolean;
 }
 
-const YogiListFilters = ({ filters, setFilters }: YogiListFiltersProps) => {
+const YogiListFilters = ({ filters, setFilters, disabled }: YogiListFiltersProps) => {
   return (
     <DropdownButton
+      disabled={disabled}
       component={
         <FlyoutMenu>
           <MenuItem
@@ -25,6 +27,7 @@ const YogiListFilters = ({ filters, setFilters }: YogiListFiltersProps) => {
               />
             }
             onClick={() => {
+              if (disabled) return;
               setFilters({ ...filters, reverend: !filters.reverend });
             }}
           />
@@ -36,6 +39,7 @@ const YogiListFilters = ({ filters, setFilters }: YogiListFiltersProps) => {
               />
             }
             onClick={() => {
+              if (disabled) return;
               setFilters({ ...filters, male: !filters.male });
             }}
           />
@@ -47,6 +51,7 @@ const YogiListFilters = ({ filters, setFilters }: YogiListFiltersProps) => {
               />
             }
             onClick={() => {
+              if (disabled) return;
               setFilters({ ...filters, female: !filters.female });
             }}
           />

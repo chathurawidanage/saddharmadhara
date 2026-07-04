@@ -508,10 +508,6 @@ export const ProposedYogiDetail = observer(({
                     <span className="label">Primary ID</span>
                     <span className="val">{String(getValue(["EDhjneO1ofm"]) || "Not provided")}</span>
                   </div>
-                  <div className="details-row">
-                    <span className="label">Photo Status</span>
-                    <span className="val">{getValue(["zMtxZwR7Kw5"]) ? "Uploaded" : "Not provided"}</span>
-                  </div>
                 </div>
               </div>
 

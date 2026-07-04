@@ -178,33 +178,32 @@ const YogisList = observer(({ retreat }: YogisListProps) => {
         </div>
       )}
       
-      {selectionState !== "proposed" && (
-        <YogiListToolbar
-          filters={filters}
-          setFilters={setFilters}
-          sortBy={sortBy}
-          onSortChange={(newSortBy) => {
-            sortByRef.current = newSortBy;
-            setSortBy(newSortBy);
-            setYogiList((currentYogis) => {
-              const sortedYogis = [...currentYogis];
-              sortYogiList(
-                sortedYogis,
-                retreat,
-                newSortBy,
-                store.metadata?.retreats || [],
-                store.metadata?.eoiSummary || [],
-              );
-              return sortedYogis;
-            });
-          }}
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-          isAdmin={store.metadata?.isAdmin}
-          showBulkMove={!retreat.finalized && (selectionState === "applied" || selectionState === "pending")}
-          onBulkMoveClick={() => setShowBulkMoveModal(true)}
-        />
-      )}
+      <YogiListToolbar
+        filters={filters}
+        setFilters={setFilters}
+        sortBy={sortBy}
+        onSortChange={(newSortBy) => {
+          sortByRef.current = newSortBy;
+          setSortBy(newSortBy);
+          setYogiList((currentYogis) => {
+            const sortedYogis = [...currentYogis];
+            sortYogiList(
+              sortedYogis,
+              retreat,
+              newSortBy,
+              store.metadata?.retreats || [],
+              store.metadata?.eoiSummary || [],
+            );
+            return sortedYogis;
+          });
+        }}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        isAdmin={store.metadata?.isAdmin}
+        showBulkMove={!retreat.finalized && (selectionState === "applied" || selectionState === "pending")}
+        onBulkMoveClick={() => setShowBulkMoveModal(true)}
+        disabled={selectionState === "proposed"}
+      />
 
       <YogiListTabs
         selectionStates={store.metadata?.selectionStates || []}

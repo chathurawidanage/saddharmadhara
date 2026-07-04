@@ -13,6 +13,7 @@ interface YogiListToolbarProps {
   isAdmin?: boolean;
   showBulkMove?: boolean;
   onBulkMoveClick?: () => void;
+  disabled?: boolean;
 }
 
 const YogiListToolbar = ({ 
@@ -24,11 +25,12 @@ const YogiListToolbar = ({
   onSearchChange,
   isAdmin,
   showBulkMove,
-  onBulkMoveClick
+  onBulkMoveClick,
+  disabled
 }: YogiListToolbarProps) => {
   return (
-    <div className="yogi-list-top-bar">
-      <YogiListFilters filters={filters} setFilters={setFilters} />
+    <div className="yogi-list-top-bar" style={disabled ? { opacity: 0.6 } : undefined}>
+      <YogiListFilters filters={filters} setFilters={setFilters} disabled={disabled} />
 
       <SingleSelectField
         placeholder="Sort"
@@ -36,6 +38,7 @@ const YogiListToolbar = ({
         onChange={(e: any) => onSortChange(e.selected)}
         selected={sortBy}
         tabIndex="0"
+        disabled={disabled}
       >
         <SingleSelectOption
           value={SELECTION_PRIORITY_SORT}
@@ -49,10 +52,11 @@ const YogiListToolbar = ({
         value={searchQuery}
         onChange={({ value }: any) => onSearchChange(value)}
         type="search"
+        disabled={disabled}
       />
       {isAdmin && showBulkMove && (
         <div style={{ marginLeft: "auto" }}>
-          <Button onClick={onBulkMoveClick}>
+          <Button onClick={onBulkMoveClick} disabled={disabled}>
             Move All to Selected
           </Button>
         </div>
