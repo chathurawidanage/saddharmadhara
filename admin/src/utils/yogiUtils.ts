@@ -3,6 +3,7 @@ import { isGeneralRetreat, isSilentRetreat } from "./retreatUtils";
 
 export const SELECTION_PRIORITY_SORT = "selection-priority";
 export const AGE_SORT = "age";
+export const PARTICIPATION_DEDUCTION_YEARS = 2;
 
 export interface YogiSortScoreBreakdown {
   statusScore: number;
@@ -57,30 +58,35 @@ export const getYogiSortScore = (
   }
 
   // 3. Participation Score (S_participation)
-  // TODO do deductions only for retreats within last 3 years
+  const deductionCutoffDate = new Date();
+  deductionCutoffDate.setFullYear(deductionCutoffDate.getFullYear() - PARTICIPATION_DEDUCTION_YEARS);
+
   let nGeneral = 0;
   let nSilent = 0;
   Object.values(yogiObj.participation || {}).forEach((p) => {
     if (p.attendance === AttendanceState.ATTENDED) {
       const retreat = allRetreats.find((r) => r.code === p.retreat);
-      if (retreat) {
-        if (isGeneralRetreat(retreat)) {
-          nGeneral++;
-        } else {
-          nSilent++;
+      if (retreat && retreat.date) {
+        const retreatDate = new Date(retreat.date);
+        if (retreatDate >= deductionCutoffDate) {
+          if (isGeneralRetreat(retreat)) {
+            nGeneral++;
+          } else {
+            nSilent++;
+          }
         }
       }
     }
   });
 
   let sParticipation = 100;
-  let participationReason = `Base 100`;
+  let participationReason = `Base 100 (considering last ${PARTICIPATION_DEDUCTION_YEARS} years)`;
   if (currentRetreat && isGeneralRetreat(currentRetreat)) {
     sParticipation = 100 - 20 * nGeneral + 10 * nSilent;
-    participationReason = `Attended: ${nGeneral} General (${-20} each), ${nSilent} Silent (${10} each) with base 100`;
+    participationReason = `Attended: ${nGeneral} General (${-20} each), ${nSilent} Silent (${10} each) with base 100 (last ${PARTICIPATION_DEDUCTION_YEARS} years)`;
   } else if (currentRetreat && isSilentRetreat(currentRetreat)) {
     sParticipation = 100 - 10 * nSilent;
-    participationReason = `Attended: ${nSilent} Silent (${-10} each) with base 100`;
+    participationReason = `Attended: ${nSilent} Silent (${-10} each) with base 100 (last ${PARTICIPATION_DEDUCTION_YEARS} years)`;
   }
 
   // 3b. Penalties (S_penalty)

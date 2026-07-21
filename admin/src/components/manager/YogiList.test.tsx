@@ -170,10 +170,10 @@ describe("YogiList Sorting Helpers", () => {
     } as any;
 
     const allRetreats = [
-      { code: "R1", season: "S1", date: "2026-06-15" },
-      { code: "R2", season: "S1", date: "2026-06-20" },
-      { code: "R3", season: "S1", date: "2026-06-25" },
-      { code: "R4", season: "S1", date: "2026-06-30" },
+      { code: "R1", season: "S1", date: "2027-06-15" },
+      { code: "R2", season: "S1", date: "2027-06-20" },
+      { code: "R3", season: "S1", date: "2027-06-25" },
+      { code: "R4", season: "S1", date: "2027-06-30" },
     ] as any[];
 
     // 1 occurrence penalty: -25
