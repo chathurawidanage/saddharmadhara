@@ -223,11 +223,19 @@ class MetadataStore {
   };
 
   setRetreatAttendanceConfirmationDate = async (retreat: Retreat, date: string): Promise<void> => {
-    await this.updateRetreatAttribute(
+    const updated = await this.updateRetreatAttribute(
       retreat,
       DHIS2_RETREAT_ATTENDANCE_CONFIRMATION_DATE_ATTRIBUTE,
       date,
     );
+    if (updated) {
+      runInAction(() => {
+        const retreatIndex = this.retreats.indexOf(retreat);
+        if (retreatIndex !== -1) {
+          this.retreats[retreatIndex].confirmationDeadline = date;
+        }
+      });
+    }
   };
 
   loadSeasons = async (): Promise<void> => {

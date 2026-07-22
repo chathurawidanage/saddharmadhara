@@ -110,14 +110,18 @@ export default async function Page(props: {
     );
   }
 
-  // check if confirmation deadline has passed
+  // check if confirmation deadline has passed (EOD Sri Lanka Time: UTC+05:30)
   const confirmationDeadline: string =
     retreatObj.attributes[DHIS2_RETREAT_ATTRIBUTE_CONFIRMATION_DEADLINE];
 
-  if (
-    confirmationDeadline &&
-    new Date(confirmationDeadline).getTime() < Date.now()
-  ) {
+  const isDeadlinePassed = (() => {
+    if (!confirmationDeadline) return false;
+    const dateOnly = confirmationDeadline.split("T")[0];
+    const eodTimestamp = new Date(`${dateOnly}T23:59:59.999+05:30`).getTime();
+    return eodTimestamp < Date.now();
+  })();
+
+  if (isDeadlinePassed) {
     return (
       <ErrorComponent
         title={{

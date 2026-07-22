@@ -67,3 +67,11 @@
 .retreat-detail-item.capitalize {
   text-transform: capitalize;
 }
+
+.retreat-details-deadline-wrapper {
+  margin-left: auto;
+}
+
+.retreat-details-deadline-wrapper * {
+  max-width: none !important;
+}

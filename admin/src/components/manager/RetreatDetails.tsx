@@ -1,4 +1,5 @@
-import { Tag } from "@dhis2/ui";
+import { IconClock16, Tag } from "@dhis2/ui";
+import { observer } from "mobx-react";
 import React from "react";
 import RetreatLocation from "../RetreatLocation";
 import { Retreat } from "../../types/domain";
@@ -7,7 +8,31 @@ interface RetreatDetailsProps {
   retreat: Retreat;
 }
 
-const RetreatDetails = ({ retreat }: RetreatDetailsProps) => {
+const RetreatDetails = observer(({ retreat }: RetreatDetailsProps) => {
+  const isRetreatDatePassed = (() => {
+    if (!retreat.date) return false;
+    const dateStr = retreat.date.toISOString().split("T")[0];
+    return new Date(`${dateStr}T23:59:59.999+05:30`).getTime() < Date.now();
+  })();
+
+  const isDeadlineExpired = (() => {
+    if (!retreat.confirmationDeadline) return false;
+    const dateStr = retreat.confirmationDeadline.split("T")[0];
+    return new Date(`${dateStr}T23:59:59.999+05:30`).getTime() < Date.now();
+  })();
+
+  const formattedDeadline = (() => {
+    if (!retreat.confirmationDeadline) return "";
+    const dateStr = retreat.confirmationDeadline.split("T")[0];
+    const dateObj = new Date(`${dateStr}T00:00:00`);
+    if (isNaN(dateObj.getTime())) return retreat.confirmationDeadline;
+    return dateObj.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+  })();
+
   return (
     <div className="retreat-details-row">
       <div>
@@ -25,8 +50,15 @@ const RetreatDetails = ({ retreat }: RetreatDetailsProps) => {
         📍 <RetreatLocation locationId={retreat.location} />
       </div>
       <div className="retreat-detail-item">🧘‍♂️ {retreat.totalYogis}</div>
+      {retreat.confirmationDeadline && !isRetreatDatePassed ? (
+        <div className="retreat-details-deadline-wrapper">
+          <Tag positive={!isDeadlineExpired} negative={isDeadlineExpired} icon={<IconClock16 />}>
+            Confirmation Deadline: {formattedDeadline}
+          </Tag>
+        </div>
+      ) : null}
     </div>
   );
-};
+});
 
 export default RetreatDetails;

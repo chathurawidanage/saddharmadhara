@@ -12,6 +12,7 @@ import {
   DHIS2_RETREAT_MEDIUM_ATTRIBUTE,
   DHIS2_RETREAT_FINALIZED_ATTRIBUTE,
   DHIS2_RETREAT_SEASON_ATTRIBUTE,
+  DHIS2_RETREAT_ATTENDANCE_CONFIRMATION_DATE_ATTRIBUTE,
 } from "../dhis2";
 import { getRetreatEndDate } from "./retreatUtils";
 import { 
@@ -60,6 +61,8 @@ export const transformRetreats = (retreatsResponse: Dhis2SqlViewResponse): Retre
       finalized:
         attributeIdToValueMap[DHIS2_RETREAT_FINALIZED_ATTRIBUTE] === "true",
       season: attributeIdToValueMap[DHIS2_RETREAT_SEASON_ATTRIBUTE],
+      confirmationDeadline:
+        attributeIdToValueMap[DHIS2_RETREAT_ATTENDANCE_CONFIRMATION_DATE_ATTRIBUTE],
     };
   });
 

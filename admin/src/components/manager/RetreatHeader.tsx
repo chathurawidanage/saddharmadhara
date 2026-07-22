@@ -7,6 +7,7 @@ import {
   MenuItem,
   Tag,
 } from "@dhis2/ui";
+import { observer } from "mobx-react";
 import React, { ReactNode } from "react";
 import { canFinalizeRetreat } from "../../utils/retreatUtils";
 import { Retreat } from "../../types/domain";
@@ -19,7 +20,7 @@ interface RetreatHeaderProps {
   downloadMenu: ReactNode;
 }
 
-const RetreatHeader = ({
+const RetreatHeader = observer(({
   retreat,
   onSendInvitations,
   onFinalise,
@@ -81,6 +82,6 @@ const RetreatHeader = ({
       </div>
     </div>
   );
-};
+});
 
 export default RetreatHeader;

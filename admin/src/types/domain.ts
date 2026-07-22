@@ -19,6 +19,7 @@ export interface Retreat {
   medium: RetreatMedium;
   finalized: boolean;
   season?: string;
+  confirmationDeadline?: string;
 }
 
 export interface Season {
