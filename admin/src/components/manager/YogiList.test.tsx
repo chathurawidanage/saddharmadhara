@@ -137,16 +137,20 @@ describe("YogiList Sorting Helpers", () => {
     const scoreRecent = getYogiSortScore(yogiWithRecentNoShow, allRetreats, [], currentRetreat);
     const scoreOld = getYogiSortScore(yogiWithOldNoShow, allRetreats, [], currentRetreat);
 
-    // base score: status(0) + age(50) + participation(100) + penalty(-25) = 125.
-    // without recent penalty: 150.
+    // base score: status(0) + age(50) + participation(100) + deduction(-25) = 125.
+    // without recent deduction: 150.
     expect(scoreRecent.total).toBe(125);
-    expect(scoreRecent.breakdown.participationScore).toBe(100);
-    expect(scoreRecent.breakdown.penaltyScore).toBe(-25);
-    expect(scoreRecent.breakdown.penaltyReason).toContain("No-show within last year (-25)");
+    expect(scoreRecent.breakdown.participation.score).toBe(100);
+    expect(scoreRecent.breakdown.deductions.score).toBe(-25);
+    expect(scoreRecent.breakdown.deductions.items).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ label: "No-show within last year (R1)", points: -25 }),
+      ]),
+    );
 
     expect(scoreOld.total).toBe(150);
-    expect(scoreOld.breakdown.participationScore).toBe(100);
-    expect(scoreOld.breakdown.penaltyScore).toBe(0);
+    expect(scoreOld.breakdown.participation.score).toBe(100);
+    expect(scoreOld.breakdown.deductions.score).toBe(0);
   });
 
   test("getYogiSortScore reduces marks for every occurrence of hasSelectionInSeason (50 for first, 25 for subsequent)", () => {
@@ -154,7 +158,7 @@ describe("YogiList Sorting Helpers", () => {
       attributes: { dob: "1990-01-01" }, // age score: 50
       expressionOfInterests: {
         R1: { state: SelectionState.SELECTED, occurredAt: "2024-01-01" },
-        R2: { state: SelectionState.PENDING, occurredAt: "2024-01-01" }, // Current retreat being graded is R2, so it's ignored for penalty
+        R2: { state: SelectionState.PENDING, occurredAt: "2024-01-01" }, // Current retreat being graded is R2, so it's ignored for deduction
       },
       participation: {},
     } as any;
@@ -177,13 +181,13 @@ describe("YogiList Sorting Helpers", () => {
       { code: "R4", season: "S1", date: "2027-06-30" },
     ] as any[];
 
-    // 1 occurrence penalty: -25
+    // 1 occurrence deduction: -25
     const resOne = getYogiSortScore(yogiWithOneOccurrence, allRetreats, [], allRetreats[1]);
-    expect(resOne.breakdown.penaltyScore).toBe(-25);
+    expect(resOne.breakdown.deductions.score).toBe(-25);
 
-    // 3 occurrences penalty: -25 - 50 * 2 = -125
+    // 3 occurrences deduction: -25 - 50 * 2 = -125
     const resThree = getYogiSortScore(yogiWithThreeOccurrences, allRetreats, [], allRetreats[3]);
-    expect(resThree.breakdown.penaltyScore).toBe(-125);
+    expect(resThree.breakdown.deductions.score).toBe(-125);
   });
 
   test("getYogiSortScore adds a boost if a yogi has never attended, selected for, or pending for any retreat ever", () => {
@@ -230,18 +234,34 @@ describe("YogiList Sorting Helpers", () => {
     const resPending = getYogiSortScore(previouslyPendingYogi, [currentRetreat], [], currentRetreat);
     const resAttended = getYogiSortScore(previouslyAttendedYogi, [currentRetreat], [], currentRetreat);
 
-    // Brand new yogi receives base participation (100) + boost (50) = 150
-    expect(resNew.breakdown.participationScore).toBe(100 + FIRST_TIME_YOGI_BOOST);
-    expect(resNew.breakdown.participationReason).toContain("First-time boost");
+    // Brand new yogi receives base participation (100) + boost (25) = 125
+    expect(resNew.breakdown.participation.score).toBe(100 + FIRST_TIME_YOGI_BOOST);
+    expect(resNew.breakdown.participation.items).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ label: "First-time Yogi Boost", points: FIRST_TIME_YOGI_BOOST }),
+      ]),
+    );
 
     // Yogis with prior selection, pending, or attendance history do not receive boost
-    expect(resSelected.breakdown.participationScore).toBe(100);
-    expect(resSelected.breakdown.participationReason).not.toContain("First-time boost");
+    expect(resSelected.breakdown.participation.score).toBe(100);
+    expect(resSelected.breakdown.participation.items).not.toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ label: "First-time Yogi Boost" }),
+      ]),
+    );
 
-    expect(resPending.breakdown.participationScore).toBe(100);
-    expect(resPending.breakdown.participationReason).not.toContain("First-time boost");
+    expect(resPending.breakdown.participation.score).toBe(100);
+    expect(resPending.breakdown.participation.items).not.toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ label: "First-time Yogi Boost" }),
+      ]),
+    );
 
-    expect(resAttended.breakdown.participationReason).not.toContain("First-time boost");
+    expect(resAttended.breakdown.participation.items).not.toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ label: "First-time Yogi Boost" }),
+      ]),
+    );
   });
 
   test("getYogiSortScore adds a boost if yogi indicated ordination intention within the last 2 years only based on ordinationIntentionSpecifiedOn", () => {
@@ -274,13 +294,13 @@ describe("YogiList Sorting Helpers", () => {
     const resOld = getYogiSortScore(yogiWithOldOrdination, [], [], retreat);
     const resNone = getYogiSortScore(yogiWithoutOrdination, [], [], retreat);
 
-    expect(resRecent.breakdown.statusScore).toBe(25);
-    expect(resRecent.breakdown.statusReason).toContain("Intends Ordination in coming 2 years (specified on");
+    expect(resRecent.breakdown.status.score).toBe(25);
+    expect(resRecent.breakdown.status.label).toContain("Intends Ordination in coming 2 years (specified on");
 
-    expect(resOld.breakdown.statusScore).toBe(0);
-    expect(resOld.breakdown.statusReason).not.toContain("Intends Ordination");
+    expect(resOld.breakdown.status.score).toBe(0);
+    expect(resOld.breakdown.status.label).not.toContain("Intends Ordination");
 
-    expect(resNone.breakdown.statusScore).toBe(0);
-    expect(resNone.breakdown.statusReason).not.toContain("Intends Ordination");
+    expect(resNone.breakdown.status.score).toBe(0);
+    expect(resNone.breakdown.status.label).not.toContain("Intends Ordination");
   });
 });

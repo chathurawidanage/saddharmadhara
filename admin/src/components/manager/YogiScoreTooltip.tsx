@@ -10,27 +10,26 @@ export const YogiScoreTooltip: React.FC<YogiScoreTooltipProps> = ({
   total,
   breakdown,
 }) => {
-  const { status, age, participation, penalty, flexibility } = breakdown;
+  const { status, age, participation, deductions, flexibility } = breakdown;
 
-  // Fallbacks if legacy structure is passed without new structured fields
-  const statusScore = status ? status.score : breakdown.statusScore || 0;
-  const statusLabel = status ? status.label : breakdown.statusReason || "Normal Status";
+  const statusScore = status.score;
+  const statusLabel = status.label;
 
-  const ageScore = age ? age.score : breakdown.ageScore || 0;
-  const ageDetails = age ? age.details : breakdown.ageReason || "Date of birth not provided";
+  const ageScore = age.score;
+  const ageDetails = age.details;
 
-  const partScore = participation ? participation.score : breakdown.participationScore || 100;
-  const partItems = participation ? participation.items : [];
+  const partScore = participation.score;
+  const partItems = participation.items;
 
-  const penScore = penalty ? penalty.score : breakdown.penaltyScore || 0;
-  const penItems = penalty ? penalty.items : [];
+  const dedScore = deductions.score;
+  const dedItems = deductions.items;
 
-  const flexMultiplier = flexibility ? flexibility.multiplier : breakdown.mFlex || 1;
-  const flexIsApplicable = flexibility ? flexibility.isApplicable : !!breakdown.mFlexReason;
-  const flexOpenCount = flexibility ? flexibility.openRequestsCount : 0;
-  const flexSeasonCount = flexibility ? flexibility.seasonRetreatCount : 0;
+  const flexMultiplier = flexibility.multiplier;
+  const flexIsApplicable = flexibility.isApplicable;
+  const flexOpenCount = flexibility.openRequestsCount;
+  const flexSeasonCount = flexibility.seasonRetreatCount;
 
-  const subtotal = statusScore + ageScore + partScore + penScore;
+  const subtotal = statusScore + ageScore + partScore + dedScore;
 
   return (
     <div className="yogi-score-tooltip-content">
@@ -77,41 +76,37 @@ export const YogiScoreTooltip: React.FC<YogiScoreTooltipProps> = ({
             +{partScore}
           </span>
         </div>
-        {partItems.length > 0 ? (
-          <div className="yogi-score-items-list">
-            {partItems.map((item, idx) => (
-              <div key={idx} className="yogi-score-item-row">
-                <span className="yogi-score-item-label">{item.label}</span>
-                <span
-                  className={`yogi-score-item-value ${
-                    item.points > 0 ? "plus" : item.points < 0 ? "minus" : ""
-                  }`}
-                >
-                  {item.points > 0 ? `+${item.points}` : item.points}
-                </span>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="yogi-score-section-subtext">{breakdown.participationReason}</div>
-        )}
+        <div className="yogi-score-items-list">
+          {partItems.map((item, idx) => (
+            <div key={idx} className="yogi-score-item-row">
+              <span className="yogi-score-item-label">{item.label}</span>
+              <span
+                className={`yogi-score-item-value ${
+                  item.points > 0 ? "plus" : item.points < 0 ? "minus" : ""
+                }`}
+              >
+                {item.points > 0 ? `+${item.points}` : item.points}
+              </span>
+            </div>
+          ))}
+        </div>
       </div>
 
-      {/* Penalties */}
+      {/* Deductions */}
       <div className="yogi-score-section">
         <div className="yogi-score-section-header">
-          <span className="yogi-score-section-label">Penalties</span>
+          <span className="yogi-score-section-label">Deductions</span>
           <span
             className={`yogi-score-badge ${
-              penScore < 0 ? "negative" : "neutral"
+              dedScore < 0 ? "negative" : "neutral"
             }`}
           >
-            {penScore}
+            {dedScore}
           </span>
         </div>
-        {penItems && penItems.length > 0 ? (
+        {dedItems && dedItems.length > 0 ? (
           <div className="yogi-score-items-list">
-            {penItems.map((item, idx) => (
+            {dedItems.map((item, idx) => (
               <div key={idx} className="yogi-score-item-row">
                 <span className="yogi-score-item-label">{item.label}</span>
                 <span className="yogi-score-item-value minus">
@@ -121,7 +116,7 @@ export const YogiScoreTooltip: React.FC<YogiScoreTooltipProps> = ({
             ))}
           </div>
         ) : (
-          <div className="yogi-score-section-subtext dim">No penalties</div>
+          <div className="yogi-score-section-subtext dim">No deductions</div>
         )}
       </div>
 
@@ -136,13 +131,21 @@ export const YogiScoreTooltip: React.FC<YogiScoreTooltipProps> = ({
           </span>
         </div>
         <div className="yogi-score-section-subtext">
-          {flexIsApplicable
-            ? `${flexOpenCount} open request${
-                flexOpenCount === 1 ? "" : "s"
-              } out of ${flexSeasonCount} active season retreat${
-                flexSeasonCount === 1 ? "" : "s"
-              } • Formula: 1 + 0.1 × (${flexSeasonCount} - ${flexOpenCount})`
-            : "Not applicable (Season not defined)"}
+          {flexIsApplicable ? (
+            <>
+              <div>
+                Limited Options Boost: Yogis with fewer open retreat choices in this season receive higher priority.
+              </div>
+              <div style={{ marginTop: "3px" }}>
+                • {flexOpenCount} open option{flexOpenCount === 1 ? "" : "s"} out of {flexSeasonCount} active season retreat{flexSeasonCount === 1 ? "" : "s"}
+              </div>
+              <div style={{ marginTop: "3px" }} className="dim">
+                • Calculation: 1.0 + 0.10 × ({flexSeasonCount} total retreat{flexSeasonCount === 1 ? "" : "s"} - {flexOpenCount} open choice{flexOpenCount === 1 ? "" : "s"}) = x{flexMultiplier.toFixed(2)}
+              </div>
+            </>
+          ) : (
+            "Not applicable (Season not defined)"
+          )}
         </div>
       </div>
 
@@ -164,5 +167,4 @@ export const YogiScoreTooltip: React.FC<YogiScoreTooltipProps> = ({
       </div>
     </div>
   );
-};
 };

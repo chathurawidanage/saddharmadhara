@@ -22,7 +22,7 @@ export interface AgeBreakdown {
 export interface BreakdownLineItem {
   label: string;
   points: number;
-  type?: "base" | "deduction" | "bonus" | "penalty" | "info";
+  type?: "base" | "deduction" | "bonus" | "info";
 }
 
 export interface ParticipationBreakdown {
@@ -30,7 +30,7 @@ export interface ParticipationBreakdown {
   items: BreakdownLineItem[];
 }
 
-export interface PenaltyBreakdown {
+export interface DeductionBreakdown {
   score: number;
   items: BreakdownLineItem[];
 }
@@ -47,20 +47,8 @@ export interface YogiSortScoreBreakdown {
   status: StatusBreakdown;
   age: AgeBreakdown;
   participation: ParticipationBreakdown;
-  penalty: PenaltyBreakdown;
+  deductions: DeductionBreakdown;
   flexibility: FlexBreakdown;
-
-  // Primitive properties preserved for backwards compatibility
-  statusScore: number;
-  statusReason: string;
-  ageScore: number;
-  ageReason: string;
-  participationScore: number;
-  participationReason: string;
-  penaltyScore: number;
-  penaltyReason: string;
-  mFlex: number;
-  mFlexReason: string;
 }
 
 export const getYogiSortScore = (
@@ -108,7 +96,7 @@ export const getYogiSortScore = (
             dateDetail = ` (specified on ${d.toISOString().split("T")[0]})`;
           }
         }
-        statusReasons.push(`Intends Ordination in coming 2 years${dateDetail} (+${ORDINATION_INTENDED_BOOST})`);
+        statusReasons.push(`Intends Ordination in coming 2 years${dateDetail}`);
       }
     }
 
@@ -124,7 +112,6 @@ export const getYogiSortScore = (
 
   // 2. Age Score (S_age)
   let sAge = 0;
-  let ageReason = "Date of Birth not provided";
   let yogiAge: number | null = null;
   let ageCategoryLabel = "Not provided";
   let ageDetails = "Date of birth not provided";
@@ -138,17 +125,14 @@ export const getYogiSortScore = (
       sAge = 50;
       ageCategoryLabel = "Young adult (20-40)";
       ageDetails = `Age ${age} • Young adult priority (20-40)`;
-      ageReason = `Age ${age} (Young adult: 20-40)`;
     } else if (age > 40 && age <= 70) {
       sAge = 30 + 1.33 * Math.abs(55 - age);
       ageCategoryLabel = "Priority age range (41-70)";
       ageDetails = `Age ${age} • Formula: 30 + 1.33 × |55 - ${age}| = ${sAge.toFixed(2)}`;
-      ageReason = `Age ${age} (Formula: 30 + 1.33 * |55 - age| = ${sAge.toFixed(2)})`;
     } else {
       sAge = 0;
       ageCategoryLabel = "Outside priority range";
-      ageDetails = `Age ${age} • Outside priority range (0 pts)`;
-      ageReason = `Age ${age} (Outside priority range)`;
+      ageDetails = `Age ${age} • Outside priority range`;
     }
   }
 
@@ -188,53 +172,50 @@ export const getYogiSortScore = (
   });
 
   let sParticipation = 100;
-  let participationReason = `Base 100 (considering last ${PARTICIPATION_DEDUCTION_YEARS} years)`;
   const participationItems: BreakdownLineItem[] = [
     { label: "Base score", points: 100, type: "base" },
   ];
 
   if (currentRetreat && isGeneralRetreat(currentRetreat)) {
     sParticipation = 100 - 20 * nGeneral + 10 * nSilent;
-    participationReason = `Attended: ${nGeneral} General (${-20} each), ${nSilent} Silent (${10} each) with base 100 (last ${PARTICIPATION_DEDUCTION_YEARS} years)`;
-    if (nGeneral > 0) {
+    attendedGeneralRetreats.forEach((code) => {
       participationItems.push({
-        label: `Attended General (${attendedGeneralRetreats.join(", ")})`,
-        points: -20 * nGeneral,
+        label: `Attended General (${code})`,
+        points: -20,
         type: "deduction",
       });
-    }
-    if (nSilent > 0) {
+    });
+    attendedSilentRetreats.forEach((code) => {
       participationItems.push({
-        label: `Attended Silent (${attendedSilentRetreats.join(", ")})`,
-        points: 10 * nSilent,
+        label: `Attended Silent (${code})`,
+        points: 10,
         type: "bonus",
       });
-    }
+    });
   } else if (currentRetreat && isSilentRetreat(currentRetreat)) {
     sParticipation = 100 - 10 * nSilent;
-    participationReason = `Attended: ${nSilent} Silent (${-10} each) with base 100 (last ${PARTICIPATION_DEDUCTION_YEARS} years)`;
-    if (nSilent > 0) {
+    attendedSilentRetreats.forEach((code) => {
       participationItems.push({
-        label: `Attended Silent (${attendedSilentRetreats.join(", ")})`,
-        points: -10 * nSilent,
+        label: `Attended Silent (${code})`,
+        points: -10,
         type: "deduction",
       });
-    }
+    });
   } else {
-    if (nGeneral > 0) {
+    attendedGeneralRetreats.forEach((code) => {
       participationItems.push({
-        label: `Attended General (${attendedGeneralRetreats.join(", ")})`,
-        points: -20 * nGeneral,
+        label: `Attended General (${code})`,
+        points: -20,
         type: "deduction",
       });
-    }
-    if (nSilent > 0) {
+    });
+    attendedSilentRetreats.forEach((code) => {
       participationItems.push({
-        label: `Attended Silent (${attendedSilentRetreats.join(", ")})`,
-        points: 10 * nSilent,
+        label: `Attended Silent (${code})`,
+        points: 10,
         type: "bonus",
       });
-    }
+    });
   }
 
   const hasParticipationEver = Object.keys(yogiObj.participation || {}).length > 0;
@@ -253,7 +234,6 @@ export const getYogiSortScore = (
 
   if (!hasParticipationEver && !hasBeenSelectedOrPendingEver) {
     sParticipation += FIRST_TIME_YOGI_BOOST;
-    participationReason += `, First-time boost (never attended, selected or pending: +${FIRST_TIME_YOGI_BOOST})`;
     participationItems.push({
       label: "First-time Yogi Boost",
       points: FIRST_TIME_YOGI_BOOST,
@@ -266,10 +246,9 @@ export const getYogiSortScore = (
     items: participationItems,
   };
 
-  // 3b. Penalties (S_penalty)
-  let sPenalty = 0;
-  let penaltyReason = "No penalties";
-  const penaltyItems: BreakdownLineItem[] = [];
+  // 3b. Deductions (S_deduction)
+  let sDeduction = 0;
+  const deductionItems: BreakdownLineItem[] = [];
 
   let hasNoShowLastYear = false;
   const noShowRetreatCodes: string[] = [];
@@ -290,20 +269,28 @@ export const getYogiSortScore = (
     }
   });
 
-  const penaltyReasons: string[] = [];
   if (hasNoShowLastYear) {
-    sPenalty += -25;
-    const noShowStr = noShowRetreatCodes.length > 0 ? ` (${noShowRetreatCodes.join(", ")})` : "";
-    penaltyReasons.push("No-show within last year (-25)");
-    penaltyItems.push({
-      label: `No-show within last year${noShowStr}`,
-      points: -25,
-      type: "penalty",
-    });
+    if (noShowRetreatCodes.length > 0) {
+      noShowRetreatCodes.forEach((code) => {
+        sDeduction += -25;
+        deductionItems.push({
+          label: `No-show within last year (${code})`,
+          points: -25,
+          type: "deduction",
+        });
+      });
+    } else {
+      sDeduction += -25;
+      deductionItems.push({
+        label: "No-show within last year",
+        points: -25,
+        type: "deduction",
+      });
+    }
   }
 
   let selectionInSeasonCount = 0;
-  const inSeasonPenaltyItems: string[] = [];
+  const inSeasonDeductionItemsList: { label: string; points: number }[] = [];
   if (currentRetreat?.season) {
     Object.entries(yogiObj.expressionOfInterests || {}).forEach(([code, eoi]) => {
       if (code === currentRetreat.code) {
@@ -314,16 +301,20 @@ export const getYogiSortScore = (
         const rCodeStr = retreat.retreatCode || retreat.name || code;
         if (eoi.state === SelectionState.SELECTED) {
           selectionInSeasonCount++;
-          penaltyReasons.push(`SELECTED for retreat: ${rCodeStr}`);
-          inSeasonPenaltyItems.push(`SELECTED for ${rCodeStr}`);
+          const pts = selectionInSeasonCount === 1 ? -25 : -50;
+          inSeasonDeductionItemsList.push({
+            label: `Selected for ${rCodeStr} (In-season)`,
+            points: pts,
+          });
         } else if (eoi.state === SelectionState.PENDING) {
           const isPastRetreat = retreat.date && new Date(retreat.date).getTime() < Date.now();
-          if (isPastRetreat) {
-            penaltyReasons.push(`PENDING (stale: retreat started/ended - no deduction) for retreat: ${rCodeStr}`);
-          } else {
+          if (!isPastRetreat) {
             selectionInSeasonCount++;
-            penaltyReasons.push(`PENDING for retreat: ${rCodeStr}`);
-            inSeasonPenaltyItems.push(`PENDING for ${rCodeStr}`);
+            const pts = selectionInSeasonCount === 1 ? -25 : -50;
+            inSeasonDeductionItemsList.push({
+              label: `Pending for ${rCodeStr} (In-season)`,
+              points: pts,
+            });
           }
         }
       }
@@ -331,23 +322,20 @@ export const getYogiSortScore = (
   }
 
   if (selectionInSeasonCount > 0) {
-    const seasonPenalty = -25 - 50 * (selectionInSeasonCount - 1);
-    sPenalty += seasonPenalty;
-    penaltyReasons.push(`Already selected/pending in this season (${inSeasonPenaltyItems.join(", ")}, Penalty: ${seasonPenalty})`);
-    penaltyItems.push({
-      label: `In-season activity (${inSeasonPenaltyItems.join(", ")})`,
-      points: seasonPenalty,
-      type: "penalty",
+    const seasonDeduction = -25 - 50 * (selectionInSeasonCount - 1);
+    sDeduction += seasonDeduction;
+    inSeasonDeductionItemsList.forEach((item) => {
+      deductionItems.push({
+        label: item.label,
+        points: item.points,
+        type: "deduction",
+      });
     });
   }
 
-  if (penaltyReasons.length > 0) {
-    penaltyReason = penaltyReasons.join(", ");
-  }
-
-  const penaltyBreakdown: PenaltyBreakdown = {
-    score: sPenalty,
-    items: penaltyItems,
+  const deductionBreakdown: DeductionBreakdown = {
+    score: sDeduction,
+    items: deductionItems,
   };
 
   // 4. Dynamic Flexibility Multiplier (M_flex)
@@ -405,7 +393,7 @@ export const getYogiSortScore = (
     }
     activeSeasonCount = seasonRetreatCount;
     mFlex = 1 + 0.1 * (seasonRetreatCount - dEffective);
-    mFlexReason = `Formula: 1 + 0.1 * (${seasonRetreatCount} active season retreats - ${dEffective} open requests) = ${mFlex.toFixed(2)}`;
+    mFlexReason = `Calculation: 1.0 + 0.10 × (${seasonRetreatCount} total retreat${seasonRetreatCount === 1 ? "" : "s"} - ${dEffective} open choice${dEffective === 1 ? "" : "s"}) = x${mFlex.toFixed(2)}`;
   }
 
   const flexBreakdown: FlexBreakdown = {
@@ -416,7 +404,7 @@ export const getYogiSortScore = (
     details: mFlexReason,
   };
 
-  const total = Math.floor((sStatus + sAge + sParticipation + sPenalty) * mFlex);
+  const total = Math.floor((sStatus + sAge + sParticipation + sDeduction) * mFlex);
 
   return {
     total,
@@ -424,18 +412,8 @@ export const getYogiSortScore = (
       status: statusBreakdown,
       age: ageBreakdown,
       participation: participationBreakdown,
-      penalty: penaltyBreakdown,
+      deductions: deductionBreakdown,
       flexibility: flexBreakdown,
-      statusScore: sStatus,
-      statusReason,
-      ageScore: sAge,
-      ageReason,
-      participationScore: sParticipation,
-      participationReason,
-      penaltyScore: sPenalty,
-      penaltyReason,
-      mFlex,
-      mFlexReason,
     },
   };
 };
