@@ -6,9 +6,9 @@ const SPECIAL_COMMENTS_QUESTION_NAME = "SpecialComments";
 
 const titleForExistingYogi = {
   [ENGLISH_LOCALE]:
-    "Since you are a pre-registered applicant, there is no need to complete the questionnaire again. If there is any other information in addition to the previously provided information, it can be mentioned here.",
+    "If you have any additional or updated information beyond what was provided in previous years, you may mention it here.",
   [SINHALA_LOCALE]:
-    "ඔබ පෙර ලියාපදිංචි වී ඇති අයදුම්කරුවකු වන බැවින් යළි ප්‍රශ්නාවලිය සම්පූර්ණ කිරීම අවශ්‍ය නොවේ. පෙර සපයා ඇති තොරතුරු වලට අමතරව වූ වෙනත් යම් තොරතුරක් වේ නම් මෙහි සදහන් කළහැකිය.",
+    "පෙර වසරවල ලබා දුන් තොරතුරුවලට අමතරව වෙනත් යම් තොරතුරක් හෝ වෙනස් වූ තොරතුරක් වේ නම් මෙහි සඳහන් කළ හැකිය.",
 };
 
 const specialCommentsPage = {
@@ -29,9 +29,9 @@ const specialCommentsPage = {
       },
       description: {
         [ENGLISH_LOCALE]:
-          "If your personal information has changed compared to the previous year, please be kind enough to indicate it here. For example: medical conditions, medication use, physical disabilities, lifestyle changes, phone numbers, personal addresses, etc.",
+          "Examples: medical conditions, medication use, physical disabilities, lifestyle changes, phone numbers, personal addresses, etc.",
         [SINHALA_LOCALE]:
-          "ඔබගේ පුද්ගලික තොරතුරු පෙර වර්ෂයට වඩා වෙනස් වන්නේ නම්, එය මෙහි දැක්වීමට කාරුණික වන්න. උදා: රෝගී තත්ත්ව, ඖෂධ භාවිතය, ශාරීරික අපහසුතා, චර්යාමය වෙනස්කම්, දුරකථන අංක, පුද්ගලික ලිපිනයන් ..යනාදිය",
+          "උදා: රෝගී තත්ත්ව, ඖෂධ භාවිතය, ශාරීරික අපහසුතා, චර්යාමය වෙනස්කම්, දුරකථන අංක, පුද්ගලික ලිපිනයන් යනාදිය",
       },
     },
   ],

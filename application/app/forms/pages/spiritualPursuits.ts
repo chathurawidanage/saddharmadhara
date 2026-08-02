@@ -14,9 +14,9 @@ const spiritualPursuitsPage = (isRequired: boolean) => {
         type: "boolean",
         title: {
           [ENGLISH_LOCALE]:
-            "Do you have intention of committing to the spiritual life (Ordination)?",
+            "Do you plan to dedicate yourself to the spiritual path (to be ordained) in the coming two years?",
           [SINHALA_LOCALE]:
-            "ආධ්‍යාත්මික ජීවිතයට (පැවිදිවීම) කැපවීමට ඔබට කිසියම් අදහසක් තිබේද?",
+            "ආධ්‍යාත්මික ජීවිතයකට (පැවිදි වීමට) ඊළඟ වසර දෙක තුළ කැපවීමට ඔබට කිසියම් අදහසක් තිබේද?",
         },
         visibleIf: "({MaritalStatus} <> 'reverend')",
         isRequired: isRequired,

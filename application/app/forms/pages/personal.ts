@@ -173,6 +173,15 @@ const personalPage = (isRequired) => {
         isRequired,
       },
       {
+        name: "Whatsapp",
+        title: {
+          [ENGLISH_LOCALE]: "Whatsapp",
+          [SINHALA_LOCALE]: "වට්ස්ඇප් අංකය",
+        },
+        type: PHONE_NUMBER_QUESTION_TYPE,
+        isRequired,
+      },
+      {
         name: "MobilePhone",
         title: {
           [ENGLISH_LOCALE]: "Mobile Phone",
@@ -188,15 +197,6 @@ const personalPage = (isRequired) => {
           [SINHALA_LOCALE]: "ස්ථාවර දුරකථන අංකය",
         },
         type: PHONE_NUMBER_QUESTION_TYPE
-      },
-      {
-        name: "Whatsapp",
-        title: {
-          [ENGLISH_LOCALE]: "Whatsapp",
-          [SINHALA_LOCALE]: "වට්ස්ඇප් අංකය",
-        },
-        type: PHONE_NUMBER_QUESTION_TYPE,
-        isRequired,
       },
       {
         name: "Email",

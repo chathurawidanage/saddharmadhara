@@ -32,7 +32,7 @@ const preparationsPage = (isRequired) => {
           [ENGLISH_LOCALE]:
             "You should try to avoid bad habits like masturbation or any kind of sexual activity at a physical level for at least two weeks prior to the retreat.",
           [SINHALA_LOCALE]:
-            "භාවනා වැඩසටහන පෙර අවම වශයෙන් සති දෙකකටවත් පෙර ශාරීරික මට්ටමේ ලිංගික ක්‍රියාකාරකම් වලින් වැළකී සිටීමට මෙන්ම ස්වයංවින්දනය වැනි නරක පුරුදුවලින් වැළකී සිටීමට හෝ ඔබ උත්සාහ කිරීම.",
+            "භාවනා වැඩසටහන පෙර අවම වශයෙන් සති දෙකකටවත් පෙර ශාරීරික මට්ටමේ ලිංගික ක්‍රියාකාරකම් වලින් වැළකී සිටීමට මෙන්ම ස්වයංවින්දනය වැනි නරක පුරුදුවලින් වැළකී සිටීමට ඔබ උත්සාහ කිරීම.",
         },
         isRequired,
         null,
@@ -64,7 +64,7 @@ const preparationsPage = (isRequired) => {
           [ENGLISH_LOCALE]:
             "With the understanding of the virtues of 'Trivida Rathna', cultivate pure and honest faith and practice Buddhanussathi, Dhammanussathi, Sanghanussathi at least two weeks prior to the retreat in advance.",
           [SINHALA_LOCALE]:
-            "'ත්‍රිවිධ රත්නයේ' ගුණ අවබෝධ කරගෙන එකී ගුණයන් ශ්‍රද්ධා සම්ප්‍රයුක්තව වඩවාගෙන බුද්ධානුස්සති, ධම්මානුස්සති, සංඝානුස්සති යන පිළිවෙත් පුරුදු පුහුණු වීම.",
+            "ත්‍රිවිධ රත්නයේ ගුණ නිවැරදිව අවබෝධ කරගනිමින්, ශ්‍රද්ධාවෙන් යුතුව බුද්ධානුස්සති, ධම්මානුස්සති සහ සංඝානුස්සති භාවනාවන්හි නිරත වීම.",
         },
         isRequired,
       ),
