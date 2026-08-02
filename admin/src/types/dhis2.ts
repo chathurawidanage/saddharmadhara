@@ -63,11 +63,16 @@ export interface Dhis2Enrollment {
   events: Dhis2TrackerEvent[];
 }
 
+export interface Dhis2TrackedEntityAttribute {
+  attribute: string;
+  value: string;
+  updatedAt?: string;
+  createdAt?: string;
+  lastUpdated?: string;
+}
+
 export interface Dhis2TrackedEntityInstance {
   trackedEntity: string;
-  attributes: Array<{
-    attribute: string;
-    value: string;
-  }>;
+  attributes: Dhis2TrackedEntityAttribute[];
   enrollments: Dhis2Enrollment[];
 }

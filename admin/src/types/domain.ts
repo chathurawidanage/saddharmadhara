@@ -142,6 +142,8 @@ export interface YogiAttributes extends Record<string, any> {
   hasUnattendedDeformitiesComment?: string;
   hasStress?: boolean;
   hasStressComment?: string;
+  ordinationIntended?: boolean;
+  ordinationIntentionSpecifiedOn?: Date | string;
 }
 
 export interface Yogi {

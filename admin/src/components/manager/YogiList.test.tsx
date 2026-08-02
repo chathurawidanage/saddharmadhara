@@ -243,4 +243,44 @@ describe("YogiList Sorting Helpers", () => {
 
     expect(resAttended.breakdown.participationReason).not.toContain("First-time boost");
   });
+
+  test("getYogiSortScore adds a boost if yogi indicated ordination intention within the last 2 years only based on ordinationIntentionSpecifiedOn", () => {
+    const today = new Date();
+    const sixMonthsAgo = new Date(today.getFullYear(), today.getMonth() - 6, 1);
+    const threeYearsAgo = new Date(today.getFullYear() - 3, today.getMonth(), 1);
+
+    const yogiWithRecentOrdination = {
+      attributes: {
+        ordinationIntended: true,
+        ordinationIntentionSpecifiedOn: sixMonthsAgo,
+      },
+    } as any;
+
+    const yogiWithOldOrdination = {
+      attributes: {
+        ordinationIntended: true,
+        ordinationIntentionSpecifiedOn: threeYearsAgo,
+      },
+    } as any;
+
+    const yogiWithoutOrdination = {
+      attributes: {
+        ordinationIntended: false,
+        ordinationIntentionSpecifiedOn: sixMonthsAgo,
+      },
+    } as any;
+
+    const resRecent = getYogiSortScore(yogiWithRecentOrdination, [], [], retreat);
+    const resOld = getYogiSortScore(yogiWithOldOrdination, [], [], retreat);
+    const resNone = getYogiSortScore(yogiWithoutOrdination, [], [], retreat);
+
+    expect(resRecent.breakdown.statusScore).toBe(25);
+    expect(resRecent.breakdown.statusReason).toContain("Intends Ordination in coming 2 years (specified on");
+
+    expect(resOld.breakdown.statusScore).toBe(0);
+    expect(resOld.breakdown.statusReason).not.toContain("Intends Ordination");
+
+    expect(resNone.breakdown.statusScore).toBe(0);
+    expect(resNone.breakdown.statusReason).not.toContain("Intends Ordination");
+  });
 });

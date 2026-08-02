@@ -26,6 +26,7 @@ import {
   DHIS2_TEI_ATTRIBUTE_HAS_UNATTENDED_DEFORMITIES_COMMENT,
   DHIS2_TEI_ATTRIBUTE_HAS_STRESS,
   DHIS2_TEI_ATTRIBUTE_HAS_STRESS_COMMENT,
+  DHIS2_TEI_ATTRIBUTE_ORDINATION_INTENDED,
 } from "../dhis2";
 import { Yogi, Retreat, ExpressionOfInterest, Participation, SpecialComment, Note, YogiAttributes, SelectionState, InvitationState, AttendanceState } from "../types/domain";
 import {
@@ -63,6 +64,7 @@ const attributeUIDToNameMap: Record<string, keyof YogiAttributes> = {
     "hasUnattendedDeformitiesComment",
   [DHIS2_TEI_ATTRIBUTE_HAS_STRESS]: "hasStress",
   [DHIS2_TEI_ATTRIBUTE_HAS_STRESS_COMMENT]: "hasStressComment",
+  [DHIS2_TEI_ATTRIBUTE_ORDINATION_INTENDED]: "ordinationIntended",
 };
 
 const attendanceEventData = ({
@@ -167,9 +169,8 @@ class YogiStore {
           resource: "tracker/events.json",
           params: {
             programStage: DHIS2_EXPRESSION_OF_INTEREST_PROGRAM_STAGE,
-            filter: `${DHIS2_RETREAT_DATA_ELEMENT}:eq:${
-              retreatName || retreatCode
-            }`,
+            filter: `${DHIS2_RETREAT_DATA_ELEMENT}:eq:${retreatName || retreatCode
+              }`,
             fields: "trackedEntity",
             skipPaging: true,
           },
@@ -217,7 +218,7 @@ class YogiStore {
           params: {
             inactive: false,
             fields:
-              "attributes[attribute,value],enrollments[status,notes[value,storedAt,createdBy[username]],events[programStage,event,occurredAt,dataValues[dataElement,value]]]",
+              "attributes[attribute,value,createdAt],enrollments[status,notes[value,storedAt,createdBy[username]],events[programStage,event,occurredAt,dataValues[dataElement,value]]]",
             program: DHIS_PROGRAM,
           },
         },
@@ -234,10 +235,15 @@ class YogiStore {
           let value = attribute.value;
           if (name === "gender" || name === "maritalState" || name === "priority") {
             value = (value || "").toLowerCase();
-          } else if (name === "hasKids" || name === "hasPermission" || name === "hasUnattendedDeformities" || name === "hasStress") {
+          } else if (name === "hasKids" || name === "hasPermission" || name === "hasUnattendedDeformities" || name === "hasStress" || name === "ordinationIntended") {
             value = value !== undefined && value !== null ? (String(value).toLowerCase() === "true" || value === true) : undefined as any;
           }
           attributeIdToValueMap[name] = value as any;
+        }
+
+        const createdAt = attribute.createdAt;
+        if (attribute.attribute === DHIS2_TEI_ATTRIBUTE_ORDINATION_INTENDED && createdAt) {
+          attributeIdToValueMap.ordinationIntentionSpecifiedOn = new Date(createdAt);
         }
       });
 
@@ -477,13 +483,13 @@ class YogiStore {
     const data = eventId
       ? attendanceEventData({ attendance, specialComment, retreat })
       : attendanceEventData({
-          attendance,
-          specialComment,
-          retreat,
-          trackedEntityInstance: yogiId,
-          orgUnit: retreat.location,
-          eventDate: new Date(),
-        });
+        attendance,
+        specialComment,
+        retreat,
+        trackedEntityInstance: yogiId,
+        orgUnit: retreat.location,
+        eventDate: new Date(),
+      });
 
     const mutation = {
       resource: "events",
@@ -517,12 +523,12 @@ class YogiStore {
     const data = eventId
       ? attendanceEventData({ roomCode, retreat })
       : attendanceEventData({
-          roomCode,
-          retreat,
-          trackedEntityInstance: yogiId,
-          orgUnit: retreat.location,
-          eventDate: new Date(),
-        });
+        roomCode,
+        retreat,
+        trackedEntityInstance: yogiId,
+        orgUnit: retreat.location,
+        eventDate: new Date(),
+      });
 
     const mutation = {
       resource: "events",

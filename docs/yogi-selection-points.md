@@ -41,6 +41,7 @@ This score is based on the yogi's status or priority group:
 | :--- | :--- | :--- |
 | **Reverend** (`MaritalState.REVEREND`) | `+9999` | Assures top priority selection. |
 | **Trust Member** / **Trust Member's Family** | `+40` | Priority boost for trust stakeholders. |
+| **Ordination Intended** | `+25` | Additional boost if yogi indicated intention to be ordained in the coming 2 years within the last 2 years. |
 | **Normal Status** (default) | `0` | Standard applicant. |
 
 ---

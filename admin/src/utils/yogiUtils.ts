@@ -5,6 +5,7 @@ export const SELECTION_PRIORITY_SORT = "selection-priority";
 export const AGE_SORT = "age";
 export const PARTICIPATION_DEDUCTION_YEARS = 2;
 export const FIRST_TIME_YOGI_BOOST = 25;
+export const ORDINATION_INTENDED_BOOST = 25;
 
 export interface StatusBreakdown {
   score: number;
@@ -71,15 +72,49 @@ export const getYogiSortScore = (
   // 1. Status Score (S_status)
   let sStatus = 0;
   let statusReason = "Normal Status";
+
   if (yogiObj.attributes.maritalState === MaritalState.REVEREND) {
     sStatus = 9999;
     statusReason = "Reverend Status";
-  } else if (yogiObj.attributes.priority === YogiPriority.TRUST_MEMBER) {
-    sStatus = 40;
-    statusReason = "Trust / Saddharmasena Member";
-  } else if (yogiObj.attributes.priority === YogiPriority.TRUST_MEMBERS_FAMILY) {
-    sStatus = 40;
-    statusReason = "Trust / Saddharmasena Member's Family";
+  } else {
+    const statusReasons: string[] = [];
+
+    if (yogiObj.attributes.priority === YogiPriority.TRUST_MEMBER) {
+      sStatus += 40;
+      statusReasons.push("Trust / Saddharmasena Member");
+    } else if (yogiObj.attributes.priority === YogiPriority.TRUST_MEMBERS_FAMILY) {
+      sStatus += 40;
+      statusReasons.push("Trust / Saddharmasena Member's Family");
+    }
+
+    if (yogiObj.attributes.ordinationIntended) {
+      const specifiedOn = yogiObj.attributes.ordinationIntentionSpecifiedOn;
+      let isWithinLastTwoYears = true;
+      if (specifiedOn) {
+        const twoYearsAgo = new Date();
+        twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2);
+        const specifiedDate = specifiedOn instanceof Date ? specifiedOn : new Date(specifiedOn);
+        if (!isNaN(specifiedDate.getTime())) {
+          isWithinLastTwoYears = specifiedDate >= twoYearsAgo;
+        }
+      }
+
+      if (isWithinLastTwoYears) {
+        sStatus += ORDINATION_INTENDED_BOOST;
+        let dateDetail = "";
+        if (specifiedOn) {
+          const d = specifiedOn instanceof Date ? specifiedOn : new Date(specifiedOn);
+          if (!isNaN(d.getTime())) {
+            dateDetail = ` (specified on ${d.toISOString().split("T")[0]})`;
+          }
+        }
+        statusReasons.push(`Intends Ordination in coming 2 years${dateDetail} (+${ORDINATION_INTENDED_BOOST})`);
+      }
+    }
+
+    if (statusReasons.length > 0) {
+      statusReason = statusReasons.join(", ");
+    }
   }
 
   const statusBreakdown: StatusBreakdown = {
