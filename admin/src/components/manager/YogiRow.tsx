@@ -29,6 +29,7 @@ import { BiLinkExternal, BiChevronLeft, BiChevronRight } from "react-icons/bi";
 import "./YogiRow.css";
 import { Retreat, Yogi, EoiSummary, MaritalState } from "../../types/domain";
 import { getYogiSortScore } from "../../utils/yogiUtils";
+import { YogiScoreTooltip } from "./YogiScoreTooltip";
 
 interface YogiRowProps {
   trackedEntity: Yogi;
@@ -108,40 +109,7 @@ const YogiRow = observer(({ trackedEntity, currentRetreat, allRetreats, eoiSumma
                 <Tooltip
                   content={
                     <div className="yogi-score-tooltip">
-                      <div className="yogi-score-tooltip-title">Score Breakdown</div>
-                      <div className="yogi-score-tooltip-row">
-                        <span className="yogi-score-tooltip-label">Status Score:</span>
-                        <span className="yogi-score-tooltip-value">+{breakdown.statusScore}</span>
-                      </div>
-                      <div className="yogi-score-tooltip-reason">{breakdown.statusReason}</div>
-                      
-                      <div className="yogi-score-tooltip-row">
-                        <span className="yogi-score-tooltip-label">Age Score:</span>
-                        <span className="yogi-score-tooltip-value">+{breakdown.ageScore.toFixed(1)}</span>
-                      </div>
-                      <div className="yogi-score-tooltip-reason">{breakdown.ageReason}</div>
-                      
-                      <div className="yogi-score-tooltip-row">
-                        <span className="yogi-score-tooltip-label">Participation:</span>
-                        <span className="yogi-score-tooltip-value">+{breakdown.participationScore}</span>
-                      </div>
-                      <div className="yogi-score-tooltip-reason">{breakdown.participationReason}</div>
-
-                      <div className="yogi-score-tooltip-row">
-                        <span className="yogi-score-tooltip-label">Penalties:</span>
-                        <span className="yogi-score-tooltip-value">{breakdown.penaltyScore}</span>
-                      </div>
-                      <div className="yogi-score-tooltip-reason">{breakdown.penaltyReason}</div>
-                      
-                      <div className="yogi-score-tooltip-row">
-                        <span className="yogi-score-tooltip-label">Flexibility Multiplier:</span>
-                        <span className="yogi-score-tooltip-value">x{breakdown.mFlex.toFixed(2)}</span>
-                      </div>
-                      <div className="yogi-score-tooltip-reason">{breakdown.mFlexReason}</div>
-                      
-                      <div className="yogi-score-tooltip-formula">
-                        Total: ({breakdown.statusScore} + {breakdown.ageScore.toFixed(1)} + {breakdown.participationScore} + ({breakdown.penaltyScore})) * {breakdown.mFlex.toFixed(2)} = {total}
-                      </div>
+                      <YogiScoreTooltip total={total} breakdown={breakdown} />
                     </div>
                   }
                 >

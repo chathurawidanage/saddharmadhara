@@ -209,6 +209,7 @@ const RetreatFormFields = ({ values, form, store, isSeasonLocked, preconfiguredS
           name="medium"
           label="Medium"
           component={SingleSelectFieldFF}
+          tabIndex="0"
           type="number"
           defaultValue="sinhala"
           validate={hasValue}
@@ -227,6 +228,7 @@ const RetreatFormFields = ({ values, form, store, isSeasonLocked, preconfiguredS
           name="retreatType"
           label="Retreat Type"
           component={SingleSelectFieldFF}
+          tabIndex="0"
           validate={hasValue}
           disabled={isSeasonLocked}
           options={store.metadata.retreatTypes.map((option) => {
@@ -242,6 +244,7 @@ const RetreatFormFields = ({ values, form, store, isSeasonLocked, preconfiguredS
           name="season"
           label="Retreat Season"
           component={SingleSelectFieldFF}
+          tabIndex="0"
           disabled={isSeasonLocked}
           options={[
             { label: "No Season", value: "" },

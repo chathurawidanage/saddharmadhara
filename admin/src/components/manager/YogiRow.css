@@ -68,54 +68,193 @@
 }
 
 .yogi-score-tooltip {
-  padding: 8px;
+  padding: 8px 10px;
   font-family: inherit;
   font-size: 12px;
   line-height: 1.4;
   color: #fff;
-  max-width: 280px;
+  width: 290px;
+  max-width: 320px;
+  box-sizing: border-box;
+}
+
+.yogi-score-tooltip-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.yogi-score-tooltip-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  padding-bottom: 6px;
+  margin-bottom: 2px;
 }
 
 .yogi-score-tooltip-title {
   font-weight: 700;
   font-size: 13px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-  margin-bottom: 8px;
-  padding-bottom: 4px;
+  color: #ffffff;
+  letter-spacing: 0.2px;
 }
 
-.yogi-score-tooltip-row {
+.yogi-score-tooltip-total-pill {
+  font-weight: 700;
+  font-size: 11px;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 2px 8px;
+  border-radius: 12px;
+  color: #ffffff;
+}
+
+.yogi-score-section {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 6px;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.12);
+}
+
+.yogi-score-section:last-of-type {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.yogi-score-section-header {
   display: flex;
   justify-content: space-between;
-  gap: 16px;
+  align-items: center;
   margin-bottom: 2px;
 }
 
-.yogi-score-tooltip-label {
+.yogi-score-section-label {
   font-weight: 600;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.yogi-score-badge {
+  font-weight: 700;
+  font-size: 11px;
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+.yogi-score-badge.positive {
+  background: rgba(76, 175, 80, 0.25);
+  color: #81c784;
+  border: 1px solid rgba(76, 175, 80, 0.4);
+}
+
+.yogi-score-badge.negative {
+  background: rgba(244, 67, 54, 0.25);
+  color: #e57373;
+  border: 1px solid rgba(244, 67, 54, 0.4);
+}
+
+.yogi-score-badge.multiplier {
+  background: rgba(33, 150, 243, 0.25);
+  color: #64b5f6;
+  border: 1px solid rgba(33, 150, 243, 0.4);
+}
+
+.yogi-score-badge.neutral {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.yogi-score-section-subtext {
+  font-size: 10.5px;
+  color: rgba(255, 255, 255, 0.65);
+  margin-top: 2px;
+}
+
+.yogi-score-section-subtext.dim {
+  color: rgba(255, 255, 255, 0.45);
+  font-style: italic;
+}
+
+.yogi-score-items-list {
+  margin-top: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.yogi-score-item-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 10.5px;
+  padding: 2px 6px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 4px;
+}
+
+.yogi-score-item-label {
   color: rgba(255, 255, 255, 0.85);
 }
 
-.yogi-score-tooltip-value {
+.yogi-score-item-value {
   font-weight: 700;
-  color: #fff;
 }
 
-.yogi-score-tooltip-reason {
-  font-size: 10px;
-  color: rgba(255, 255, 255, 0.6);
-  margin-bottom: 6px;
-  padding-left: 6px;
-  border-left: 2px solid rgba(255, 255, 255, 0.15);
+.yogi-score-item-value.plus {
+  color: #81c784;
 }
 
-.yogi-score-tooltip-formula {
+.yogi-score-item-value.minus {
+  color: #e57373;
+}
+
+.yogi-score-calculation-box {
   margin-top: 6px;
-  padding-top: 4px;
-  border-top: 1px solid rgba(255, 255, 255, 0.2);
-  font-weight: bold;
+  padding: 8px 10px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.yogi-score-calc-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+}
+
+.yogi-score-calc-label {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.yogi-score-calc-val {
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.yogi-score-calc-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.15);
+  margin: 2px 0;
+}
+
+.yogi-score-calc-row.total .yogi-score-calc-label {
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.yogi-score-calc-total-val {
+  font-weight: 800;
   font-size: 12px;
-  text-align: right;
+  color: #81c784;
+  background: rgba(76, 175, 80, 0.25);
+  padding: 2px 8px;
+  border-radius: 10px;
+  border: 1px solid rgba(76, 175, 80, 0.4);
 }
 
 .yogi-special-comments-subrow {

@@ -254,6 +254,7 @@ const SeasonsDashboard = observer(() => {
                                       onChange={({ selected }: { selected: string }) => {
                                         store.metadata?.assignSeasonToRetreat(retreat, selected);
                                       }}
+                                      tabIndex="0"
                                     >
                                       <SingleSelectOption label="Unassigned" value="" />
                                       {(store.metadata?.seasons || []).map((s: Season) => (
@@ -366,6 +367,7 @@ const SeasonsDashboard = observer(() => {
                                 onChange={({ selected }) => {
                                   store.metadata.assignSeasonToRetreat(retreat, selected);
                                 }}
+                                tabIndex="0"
                               >
                                 <SingleSelectOption label="Unassigned" value="" />
                                 {store.metadata.seasons.map((s) => (

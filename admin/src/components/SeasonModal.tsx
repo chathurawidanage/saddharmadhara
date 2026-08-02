@@ -149,6 +149,7 @@ const SeasonModal = ({ store, onCancel }: SeasonModalProps) => {
                   name="retreatType"
                   label="Fixed Retreat Type"
                   component={SingleSelectFieldFF}
+                  tabIndex="0"
                   validate={hasValue}
                   options={(store.metadata?.retreatTypes || []).map((option: any) => ({
                     label: option.name,
@@ -174,6 +175,7 @@ const SeasonModal = ({ store, onCancel }: SeasonModalProps) => {
                   name="medium"
                   label="Language (Retreat Medium)"
                   component={SingleSelectFieldFF}
+                  tabIndex="0"
                   validate={hasValue}
                   defaultValue="sinhala"
                   options={(store.metadata?.languages || []).map((option: any) => ({
