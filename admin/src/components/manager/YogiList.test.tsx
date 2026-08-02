@@ -4,6 +4,7 @@ import {
   ageSorter,
   sortYogiList,
   SELECTION_PRIORITY_SORT,
+  FIRST_TIME_YOGI_BOOST,
 } from "../../utils/yogiUtils";
 import { SelectionState } from "../../types/domain";
 
@@ -183,5 +184,63 @@ describe("YogiList Sorting Helpers", () => {
     // 3 occurrences penalty: -25 - 50 * 2 = -125
     const resThree = getYogiSortScore(yogiWithThreeOccurrences, allRetreats, [], allRetreats[3]);
     expect(resThree.breakdown.penaltyScore).toBe(-125);
+  });
+
+  test("getYogiSortScore adds a boost if a yogi has never attended, selected for, or pending for any retreat ever", () => {
+    const currentRetreat = { code: "R1", retreatType: "general" } as any;
+
+    const brandNewYogi = {
+      attributes: { dob: "1990-01-01" }, // age score: 50
+      expressionOfInterests: {
+        R1: { state: SelectionState.APPLIED, occurredAt: "2024-01-01" },
+      },
+      participation: {},
+    } as any;
+
+    const previouslySelectedYogi = {
+      attributes: { dob: "1990-01-01" },
+      expressionOfInterests: {
+        R1: { state: SelectionState.APPLIED, occurredAt: "2024-01-01" },
+        R2: { state: SelectionState.SELECTED, occurredAt: "2024-01-01" },
+      },
+      participation: {},
+    } as any;
+
+    const previouslyPendingYogi = {
+      attributes: { dob: "1990-01-01" },
+      expressionOfInterests: {
+        R1: { state: SelectionState.APPLIED, occurredAt: "2024-01-01" },
+        R2: { state: SelectionState.PENDING, occurredAt: "2024-01-01" },
+      },
+      participation: {},
+    } as any;
+
+    const previouslyAttendedYogi = {
+      attributes: { dob: "1990-01-01" },
+      expressionOfInterests: {
+        R1: { state: SelectionState.APPLIED, occurredAt: "2024-01-01" },
+      },
+      participation: {
+        R0: { retreat: "R0", attendance: "attended" },
+      },
+    } as any;
+
+    const resNew = getYogiSortScore(brandNewYogi, [currentRetreat], [], currentRetreat);
+    const resSelected = getYogiSortScore(previouslySelectedYogi, [currentRetreat], [], currentRetreat);
+    const resPending = getYogiSortScore(previouslyPendingYogi, [currentRetreat], [], currentRetreat);
+    const resAttended = getYogiSortScore(previouslyAttendedYogi, [currentRetreat], [], currentRetreat);
+
+    // Brand new yogi receives base participation (100) + boost (50) = 150
+    expect(resNew.breakdown.participationScore).toBe(100 + FIRST_TIME_YOGI_BOOST);
+    expect(resNew.breakdown.participationReason).toContain("First-time boost");
+
+    // Yogis with prior selection, pending, or attendance history do not receive boost
+    expect(resSelected.breakdown.participationScore).toBe(100);
+    expect(resSelected.breakdown.participationReason).not.toContain("First-time boost");
+
+    expect(resPending.breakdown.participationScore).toBe(100);
+    expect(resPending.breakdown.participationReason).not.toContain("First-time boost");
+
+    expect(resAttended.breakdown.participationReason).not.toContain("First-time boost");
   });
 });

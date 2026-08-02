@@ -4,6 +4,7 @@ import { isGeneralRetreat, isSilentRetreat } from "./retreatUtils";
 export const SELECTION_PRIORITY_SORT = "selection-priority";
 export const AGE_SORT = "age";
 export const PARTICIPATION_DEDUCTION_YEARS = 2;
+export const FIRST_TIME_YOGI_BOOST = 25;
 
 export interface YogiSortScoreBreakdown {
   statusScore: number;
@@ -87,6 +88,25 @@ export const getYogiSortScore = (
   } else if (currentRetreat && isSilentRetreat(currentRetreat)) {
     sParticipation = 100 - 10 * nSilent;
     participationReason = `Attended: ${nSilent} Silent (${-10} each) with base 100 (last ${PARTICIPATION_DEDUCTION_YEARS} years)`;
+  }
+
+  const hasParticipationEver = Object.keys(yogiObj.participation || {}).length > 0;
+  const hasBeenSelectedOrPendingEver = Object.entries(
+    yogiObj.expressionOfInterests || {}
+  ).some(([code, eoi]) => {
+    if (currentRetreat && code === currentRetreat.code) {
+      return false;
+    }
+    const stateStr = String(eoi?.state || "").toLowerCase();
+    return (
+      stateStr === SelectionState.SELECTED ||
+      stateStr === SelectionState.PENDING
+    );
+  });
+
+  if (!hasParticipationEver && !hasBeenSelectedOrPendingEver) {
+    sParticipation += FIRST_TIME_YOGI_BOOST;
+    participationReason += `, First-time boost (never attended, selected or pending: +${FIRST_TIME_YOGI_BOOST})`;
   }
 
   // 3b. Penalties (S_penalty)
