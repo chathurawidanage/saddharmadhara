@@ -437,6 +437,23 @@ export const ProposedYogiDetail = observer(({
                     <span className="val">{String(getValue(["MMb2cXBOrSY"]) || "Not provided")}</span>
                   </div>
                   <div className="details-row">
+                    <span className="label">Applied On</span>
+                    <span className="val">
+                      {(() => {
+                        const eoi = yogi.expressionOfInterests[retreat.code];
+                        if (!eoi?.occurredAt) return "Not provided";
+                        const d = new Date(eoi.occurredAt);
+                        return isNaN(d.getTime())
+                          ? eoi.occurredAt
+                          : d.toLocaleDateString("en-US", {
+                              year: "numeric",
+                              month: "short",
+                              day: "numeric",
+                            });
+                      })()}
+                    </span>
+                  </div>
+                  <div className="details-row">
                     <span className="label">Gender</span>
                     <span className="val" style={{ textTransform: "capitalize" }}>{yogi.attributes.gender || "Not provided"}</span>
                   </div>

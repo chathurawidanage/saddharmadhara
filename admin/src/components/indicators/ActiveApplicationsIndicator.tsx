@@ -1,6 +1,7 @@
 import { Tooltip } from "@dhis2/ui";
 import { observer } from "mobx-react";
 import React from "react";
+import { BiCalendar } from "react-icons/bi";
 import "./ApplicationIndicator.css";
 
 import { useStore } from "../../stores/StoreProvider";
@@ -47,7 +48,21 @@ const ActiveApplicationIndicator = observer(
         trackedEntity.expressionOfInterests[r.code]
     );
 
-    if (seasonRetreats.length === 0 && otherRetreats.length === 0) {
+    const currentEoi = trackedEntity.expressionOfInterests[currentRetreat.code];
+    const appliedDateFormatted = currentEoi?.occurredAt
+      ? (() => {
+          const d = new Date(currentEoi.occurredAt);
+          return isNaN(d.getTime())
+            ? currentEoi.occurredAt
+            : d.toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+              });
+        })()
+      : null;
+
+    if (!appliedDateFormatted && seasonRetreats.length === 0 && otherRetreats.length === 0) {
       return null;
     }
 
@@ -68,6 +83,13 @@ const ActiveApplicationIndicator = observer(
 
     return (
       <div className="yogi-applications-container">
+        {appliedDateFormatted && (
+          <div className="yogi-current-applied-date">
+            <BiCalendar className="yogi-applied-icon" />
+            <span className="yogi-applied-label">Applied On:</span>
+            <span className="yogi-applied-value">{appliedDateFormatted}</span>
+          </div>
+        )}
         {seasonRetreats.length > 0 && (
           <div className="yogi-applications-section">
             <div className="yogi-applications-section-title">This Season</div>
