@@ -9,6 +9,7 @@ import {
   FiChevronDown,
   FiChevronUp,
   FiClock,
+  FiGlobe,
   FiLayers,
   FiMapPin,
   FiMessageSquare,
@@ -163,7 +164,8 @@ const SeasonsDashboard = observer(() => {
                     {season.noOfDays && <Tag neutral>{season.noOfDays} Days</Tag>}
                     {season.medium && (
                       <Tag neutral>
-                        🌐 {store.metadata?.languages?.find((l) => l.code === season.medium)?.name || season.medium}
+                        <FiGlobe style={{ marginRight: "4px" }} />
+                        {store.metadata?.languages?.find((l) => l.code === season.medium)?.name || season.medium}
                       </Tag>
                     )}
                     {season.startDate && (

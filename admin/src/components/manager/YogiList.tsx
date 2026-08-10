@@ -73,16 +73,27 @@ const YogisList = observer(({ retreat }: YogisListProps) => {
 
   const proposedYogi = getProposedYogi();
 
-  const countByState: Record<string, number> = {};
+  const countByState: Record<string, { total: number; male: number; female: number }> = {};
   yogiList.forEach((yogi) => {
     const state = yogi.expressionOfInterests[retreat.code]?.state;
     if (state) {
       if (!countByState[state]) {
-        countByState[state] = 0;
+        countByState[state] = { total: 0, male: 0, female: 0 };
       }
-      countByState[state]++;
+      countByState[state].total++;
+      if (yogi.attributes?.gender === Gender.MALE) {
+        countByState[state].male++;
+      } else if (yogi.attributes?.gender === Gender.FEMALE) {
+        countByState[state].female++;
+      }
     }
   });
+
+  if (countByState["applied"]) {
+    countByState["proposed"] = { ...countByState["applied"] };
+  } else {
+    countByState["proposed"] = { total: 0, male: 0, female: 0 };
+  }
 
   useEffect(() => {
     setCurrentPage(1);

@@ -1,6 +1,14 @@
 import { IconClock16, Tag } from "@dhis2/ui";
 import { observer } from "mobx-react";
 import React from "react";
+import {
+  FaGlobe,
+  FaCalendarAlt,
+  FaClock,
+  FaMapMarkerAlt,
+  FaUsers,
+  FaSlidersH,
+} from "react-icons/fa";
 import RetreatLocation from "../RetreatLocation";
 import { Retreat } from "../../types/domain";
 import { useStore } from "../../stores/StoreProvider";
@@ -50,20 +58,32 @@ const RetreatDetails = observer(({ retreat }: RetreatDetailsProps) => {
         <Tag neutral>{retreat.retreatCode}</Tag>
       </div>
       <div className="retreat-detail-item capitalize">
-        🌐 {retreat.medium || "Sinhala"}
+        <FaGlobe className="retreat-detail-icon globe" />
+        <span>{retreat.medium || "Sinhala"}</span>
       </div>
-      <div className="retreat-detail-item">📅 {retreat.date.toDateString()}</div>
-      <div className="retreat-detail-item">⛺ {retreat.noOfDays} Days</div>
       <div className="retreat-detail-item">
-        📍 <RetreatLocation locationId={retreat.location} />
+        <FaCalendarAlt className="retreat-detail-icon calendar" />
+        <span>{retreat.date.toDateString()}</span>
       </div>
-      <div className="retreat-detail-item">🧘‍♂️ {retreat.totalYogis}</div>
+      <div className="retreat-detail-item">
+        <FaClock className="retreat-detail-icon clock" />
+        <span>{retreat.noOfDays} Days</span>
+      </div>
+      <div className="retreat-detail-item">
+        <FaMapMarkerAlt className="retreat-detail-icon location" />
+        <RetreatLocation locationId={retreat.location} />
+      </div>
+      <div className="retreat-detail-item">
+        <FaUsers className="retreat-detail-icon users" />
+        <span>{retreat.totalYogis} Yogis</span>
+      </div>
       {discretionaryInfo && (
         <div
           className="discretionary-quota-pill"
           title={`Dynamic wildcard quota based on ${Math.round(DISCRETIONARY_QUOTA_PERCENTAGE * 100)}% of active Pending/Selected yogis across retreat (max ${DISCRETIONARY_QUOTA_MAX_CAP})`}
         >
-          <span className="discretionary-pill-label">Selector's Discretions Used</span>
+          <FaSlidersH className="discretionary-pill-icon" />
+          <span className="discretionary-pill-label">Selector's Discretions</span>
           <span className="discretionary-pill-value">
             {discretionaryInfo.usedSlots}/{discretionaryInfo.maxSlots}
           </span>

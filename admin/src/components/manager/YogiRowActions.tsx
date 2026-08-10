@@ -9,6 +9,7 @@ import {
   ModalActions,
   ModalContent,
   ModalTitle,
+  NoticeBox,
   Tag,
   TextAreaField,
   Radio,
@@ -244,9 +245,14 @@ export const StateChangeButton = observer(({ currentState, yogi, retreat, allYog
           <Modal hide={!showDiscretionaryModal}>
             <ModalTitle>Select {yogi.attributes.fullName} via Selector's Discretion</ModalTitle>
             <ModalContent>
-              <p style={{ margin: "0 0 15px 0", fontSize: "14px", color: "var(--color-grey-700)" }}>
+              <p style={{ margin: "0 0 12px 0", fontSize: "14px", color: "var(--color-grey-700)" }}>
                 This action bypasses the automated score queue using 1 discretionary slot ({quota.usedSlots}/{quota.maxSlots} used). Please specify the reason for this manual selection.
               </p>
+              <div style={{ marginBottom: "15px" }}>
+                <NoticeBox title="Normal Selections">
+                  Please use the <strong>Selection</strong> tab for normal selections.
+                </NoticeBox>
+              </div>
               <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginBottom: "20px" }}>
                 {DISCRETIONARY_OPTIONS.map((opt) => (
                   <Radio

@@ -129,6 +129,83 @@
   color: #01579b !important;
 }
 
+/* 2-Row Tab header layout (Row 1: Name + Total, Row 2: Male + Female) */
+.yogi-tab-two-rows {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  text-align: center;
+  white-space: nowrap;
+  padding: 2px 0;
+}
+
+.yogi-tab-row1 {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.yogi-tab-name {
+  font-weight: 600;
+  font-size: 13px;
+  line-height: 1.2;
+}
+
+.yogi-tab-total {
+  font-weight: 700;
+  color: #334155;
+  background-color: #f1f5f9;
+  padding: 1px 6px;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  font-size: 11px;
+  line-height: 1.2;
+}
+
+.yogi-tab-total.zero {
+  color: #94a3b8;
+  background-color: #f8fafc;
+  border-color: #e2e8f0;
+  font-weight: 500;
+}
+
+.yogi-tab-row2 {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 11px;
+  min-height: 15px;
+  line-height: 1;
+}
+
+.yogi-tab-row2 .count-male {
+  display: inline-flex;
+  align-items: center;
+  gap: 1px;
+  color: #0288d1;
+  font-weight: 600;
+}
+
+.yogi-tab-row2 .count-female {
+  display: inline-flex;
+  align-items: center;
+  gap: 1px;
+  color: #d81b60;
+  font-weight: 600;
+}
+
+.yogi-tab-row2 .tab-gender-icon {
+  font-size: 11px;
+}
+
+.yogi-tab-row2 .row2-spacer {
+  visibility: hidden;
+  font-size: 11px;
+}
+
 .proposed-gender-switch-container {
   display: flex;
   background: #e2e8f0;
