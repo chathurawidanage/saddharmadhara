@@ -1,4 +1,4 @@
-import { IconClock16, Tag } from "@dhis2/ui";
+import { Tag } from "@dhis2/ui";
 import { observer } from "mobx-react";
 import React from "react";
 import {
@@ -8,6 +8,7 @@ import {
   FaMapMarkerAlt,
   FaUsers,
   FaSlidersH,
+  FaHourglassHalf,
 } from "react-icons/fa";
 import RetreatLocation from "../RetreatLocation";
 import { Retreat } from "../../types/domain";
@@ -90,10 +91,10 @@ const RetreatDetails = observer(({ retreat }: RetreatDetailsProps) => {
         </div>
       )}
       {retreat.confirmationDeadline && !isRetreatDatePassed ? (
-        <div className="retreat-details-deadline-wrapper">
-          <Tag positive={!isDeadlineExpired} negative={isDeadlineExpired} icon={<IconClock16 />}>
-            Confirmation Deadline: {formattedDeadline}
-          </Tag>
+        <div className={`confirmation-deadline-pill retreat-details-deadline-wrapper ${isDeadlineExpired ? "expired" : ""}`}>
+          <FaHourglassHalf className="deadline-pill-icon" />
+          <span className="deadline-pill-label">Confirmation Deadline</span>
+          <span className="deadline-pill-value">{formattedDeadline}</span>
         </div>
       ) : null}
     </div>
