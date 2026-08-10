@@ -6,6 +6,8 @@ export const AGE_SORT = "age";
 export const PARTICIPATION_DEDUCTION_YEARS = 2;
 export const FIRST_TIME_YOGI_BOOST = 25;
 export const ORDINATION_INTENDED_BOOST = 25;
+export const DISCRETIONARY_QUOTA_PERCENTAGE = 0.05;
+export const DISCRETIONARY_QUOTA_MAX_CAP = 4;
 
 export interface StatusBreakdown {
   score: number;

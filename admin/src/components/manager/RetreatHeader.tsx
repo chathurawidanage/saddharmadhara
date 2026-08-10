@@ -27,6 +27,7 @@ const RetreatHeader = observer(({
   onEdit,
   downloadMenu,
 }: RetreatHeaderProps) => {
+
   const { show: showAlert } = useAlert("Private link copied to clipboard", {
     duration: 2000,
     success: true,

@@ -34,6 +34,7 @@ import {
   Dhis2TrackerEventsResponse,
   Dhis2TrackedEntityInstance,
 } from "../types/dhis2";
+import { DISCRETIONARY_QUOTA_PERCENTAGE, DISCRETIONARY_QUOTA_MAX_CAP } from "../utils/yogiUtils";
 
 
 interface AttendanceEventDataParams {
@@ -132,6 +133,7 @@ class YogiStore {
   yogiIdToObjectMap = new Map<string, Yogi>();
   expressionOfInterestsYogiIds = new Map<string, string[]>();
   denyFeedbacks = new Map<string, { reason: string; comment: string; yogiId: string; retreatCode: string; deniedBy?: string; submittedAt: string }>();
+  discretionarySelections = new Map<string, { reason: string; comment: string; yogiId: string; retreatCode: string; gender: string; addedBy?: string; submittedAt: string }>();
   engine: Dhis2Engine;
 
 
@@ -409,6 +411,7 @@ class YogiStore {
       );
 
       await this.loadDenyFeedbacks(retreatCode, retreatShortCode);
+      await this.loadDiscretionarySelections(retreatCode, retreatShortCode);
 
       if (failed > 0) {
         runInAction(() => {
@@ -689,41 +692,45 @@ class YogiStore {
   deleteProposedDenyFeedback = async (
     retreatCode: string,
     yogiId: string,
+    retreatShortCode?: string,
   ): Promise<boolean> => {
-    const key = `${retreatCode}_${yogiId}`;
-    let exists = false;
-    try {
-      await this.engine.query({
-        feedback: {
-          resource: `dataStore/yogi-proposal-denials/${key}`,
-        },
-      });
-      exists = true;
-    } catch (e) {
-      exists = false;
+    const candidateKeys = new Set<string>();
+    candidateKeys.add(`${retreatCode}_${yogiId}`);
+    if (retreatShortCode) {
+      candidateKeys.add(`${retreatShortCode}_${yogiId}`);
     }
 
-    if (!exists) {
+    this.denyFeedbacks.forEach((fb, key) => {
+      if (fb.yogiId === yogiId) {
+        if (
+          fb.retreatCode === retreatCode ||
+          (retreatShortCode && fb.retreatCode === retreatShortCode) ||
+          key.startsWith(`${retreatCode}_`) ||
+          (retreatShortCode && key.startsWith(`${retreatShortCode}_`))
+        ) {
+          candidateKeys.add(key);
+        }
+      }
+    });
+
+    const keysArray = Array.from(candidateKeys);
+
+    for (const key of keysArray) {
+      try {
+        await this.engine.mutate({
+          type: "delete" as const,
+          resource: "dataStore/yogi-proposal-denials",
+          id: key,
+        });
+      } catch (e) {
+        // Datastore entry might not exist
+      }
       runInAction(() => {
         this.denyFeedbacks.delete(key);
       });
-      return true;
     }
 
-    try {
-      await this.engine.mutate({
-        type: "delete" as const,
-        resource: `dataStore/yogi-proposal-denials`,
-        id: key,
-      });
-      runInAction(() => {
-        this.denyFeedbacks.delete(key);
-      });
-      return true;
-    } catch (error) {
-      console.error("Failed to delete feedback from DHIS2 datastore:", error);
-      return false;
-    }
+    return true;
   };
 
   loadDenyFeedbacks = async (retreatCode: string, retreatShortCode?: string): Promise<void> => {
@@ -734,8 +741,11 @@ class YogiStore {
         },
       });
       const keys = (response.keys as string[]) || [];
-      const filterPrefix = retreatShortCode || retreatCode;
-      const retreatKeys = keys.filter((k) => k.startsWith(`${filterPrefix}_`));
+      const retreatKeys = keys.filter(
+        (k) =>
+          k.startsWith(`${retreatCode}_`) ||
+          (retreatShortCode && k.startsWith(`${retreatShortCode}_`))
+      );
 
       const feedbacks = await Promise.all(
         retreatKeys.map(async (key) => {
@@ -755,12 +765,225 @@ class YogiStore {
       runInAction(() => {
         feedbacks.filter(Boolean).forEach((fb) => {
           this.denyFeedbacks.set(`${fb.retreatCode}_${fb.yogiId}`, fb);
+          if (retreatCode) {
+            this.denyFeedbacks.set(`${retreatCode}_${fb.yogiId}`, fb);
+          }
+          if (retreatShortCode) {
+            this.denyFeedbacks.set(`${retreatShortCode}_${fb.yogiId}`, fb);
+          }
         });
       });
     } catch (error) {
       // Namespace might not exist, which is fine
       console.log("No deny feedback found or namespace not initialized:", error);
     }
+  };
+
+  saveDiscretionarySelection = async (
+    retreatCode: string,
+    yogiId: string,
+    reason: string,
+    comment: string,
+    gender: string,
+    addedBy?: string,
+  ): Promise<boolean> => {
+    const key = `${retreatCode}_${yogiId}`;
+    let exists = false;
+    try {
+      await this.engine.query({
+        item: {
+          resource: `dataStore/yogi-discretionary-selections/${key}`,
+        },
+      });
+      exists = true;
+    } catch (e) {
+      exists = false;
+    }
+
+    const mutation = {
+      resource: `dataStore/yogi-discretionary-selections/${key}`,
+      type: exists ? ("update" as const) : ("create" as const),
+      data: {
+        reason,
+        comment,
+        yogiId,
+        retreatCode,
+        gender,
+        addedBy: addedBy || null,
+        submittedAt: new Date().toISOString(),
+      },
+    };
+
+    try {
+      await this.engine.mutate(mutation);
+      runInAction(() => {
+        const record = {
+          reason,
+          comment,
+          yogiId,
+          retreatCode,
+          gender,
+          addedBy: addedBy || undefined,
+          submittedAt: mutation.data.submittedAt,
+        };
+        this.discretionarySelections.set(key, record);
+        this.discretionarySelections.set(`${retreatCode}_${yogiId}`, record);
+      });
+      return true;
+    } catch (error) {
+      console.error("Failed to save discretionary selection to DHIS2 datastore:", error);
+      return false;
+    }
+  };
+
+  deleteDiscretionarySelection = async (
+    retreatCode: string,
+    yogiId: string,
+    retreatShortCode?: string,
+  ): Promise<boolean> => {
+    const candidateKeys = new Set<string>();
+    candidateKeys.add(`${retreatCode}_${yogiId}`);
+    if (retreatShortCode) {
+      candidateKeys.add(`${retreatShortCode}_${yogiId}`);
+    }
+
+    this.discretionarySelections.forEach((record, key) => {
+      if (record.yogiId === yogiId) {
+        if (
+          record.retreatCode === retreatCode ||
+          (retreatShortCode && record.retreatCode === retreatShortCode) ||
+          key.startsWith(`${retreatCode}_`) ||
+          (retreatShortCode && key.startsWith(`${retreatShortCode}_`))
+        ) {
+          candidateKeys.add(key);
+        }
+      }
+    });
+
+    const keysArray = Array.from(candidateKeys);
+
+    for (const key of keysArray) {
+      try {
+        await this.engine.mutate({
+          type: "delete" as const,
+          resource: "dataStore/yogi-discretionary-selections",
+          id: key,
+        });
+      } catch (e) {
+        // Datastore entry might not exist
+      }
+      runInAction(() => {
+        this.discretionarySelections.delete(key);
+      });
+    }
+
+    return true;
+  };
+
+  loadDiscretionarySelections = async (retreatCode: string, retreatShortCode?: string): Promise<void> => {
+    try {
+      const response = await this.engine.query({
+        keys: {
+          resource: "dataStore/yogi-discretionary-selections",
+        },
+      });
+      const keys = (response.keys as string[]) || [];
+      const retreatKeys = keys.filter(
+        (k) =>
+          k.startsWith(`${retreatCode}_`) ||
+          (retreatShortCode && k.startsWith(`${retreatShortCode}_`))
+      );
+
+      const items = await Promise.all(
+        retreatKeys.map(async (key) => {
+          try {
+            const data = await this.engine.query({
+              val: {
+                resource: `dataStore/yogi-discretionary-selections/${key}`,
+              },
+            });
+            return data.val;
+          } catch (e) {
+            return null;
+          }
+        }),
+      );
+
+      runInAction(() => {
+        items.filter(Boolean).forEach((item) => {
+          this.discretionarySelections.set(`${item.retreatCode}_${item.yogiId}`, item);
+          if (retreatCode) {
+            this.discretionarySelections.set(`${retreatCode}_${item.yogiId}`, item);
+          }
+          if (retreatShortCode) {
+            this.discretionarySelections.set(`${retreatShortCode}_${item.yogiId}`, item);
+          }
+        });
+      });
+    } catch (error) {
+      console.log("No discretionary selections found or namespace not initialized:", error);
+    }
+  };
+
+  getDiscretionaryQuota = (retreatCode: string, yogiList?: Yogi[], gender?: string) => {
+    const listToUse =
+      yogiList && yogiList.length > 0
+        ? yogiList
+        : Array.from(this.yogiIdToObjectMap.values());
+
+    const activeYogis = listToUse.filter((yogi) => {
+      const eoiState = yogi.expressionOfInterests?.[retreatCode]?.state;
+      const isPendingOrSelected =
+        eoiState === SelectionState.PENDING || eoiState === SelectionState.SELECTED;
+      if (!isPendingOrSelected) return false;
+      if (gender) {
+        return yogi.attributes?.gender === gender;
+      }
+      return true;
+    });
+
+    const activeCount = activeYogis.length;
+    const maxSlots =
+      activeCount === 0
+        ? 0
+        : Math.min(
+            DISCRETIONARY_QUOTA_MAX_CAP,
+            Math.ceil(activeCount * DISCRETIONARY_QUOTA_PERCENTAGE),
+          );
+
+    let usedSlots = 0;
+    const processedYogiIds = new Set<string>();
+
+    this.discretionarySelections.forEach((record, key) => {
+      if (processedYogiIds.has(record.yogiId)) return;
+
+      const matchesRetreat =
+        record.retreatCode === retreatCode || key.startsWith(`${retreatCode}_`);
+      if (matchesRetreat) {
+        if (!gender || record.gender === gender) {
+          const yogi =
+            listToUse.find((y) => y.id === record.yogiId) ||
+            this.yogiIdToObjectMap.get(record.yogiId);
+          const eoiState = yogi?.expressionOfInterests?.[retreatCode]?.state;
+          const isActive =
+            eoiState === SelectionState.PENDING || eoiState === SelectionState.SELECTED;
+
+          if (isActive) {
+            processedYogiIds.add(record.yogiId);
+            usedSlots++;
+          }
+        }
+      }
+    });
+
+    const availableSlots = Math.max(0, maxSlots - usedSlots);
+
+    return {
+      activeCount,
+      maxSlots,
+      usedSlots,
+      availableSlots,
+    };
   };
 }
 

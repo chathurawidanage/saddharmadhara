@@ -1,7 +1,11 @@
 import { Button, InputField, SingleSelectField, SingleSelectOption } from "@dhis2/ui";
+import { observer } from "mobx-react";
 import React from "react";
 import YogiListFilters from "./YogiListFilters";
-import { AGE_SORT, SELECTION_PRIORITY_SORT } from "../../utils/yogiUtils";
+import {
+  AGE_SORT,
+  SELECTION_PRIORITY_SORT,
+} from "../../utils/yogiUtils";
 
 interface YogiListToolbarProps {
   filters: any;
@@ -16,7 +20,7 @@ interface YogiListToolbarProps {
   disabled?: boolean;
 }
 
-const YogiListToolbar = ({ 
+const YogiListToolbar = observer(({ 
   filters, 
   setFilters, 
   sortBy, 
@@ -63,6 +67,6 @@ const YogiListToolbar = ({
       )}
     </div>
   );
-};
+});
 
 export default YogiListToolbar;

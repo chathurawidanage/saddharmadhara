@@ -27,7 +27,7 @@ import {
 } from "../indicators/ProfileInfo";
 import { BiLinkExternal, BiChevronLeft, BiChevronRight } from "react-icons/bi";
 import "./YogiRow.css";
-import { Retreat, Yogi, EoiSummary, MaritalState } from "../../types/domain";
+import { Retreat, Yogi, EoiSummary, MaritalState, SelectionState } from "../../types/domain";
 import { getYogiSortScore } from "../../utils/yogiUtils";
 import { YogiScoreTooltip } from "./YogiScoreTooltip";
 
@@ -62,6 +62,26 @@ const getReasonLabel = (reason: string) => {
   }
 };
 
+const getDiscretionaryReasonLabel = (reason: string) => {
+  switch (reason) {
+    case "MONASTIC_RECOMMENDATION":
+    case "MONASTIC_REQUEST":
+      return "Monastic / Reverend Recommendation";
+    case "MISSION_VOLUNTEER":
+    case "OPS_VOLUNTEER":
+      return "Mission / Retreat Volunteer";
+    case "SERIOUS_PRACTITIONER":
+      return "Serious Practitioner";
+    case "EXCEPTIONAL_ADMIN_CASE":
+    case "EMERGENCY_CASE":
+      return "Exceptional Administrative Case";
+    case "OTHER":
+      return "Other";
+    default:
+      return reason;
+  }
+};
+
 const YogiRow = observer(({ trackedEntity, currentRetreat, allRetreats, eoiSummary, actions }: YogiRowProps) => {
     const { baseUrl } = useConfig();
     const store = useStore();
@@ -80,9 +100,18 @@ const YogiRow = observer(({ trackedEntity, currentRetreat, allRetreats, eoiSumma
         .reverse();
     }, [trackedEntity.notes]);
 
-    const denyFeedback = store.yogis?.denyFeedbacks.get(
-      `${currentRetreat.retreatCode}_${trackedEntity.id}`,
-    );
+    const denyFeedback =
+      store.yogis?.denyFeedbacks.get(`${currentRetreat.code}_${trackedEntity.id}`) ||
+      store.yogis?.denyFeedbacks.get(`${currentRetreat.retreatCode}_${trackedEntity.id}`);
+
+    const discretionarySelection =
+      store.yogis?.discretionarySelections.get(`${currentRetreat.code}_${trackedEntity.id}`) ||
+      store.yogis?.discretionarySelections.get(`${currentRetreat.retreatCode}_${trackedEntity.id}`);
+
+    const currentRetreatState = trackedEntity.expressionOfInterests[currentRetreat.code]?.state;
+    const isDiscretionaryActive =
+      discretionarySelection &&
+      (currentRetreatState === SelectionState.PENDING || currentRetreatState === SelectionState.SELECTED);
 
     const rowClassNames = [];
 
@@ -273,6 +302,34 @@ const YogiRow = observer(({ trackedEntity, currentRetreat, allRetreats, eoiSumma
                   {denyFeedback.comment && (
                     <div style={{ marginTop: "6px", fontStyle: "italic", color: "var(--color-grey-600)" }}>
                       "{denyFeedback.comment}"
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+          {isDiscretionaryActive && (
+            <div className="yogi-discretionary-feedback-subrow">
+              <div className="yogi-comment-container">
+                <div className="yogi-comment-header">
+                  <div className="yogi-comment-title-section">
+                    <span className="yogi-discretionary-badge">Added at Selector's Discretion</span>
+                    {discretionarySelection.submittedAt && (
+                      <span className="yogi-comment-date">
+                        {new Date(discretionarySelection.submittedAt).toLocaleDateString("en-US", {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                        })}
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <div className="yogi-comment-body">
+                  Added at selector's discretion by <strong>{discretionarySelection.addedBy || "unknown"}</strong> due to: <strong>{getDiscretionaryReasonLabel(discretionarySelection.reason)}</strong>
+                  {discretionarySelection.comment && (
+                    <div style={{ marginTop: "6px", fontStyle: "italic", color: "var(--color-grey-600)" }}>
+                      "{discretionarySelection.comment}"
                     </div>
                   )}
                 </div>

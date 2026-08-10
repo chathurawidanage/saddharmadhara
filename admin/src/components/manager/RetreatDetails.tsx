@@ -3,12 +3,20 @@ import { observer } from "mobx-react";
 import React from "react";
 import RetreatLocation from "../RetreatLocation";
 import { Retreat } from "../../types/domain";
+import { useStore } from "../../stores/StoreProvider";
+import {
+  DISCRETIONARY_QUOTA_PERCENTAGE,
+  DISCRETIONARY_QUOTA_MAX_CAP,
+} from "../../utils/yogiUtils";
 
 interface RetreatDetailsProps {
   retreat: Retreat;
 }
 
 const RetreatDetails = observer(({ retreat }: RetreatDetailsProps) => {
+  const store = useStore();
+  const discretionaryInfo = store.yogis?.getDiscretionaryQuota(retreat.code);
+
   const isRetreatDatePassed = (() => {
     if (!retreat.date) return false;
     const dateStr = retreat.date.toISOString().split("T")[0];
@@ -50,6 +58,17 @@ const RetreatDetails = observer(({ retreat }: RetreatDetailsProps) => {
         📍 <RetreatLocation locationId={retreat.location} />
       </div>
       <div className="retreat-detail-item">🧘‍♂️ {retreat.totalYogis}</div>
+      {discretionaryInfo && (
+        <div
+          className="discretionary-quota-pill"
+          title={`Dynamic wildcard quota based on ${Math.round(DISCRETIONARY_QUOTA_PERCENTAGE * 100)}% of active Pending/Selected yogis across retreat (max ${DISCRETIONARY_QUOTA_MAX_CAP})`}
+        >
+          <span className="discretionary-pill-label">Selector's Discretions Used</span>
+          <span className="discretionary-pill-value">
+            {discretionaryInfo.usedSlots}/{discretionaryInfo.maxSlots}
+          </span>
+        </div>
+      )}
       {retreat.confirmationDeadline && !isRetreatDatePassed ? (
         <div className="retreat-details-deadline-wrapper">
           <Tag positive={!isDeadlineExpired} negative={isDeadlineExpired} icon={<IconClock16 />}>

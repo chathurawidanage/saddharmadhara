@@ -14,6 +14,7 @@ import {
   DHIS2_RETREAT_SELECTION_STATE_PENDING_CONFIRMATION_CODE,
   DHIS2_RETREAT_SELECTION_STATE_SELECTED_CODE,
 } from "../../dhis2";
+import { useStore } from "../../stores/StoreProvider";
 import {
   AttendanceButton,
   InvitationIndicator,
@@ -46,6 +47,10 @@ const YogiTable = ({
   allRetreats,
   eoiSummary,
 }: YogiTableProps) => {
+  const store = useStore();
+  const stateObj = (store.metadata?.selectionStates || []).find((s) => s.code === selectionState);
+  const stateName = stateObj?.name || selectionState;
+
   const renderPagination = (total: number) => (
     <Pagination
       page={currentPage}
@@ -79,7 +84,9 @@ const YogiTable = ({
               <TableRow>
                 <TableCell colSpan={5} align="center">
                   <div style={{ padding: "30px", color: "var(--color-grey-600)" }}>
-                    No proposed yogi available for this gender selection.
+                    {selectionState === "proposed"
+                      ? "No proposed yogi available for this gender selection."
+                      : `No yogis found in ${stateName}.`}
                   </div>
                 </TableCell>
               </TableRow>
@@ -111,6 +118,7 @@ const YogiTable = ({
                             yogi={yogi}
                             currentState={selectionState}
                             retreat={retreat}
+                            allYogis={allYogis}
                           />
                           {selectionState ===
                           DHIS2_RETREAT_SELECTION_STATE_SELECTED_CODE ? (

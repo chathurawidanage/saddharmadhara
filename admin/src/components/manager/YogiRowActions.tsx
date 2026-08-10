@@ -9,8 +9,6 @@ import {
   ModalActions,
   ModalContent,
   ModalTitle,
-  SingleSelectField,
-  SingleSelectOption,
   Tag,
   TextAreaField,
   Radio,
@@ -27,50 +25,57 @@ interface StateChangeButtonProps {
   currentState: string;
   yogi: Yogi;
   retreat: Retreat;
+  allYogis?: Yogi[];
 }
 
-export const StateChangeButton = observer(({ currentState, yogi, retreat }: StateChangeButtonProps) => {
+export const StateChangeButton = observer(({ currentState, yogi, retreat, allYogis = [] }: StateChangeButtonProps) => {
   const store = useStore();
+  const [loading, setLoading] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [showDenyModal, setShowDenyModal] = useState(false);
+  const [showDiscretionaryModal, setShowDiscretionaryModal] = useState(false);
+  const [selectedReason, setSelectedReason] = useState("");
+  const [comment, setComment] = useState("");
+
   const { show: alertStateChangeStatus } = useAlert(
     ({ yogiName, toState, success }: { yogiName: string; toState: string; success: boolean }) =>
       success
         ? `${yogiName} moved to ${toState}`
         : `Failed to move ${yogiName}`,
-    ({ success }: { success: boolean }) => {
-      return {
-        success,
-        critical: !success,
-        duration: 2000,
-      };
-    },
+    ({ success }: { success: boolean }) => ({
+      success,
+      critical: !success,
+      duration: 2000,
+    }),
+  );
+
+  const { show: alertError } = useAlert(
+    (message: string) => message,
+    { critical: true, duration: 4000 }
   );
 
   const { show: changeFromSelectedStatePrompt } = useAlert(
     ({ yogiName }: { yogiName: string }) =>
       `Are you sure you want to remove ${yogiName} from the 'Selected' state? This will result in the loss of their room allocations and any attendance records if they exist.`,
-    ({ onMoveClicked }: { onMoveClicked: () => void }) => {
-      return {
-        critical: true,
-        permanent: true,
-        actions: [
-          { label: "Move", onClick: onMoveClicked },
-          {
-            label: "Don't Move",
-            // eslint-disable-next-line @typescript-eslint/no-empty-function
-            onClick: () => {},
-          },
-        ],
-      };
-    },
+    ({ onMoveClicked }: { onMoveClicked: () => void }) => ({
+      critical: true,
+      permanent: true,
+      actions: [
+        { label: "Move", onClick: onMoveClicked },
+        { label: "Don't Move", onClick: () => {} },
+      ],
+    }),
   );
 
   const doStateChange = async (toStateCode: SelectionState) => {
     if (!store.yogis) return;
+    setLoading(true);
     const success = await store.yogis.changeRetreatState(
       yogi.id,
       retreat.code,
       toStateCode,
     );
+    setLoading(false);
     alertStateChangeStatus({
       yogiName: yogi.attributes.fullName,
       toState: toStateCode,
@@ -97,27 +102,297 @@ export const StateChangeButton = observer(({ currentState, yogi, retreat }: Stat
         },
       });
     } else {
+      if (toStateCode === SelectionState.APPLIED) {
+        await store.yogis.deleteProposedDenyFeedback(retreat.code, yogi.id, retreat.retreatCode);
+        await store.yogis.deleteDiscretionarySelection(retreat.code, yogi.id, retreat.retreatCode);
+      }
       await doStateChange(toStateCode);
     }
   };
 
+  const handleDenyConfirm = async () => {
+    if (!selectedReason) return;
+    if (selectedReason === "OTHER" && !comment.trim()) return;
+
+    setLoading(true);
+    const feedbackSaved = await store.yogis?.saveProposedDenyFeedback(
+      retreat.code,
+      yogi.id,
+      selectedReason,
+      comment,
+      store.metadata?.currentUser?.username,
+    );
+
+    if (!feedbackSaved) {
+      setLoading(false);
+      alertError("Failed to save deny feedback to DHIS2 datastore. Please try again.");
+      return;
+    }
+
+    const success = await store.yogis?.changeRetreatState(
+      yogi.id,
+      retreat.code,
+      SelectionState.DESELECTED,
+    );
+
+    setLoading(false);
+    setShowDenyModal(false);
+
+    alertStateChangeStatus({
+      yogiName: yogi.attributes.fullName,
+      toState: SelectionState.DESELECTED,
+      success,
+    });
+  };
+
+  const handleDiscretionaryConfirm = async () => {
+    if (!selectedReason) return;
+    if (selectedReason === "OTHER" && !comment.trim()) return;
+
+    setLoading(true);
+    const saved = await store.yogis?.saveDiscretionarySelection(
+      retreat.code,
+      yogi.id,
+      selectedReason,
+      comment,
+      yogi.attributes.gender,
+      store.metadata?.currentUser?.username,
+    );
+
+    if (!saved) {
+      setLoading(false);
+      alertError("Failed to save discretionary selection to DHIS2 datastore. Please try again.");
+      return;
+    }
+
+    const success = await store.yogis?.changeRetreatState(
+      yogi.id,
+      retreat.code,
+      SelectionState.PENDING,
+    );
+
+    setLoading(false);
+    setShowDiscretionaryModal(false);
+
+    alertStateChangeStatus({
+      yogiName: yogi.attributes.fullName,
+      toState: SelectionState.PENDING,
+      success,
+    });
+  };
+
+  const DENY_OPTIONS = [
+    { label: "Based on past staff review (eg: inappropriate behavior)", value: "PAST_REVIEW" },
+    { label: "Possible disciplinary or behavioral concerns", value: "DISCIPLINARY_CONCERNS" },
+    { label: "Too many no shows across past years", value: "TOO_MANY_NO_SHOWS" },
+    { label: "Already known to be not attending based on outside communication", value: "OUTSIDE_COMMUNICATION" },
+    { label: "Based on the answers to the questions Physical & Psychological Readiness.", value: "READINESS_ANSWERS" },
+    { label: "Health issues", value: "HEALTH_ISSUES" },
+    { label: "Age concerns", value: "AGE_CONCERNS" },
+    { label: "Other", value: "OTHER" },
+  ];
+
+  const DISCRETIONARY_OPTIONS = [
+    { label: "Monastic / Reverend Recommendation", value: "MONASTIC_RECOMMENDATION" },
+    { label: "Mission / Retreat Volunteer", value: "MISSION_VOLUNTEER" },
+    { label: "Serious Practitioner", value: "SERIOUS_PRACTITIONER" },
+    { label: "Exceptional Administrative Case", value: "EXCEPTIONAL_ADMIN_CASE" },
+    { label: "Other", value: "OTHER" },
+  ];
+
+  const getStateName = (code: string) => {
+    const found = (store.metadata?.selectionStates || []).find(
+      (state: any) => state.code === code,
+    );
+    return found?.name || code;
+  };
+
+  if (currentState === "applied" || currentState === SelectionState.APPLIED) {
+    const quota = store.yogis?.getDiscretionaryQuota(retreat.code, allYogis) || {
+      availableSlots: 0,
+      usedSlots: 0,
+      maxSlots: 0,
+      activeCount: 0,
+    };
+    const canSelectDiscretionary = quota.availableSlots > 0;
+
+    return (
+      <>
+        <DropdownButton
+          open={menuOpen}
+          onClick={() => setMenuOpen(!menuOpen)}
+          disabled={loading}
+          component={
+            <FlyoutMenu>
+              <MenuItem
+                label={getStateName(SelectionState.PENDING)}
+                disabled={!canSelectDiscretionary}
+                onClick={() => {
+                  setMenuOpen(false);
+                  setSelectedReason("");
+                  setComment("");
+                  setShowDiscretionaryModal(true);
+                }}
+              />
+            </FlyoutMenu>
+          }
+        >
+          Move to
+        </DropdownButton>
+
+        {showDiscretionaryModal && (
+          <Modal hide={!showDiscretionaryModal}>
+            <ModalTitle>Select {yogi.attributes.fullName} via Selector's Discretion</ModalTitle>
+            <ModalContent>
+              <p style={{ margin: "0 0 15px 0", fontSize: "14px", color: "var(--color-grey-700)" }}>
+                This action bypasses the automated score queue using 1 discretionary slot ({quota.usedSlots}/{quota.maxSlots} used). Please specify the reason for this manual selection.
+              </p>
+              <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginBottom: "20px" }}>
+                {DISCRETIONARY_OPTIONS.map((opt) => (
+                  <Radio
+                    key={opt.value}
+                    label={opt.label}
+                    value={opt.value}
+                    checked={selectedReason === opt.value}
+                    onChange={() => setSelectedReason(opt.value)}
+                    dense
+                  />
+                ))}
+              </div>
+              <TextAreaField
+                label="Comment / Note"
+                value={comment}
+                onChange={({ value }: { value: string }) => setComment(value)}
+                required={selectedReason === "OTHER"}
+                validationText={
+                  selectedReason === "OTHER" && !comment.trim()
+                    ? "Comment is required when 'Other' is selected"
+                    : undefined
+                }
+                error={selectedReason === "OTHER" && !comment.trim()}
+              />
+            </ModalContent>
+            <ModalActions>
+              <ButtonStrip>
+                <Button onClick={() => setShowDiscretionaryModal(false)} secondary disabled={loading}>
+                  Cancel
+                </Button>
+                <Button
+                  primary
+                  loading={loading}
+                  disabled={!selectedReason || (selectedReason === "OTHER" && !comment.trim())}
+                  onClick={handleDiscretionaryConfirm}
+                >
+                  Confirm Selection
+                </Button>
+              </ButtonStrip>
+            </ModalActions>
+          </Modal>
+        )}
+
+        {showDenyModal && (
+          <Modal hide={!showDenyModal}>
+            <ModalTitle>Disqualify / Deny {yogi.attributes.fullName}</ModalTitle>
+            <ModalContent>
+              <p style={{ margin: "0 0 15px 0", fontSize: "14px", color: "var(--color-grey-700)" }}>
+                Please specify why this applicant is unsuited for this retreat.
+              </p>
+              <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginBottom: "20px" }}>
+                {DENY_OPTIONS.map((opt) => (
+                  <Radio
+                    key={opt.value}
+                    label={opt.label}
+                    value={opt.value}
+                    checked={selectedReason === opt.value}
+                    onChange={() => setSelectedReason(opt.value)}
+                    dense
+                  />
+                ))}
+              </div>
+              <TextAreaField
+                label="Comment"
+                value={comment}
+                onChange={({ value }: { value: string }) => setComment(value)}
+                required={selectedReason === "OTHER"}
+                validationText={
+                  selectedReason === "OTHER" && !comment.trim()
+                    ? "Comment is required when 'Other' is selected"
+                    : undefined
+                }
+                error={selectedReason === "OTHER" && !comment.trim()}
+              />
+            </ModalContent>
+            <ModalActions>
+              <ButtonStrip>
+                <Button onClick={() => setShowDenyModal(false)} secondary disabled={loading}>
+                  Cancel
+                </Button>
+                <Button
+                  destructive
+                  loading={loading}
+                  disabled={!selectedReason || (selectedReason === "OTHER" && !comment.trim())}
+                  onClick={handleDenyConfirm}
+                >
+                  Deny
+                </Button>
+              </ButtonStrip>
+            </ModalActions>
+          </Modal>
+        )}
+      </>
+    );
+  }
+
+  let targetCodes: SelectionState[] = [];
+
+  if (currentState === SelectionState.PENDING || currentState === "pending") {
+    targetCodes = [
+      SelectionState.SELECTED,
+      SelectionState.UNATTENDING,
+      SelectionState.UNCONFIRMED,
+    ];
+  } else if (currentState === SelectionState.SELECTED || currentState === "selected") {
+    targetCodes = [SelectionState.UNATTENDING];
+  } else if (currentState === SelectionState.DESELECTED || currentState === "deselected") {
+    if (store.metadata?.isAdmin) {
+      targetCodes = [SelectionState.APPLIED];
+    }
+  } else if (
+    currentState === SelectionState.UNATTENDING ||
+    currentState === SelectionState.UNCONFIRMED ||
+    currentState === SelectionState.WAITING
+  ) {
+    if (store.metadata?.isAdmin) {
+      targetCodes = [SelectionState.APPLIED];
+    }
+  }
+
+  const allowedTargets = targetCodes.map((code) => ({
+    code,
+    name: getStateName(code),
+  }));
+
+  if (allowedTargets.length === 0) {
+    return null;
+  }
+
   return (
     <DropdownButton
+      open={menuOpen}
+      onClick={() => setMenuOpen(!menuOpen)}
+      disabled={loading}
       component={
         <FlyoutMenu>
-          {(store.metadata?.selectionStates || [])
-            .filter((state) => state.code !== currentState)
-            .map((state) => {
-              return (
-                <MenuItem
-                  key={state.code}
-                  onClick={() => {
-                    onStateChanged(state.code);
-                  }}
-                  label={state.name}
-                />
-              );
-            })}
+          {allowedTargets.map((target) => (
+            <MenuItem
+              key={target.code}
+              onClick={() => {
+                setMenuOpen(false);
+                onStateChanged(target.code);
+              }}
+              label={target.name}
+            />
+          ))}
         </FlyoutMenu>
       }
     >
@@ -319,7 +594,11 @@ export const ProposedActions = observer(({ yogi, retreat }: ProposedActionsProps
 
     if (toStateCode === SelectionState.PENDING) {
       await store.yogis.deleteProposedDenyFeedback(
-        retreat.retreatCode,
+        retreat.code,
+        yogi.id,
+      );
+      await store.yogis.deleteDiscretionarySelection(
+        retreat.code,
         yogi.id,
       );
     }
@@ -349,7 +628,7 @@ export const ProposedActions = observer(({ yogi, retreat }: ProposedActionsProps
 
     setLoading(true);
     const feedbackSaved = await store.yogis?.saveProposedDenyFeedback(
-      retreat.retreatCode,
+      retreat.code,
       yogi.id,
       selectedReason,
       comment,
