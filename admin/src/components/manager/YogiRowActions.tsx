@@ -37,6 +37,7 @@ export const StateChangeButton = observer(({ currentState, yogi, retreat, allYog
   const [menuOpen, setMenuOpen] = useState(false);
   const [showDenyModal, setShowDenyModal] = useState(false);
   const [showDiscretionaryModal, setShowDiscretionaryModal] = useState(false);
+  const [targetDiscretionaryState, setTargetDiscretionaryState] = useState<SelectionState>(SelectionState.PENDING);
   const [selectedReason, setSelectedReason] = useState("");
   const [comment, setComment] = useState("");
 
@@ -171,7 +172,7 @@ export const StateChangeButton = observer(({ currentState, yogi, retreat, allYog
     const success = await store.yogis?.changeRetreatState(
       yogi.id,
       retreat.code,
-      SelectionState.PENDING,
+      targetDiscretionaryState,
     );
 
     setLoading(false);
@@ -179,7 +180,7 @@ export const StateChangeButton = observer(({ currentState, yogi, retreat, allYog
 
     alertStateChangeStatus({
       yogiName: yogi.attributes.fullName,
-      toState: SelectionState.PENDING,
+      toState: targetDiscretionaryState,
       success,
     });
   };
@@ -234,6 +235,18 @@ export const StateChangeButton = observer(({ currentState, yogi, retreat, allYog
                   setMenuOpen(false);
                   setSelectedReason("");
                   setComment("");
+                  setTargetDiscretionaryState(SelectionState.PENDING);
+                  setShowDiscretionaryModal(true);
+                }}
+              />
+              <MenuItem
+                label={getStateName(SelectionState.SELECTED)}
+                disabled={!canSelectDiscretionary}
+                onClick={() => {
+                  setMenuOpen(false);
+                  setSelectedReason("");
+                  setComment("");
+                  setTargetDiscretionaryState(SelectionState.SELECTED);
                   setShowDiscretionaryModal(true);
                 }}
               />
@@ -247,14 +260,22 @@ export const StateChangeButton = observer(({ currentState, yogi, retreat, allYog
           <Modal hide={!showDiscretionaryModal}>
             <ModalTitle>Select {yogi.attributes.fullName} via Selector's Discretion</ModalTitle>
             <ModalContent>
-              <p style={{ margin: "0 0 12px 0", fontSize: "14px", color: "var(--color-grey-700)" }}>
-                This action bypasses the automated score queue using 1 discretionary slot ({quota.usedSlots}/{quota.maxSlots} used). Please specify the reason for this manual selection.
-              </p>
               <div style={{ marginBottom: "15px" }}>
-                <NoticeBox title="Normal Selections">
-                  Please use the <strong>Selection</strong> tab for normal selections.
+                <NoticeBox error>
+                  <p style={{ margin: 0 }}>
+                    This action bypasses the standard scored waitlist.
+                  </p>
+                  <p style={{ margin: "4px 0 0 0" }}>
+                    ({quota.usedSlots}/{quota.maxSlots} discretionary slots used)
+                  </p>
+                  <p style={{ margin: "6px 0 0 0" }}>
+                    If this action was not intended, please cancel and use the <strong>Selection</strong> tab for normal selections.
+                  </p>
                 </NoticeBox>
               </div>
+              <p style={{ margin: "0 0 12px 0", fontSize: "14px", color: "var(--color-grey-700)" }}>
+                Please specify the reason for this manual selection.
+              </p>
               <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginBottom: "20px" }}>
                 {DISCRETIONARY_OPTIONS.map((opt) => (
                   <Radio

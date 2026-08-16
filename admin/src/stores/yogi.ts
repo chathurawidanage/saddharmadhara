@@ -784,7 +784,7 @@ class YogiStore {
     yogiId: string,
     reason: string,
     comment: string,
-    gender: string,
+    gender?: string,
     addedBy?: string,
   ): Promise<boolean> => {
     const key = `${retreatCode}_${yogiId}`;
