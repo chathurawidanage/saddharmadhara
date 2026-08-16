@@ -382,18 +382,17 @@ export const StateChangeButton = observer(({ currentState, yogi, retreat, allYog
     ];
   } else if (currentState === SelectionState.SELECTED || currentState === "selected") {
     targetCodes = [SelectionState.UNATTENDING];
-  } else if (currentState === SelectionState.DESELECTED || currentState === "deselected") {
-    if (store.metadata?.isAdmin) {
-      targetCodes = [SelectionState.APPLIED];
-    }
   } else if (
+    currentState === SelectionState.DESELECTED ||
+    currentState === "deselected" ||
     currentState === SelectionState.UNATTENDING ||
+    currentState === "unattending" ||
     currentState === SelectionState.UNCONFIRMED ||
-    currentState === SelectionState.WAITING
+    currentState === "unconfirmed" ||
+    currentState === SelectionState.WAITING ||
+    currentState === "waiting"
   ) {
-    if (store.metadata?.isAdmin) {
-      targetCodes = [SelectionState.APPLIED];
-    }
+    targetCodes = [SelectionState.APPLIED];
   }
 
   const allowedTargets = targetCodes.map((code) => ({
