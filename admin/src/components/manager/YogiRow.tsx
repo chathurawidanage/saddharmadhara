@@ -24,6 +24,7 @@ import {
   AgeProfileInfor,
   IdProfileInfo,
   PhoneProfileInfo,
+  WhatsappProfileInfo,
 } from "../indicators/ProfileInfo";
 import { BiLinkExternal, BiChevronLeft, BiChevronRight } from "react-icons/bi";
 import "./YogiRow.css";
@@ -176,6 +177,12 @@ const YogiRow = observer(({ trackedEntity, currentRetreat, allRetreats, eoiSumma
             phonesArray={[
               trackedEntity.attributes.mobile,
             ]}
+          />
+          <WhatsappProfileInfo
+            whatsapp={
+              trackedEntity.attributes.whatsapp ||
+              trackedEntity.attributes.CpF36JSasMJ
+            }
           />
           <AgeProfileInfor
             birthday={trackedEntity.attributes.dob}

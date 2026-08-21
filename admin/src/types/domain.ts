@@ -129,6 +129,7 @@ export interface YogiAttributes extends Record<string, any> {
   fullName?: string;
   gender?: Gender;
   mobile?: string;
+  whatsapp?: string;
   maritalState?: MaritalState;
   nic?: string;
   passport?: string;

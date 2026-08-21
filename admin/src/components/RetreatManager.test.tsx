@@ -43,7 +43,7 @@ describe("RetreatManager Export Formatting", () => {
       retreat,
     );
     const lines = result.split("\n");
-    expect(lines[0]).toBe(",Name,NIC,Passport,Phone,Room");
+    expect(lines[0]).toBe(",Name,NIC,Passport,Phone,WhatsApp,Room");
     expect(lines[1]).toContain("01,John Doe");
     expect(lines[1]).toContain("Room 101");
   });

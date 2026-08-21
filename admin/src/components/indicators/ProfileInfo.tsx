@@ -4,18 +4,21 @@ import ID from "./img/id.png";
 import PHONE from "./img/phone.png";
 import AGE from "./img/age.png";
 import React from "react";
+import { FaWhatsapp } from "react-icons/fa";
 
 interface ProfileInfoProps {
-  image: string;
+  image?: string;
+  icon?: React.ReactNode;
   tooltip: string;
   text: string | number;
 }
 
-const ProfileInfo = ({ image, tooltip, text }: ProfileInfoProps) => {
+const ProfileInfo = ({ image, icon, tooltip, text }: ProfileInfoProps) => {
   return (
     <Tooltip content={tooltip}>
       <div className="profile-info">
-        <img src={image} alt={tooltip} />
+        {image && <img src={image} alt={tooltip} />}
+        {icon}
         <label>{text}</label>
       </div>
     </Tooltip>
@@ -23,12 +26,27 @@ const ProfileInfo = ({ image, tooltip, text }: ProfileInfoProps) => {
 };
 
 export const IdProfileInfo = ({ idArray }: { idArray: (string | undefined)[] }) => {
-  return <ProfileInfo image={ID} tooltip="ID" text={idArray.filter(Boolean).join(" ")} />;
+  const text = idArray.filter(Boolean).join(" ");
+  if (!text) return null;
+  return <ProfileInfo image={ID} tooltip="ID" text={text} />;
 };
 
 export const PhoneProfileInfo = ({ phonesArray }: { phonesArray: (string | undefined)[] }) => {
+  const text = phonesArray.filter(Boolean).join(" ");
+  if (!text) return null;
   return (
-    <ProfileInfo image={PHONE} tooltip="Phone" text={phonesArray.filter(Boolean).join(" ")} />
+    <ProfileInfo image={PHONE} tooltip="Phone" text={text} />
+  );
+};
+
+export const WhatsappProfileInfo = ({ whatsapp }: { whatsapp: string | undefined }) => {
+  if (!whatsapp?.trim()) return null;
+  return (
+    <ProfileInfo
+      icon={<FaWhatsapp style={{ color: "#25D366", fontSize: "1.25em" }} />}
+      tooltip="WhatsApp"
+      text={whatsapp.trim()}
+    />
   );
 };
 

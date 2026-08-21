@@ -161,6 +161,8 @@ const YogisList = observer(({ retreat }: YogisListProps) => {
             yogi.attributes.fullName?.toLowerCase() || "";
           const mobile =
             yogi.attributes.mobile?.toLowerCase() || "";
+          const whatsapp =
+            (yogi.attributes.whatsapp || yogi.attributes.CpF36JSasMJ)?.toLowerCase() || "";
           const nic = yogi.attributes.nic?.toLowerCase() || "";
           const passport =
             yogi.attributes.passport?.toLowerCase() || "";
@@ -168,6 +170,7 @@ const YogisList = observer(({ retreat }: YogisListProps) => {
           return (
             name.includes(query) ||
             mobile.includes(query) ||
+            whatsapp.includes(query) ||
             nic.includes(query) ||
             passport.includes(query)
           );
