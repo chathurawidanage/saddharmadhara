@@ -2,6 +2,8 @@ import {
   getRetreatEndDate,
   canFinalizeRetreat,
   isGeneralRetreat,
+  isSilentRetreat,
+  isDhammaSevaRetreat,
   getRetreatDisplayRange,
 } from "./retreatUtils";
 
@@ -56,6 +58,31 @@ describe("retreatUtils", () => {
 
     test("returns false for non-general retreats", () => {
       expect(isGeneralRetreat({ retreatType: "silent" })).toBe(false);
+      expect(isGeneralRetreat({ retreatType: "dhamma-seva" })).toBe(false);
+    });
+  });
+
+  describe("isSilentRetreat", () => {
+    test("identifies silent retreats", () => {
+      expect(isSilentRetreat({ retreatType: "silent" })).toBe(true);
+    });
+
+    test("returns false for non-silent retreats", () => {
+      expect(isSilentRetreat({ retreatType: "general" })).toBe(false);
+      expect(isSilentRetreat({ retreatType: "dhamma-seva" })).toBe(false);
+    });
+  });
+
+  describe("isDhammaSevaRetreat", () => {
+    test("identifies dhamma seva retreats", () => {
+      expect(isDhammaSevaRetreat({ retreatType: "dhamma-seva" })).toBe(true);
+      expect(isDhammaSevaRetreat({ retreatType: "dhamma seva" as any })).toBe(true);
+      expect(isDhammaSevaRetreat({ retreatType: "Dhamma Seva" as any })).toBe(true);
+    });
+
+    test("returns false for non-dhamma-seva retreats", () => {
+      expect(isDhammaSevaRetreat({ retreatType: "general" })).toBe(false);
+      expect(isDhammaSevaRetreat({ retreatType: "silent" })).toBe(false);
     });
   });
 

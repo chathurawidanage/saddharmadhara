@@ -1,11 +1,12 @@
 import { Retreat, Yogi, EoiSummary, MaritalState, SelectionState, YogiPriority, AttendanceState, Gender } from "../types/domain";
-import { isGeneralRetreat, isSilentRetreat } from "./retreatUtils";
+import { isGeneralRetreat, isSilentRetreat, isDhammaSevaRetreat } from "./retreatUtils";
 
 export const SELECTION_PRIORITY_SORT = "selection-priority";
 export const AGE_SORT = "age";
-export const PARTICIPATION_DEDUCTION_YEARS = 2;
-export const FIRST_TIME_YOGI_BOOST = 25;
+export const PARTICIPATION_LOOKBACK_YEARS = 2;
+export const FIRST_TIME_YOGI_BOOST = 50;
 export const ORDINATION_INTENDED_BOOST = 25;
+export const DHAMMA_SEVA_BOOST = 100;
 export const DISCRETIONARY_QUOTA_PERCENTAGE = 0.07;
 export const DISCRETIONARY_QUOTA_MAX_CAP = 4;
 
@@ -146,25 +147,30 @@ export const getYogiSortScore = (
   };
 
   // 3. Participation Score (S_participation)
-  const deductionCutoffDate = new Date();
-  deductionCutoffDate.setFullYear(deductionCutoffDate.getFullYear() - PARTICIPATION_DEDUCTION_YEARS);
+  const participationCutoffDate = new Date();
+  participationCutoffDate.setFullYear(participationCutoffDate.getFullYear() - PARTICIPATION_LOOKBACK_YEARS);
 
   let nGeneral = 0;
   let nSilent = 0;
+  let nDhammaSeva = 0;
   const attendedGeneralRetreats: string[] = [];
   const attendedSilentRetreats: string[] = [];
+  const attendedDhammaSevaRetreats: string[] = [];
 
   Object.values(yogiObj.participation || {}).forEach((p) => {
     if (p.attendance === AttendanceState.ATTENDED) {
       const retreat = allRetreats.find((r) => r.code === p.retreat);
       if (retreat && retreat.date) {
         const retreatDate = new Date(retreat.date);
-        if (retreatDate >= deductionCutoffDate) {
+        if (retreatDate >= participationCutoffDate) {
           const retreatNameOrCode = retreat.retreatCode || p.retreat;
-          if (isGeneralRetreat(retreat)) {
+          if (isDhammaSevaRetreat(retreat)) {
+            nDhammaSeva++;
+            attendedDhammaSevaRetreats.push(retreatNameOrCode);
+          } else if (isGeneralRetreat(retreat)) {
             nGeneral++;
             attendedGeneralRetreats.push(retreatNameOrCode);
-          } else {
+          } else if (isSilentRetreat(retreat)) {
             nSilent++;
             attendedSilentRetreats.push(retreatNameOrCode);
           }
@@ -203,6 +209,8 @@ export const getYogiSortScore = (
         type: "deduction",
       });
     });
+  } else if (currentRetreat && isDhammaSevaRetreat(currentRetreat)) {
+    sParticipation = 100;
   } else {
     attendedGeneralRetreats.forEach((code) => {
       participationItems.push({
@@ -217,6 +225,15 @@ export const getYogiSortScore = (
         points: 10,
         type: "bonus",
       });
+    });
+  }
+
+  if (nDhammaSeva > 0) {
+    sParticipation += DHAMMA_SEVA_BOOST;
+    participationItems.push({
+      label: "Dhamma Seva Boost",
+      points: DHAMMA_SEVA_BOOST,
+      type: "bonus",
     });
   }
 

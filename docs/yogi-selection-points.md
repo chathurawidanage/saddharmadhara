@@ -76,6 +76,14 @@ The score starts at a base of `100` and is modified depending on the **type of t
 * **If current retreat type is unspecified**:
   $$S_{\text{participation}} = 100$$
 
+* **Dhamma Seva Boost**:
+  If the yogi has attended at least one **Dhamma Seva** (`dhamma-seva`) retreat within the last 2 years, they receive a boost of `+100` points added to $S_{\text{participation}}$:
+  $$\text{Boost} = +100$$
+
+* **First-Time Yogi Boost**:
+  If the yogi has never attended any retreat and has never been in `SELECTED` or `PENDING` state for any other retreat, an additional boost is added to $S_{\text{participation}}$:
+  $$\text{Boost} = +50$$
+
 ---
 
 ### D. Penalty Score ($S_{\text{penalty}}$)

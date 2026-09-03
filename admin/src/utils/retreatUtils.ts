@@ -38,6 +38,11 @@ export const isSilentRetreat = (retreat: Partial<Retreat> | null): boolean => {
   return retreat?.retreatType?.toLowerCase() === "silent";
 };
 
+export const isDhammaSevaRetreat = (retreat: Partial<Retreat> | null): boolean => {
+  const type = retreat?.retreatType?.toLowerCase().replace(/[\s_]/g, "-") || "";
+  return type === "dhamma-seva";
+};
+
 /**
  * Returns a formatted display range for the retreat dates
  * @param {Retreat} retreat

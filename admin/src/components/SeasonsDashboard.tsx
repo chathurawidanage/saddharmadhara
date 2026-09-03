@@ -28,6 +28,7 @@ const getTypeColor = (type: string | null | undefined) => {
   const normalizedType = type?.toLowerCase() || "";
   if (normalizedType.includes("silent")) return "#6610f2"; // Purple
   if (normalizedType.includes("general")) return "#28a745"; // Green
+  if (normalizedType.includes("dhamma")) return "#fd7e14"; // Orange
   return "#6c757d"; // Gray default
 };
 

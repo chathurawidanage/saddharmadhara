@@ -5,6 +5,7 @@ import {
   sortYogiList,
   SELECTION_PRIORITY_SORT,
   FIRST_TIME_YOGI_BOOST,
+  DHAMMA_SEVA_BOOST,
 } from "../../utils/yogiUtils";
 import { SelectionState } from "../../types/domain";
 
@@ -234,7 +235,7 @@ describe("YogiList Sorting Helpers", () => {
     const resPending = getYogiSortScore(previouslyPendingYogi, [currentRetreat], [], currentRetreat);
     const resAttended = getYogiSortScore(previouslyAttendedYogi, [currentRetreat], [], currentRetreat);
 
-    // Brand new yogi receives base participation (100) + boost (25) = 125
+    // Brand new yogi receives base participation (100) + boost (50) = 150
     expect(resNew.breakdown.participation.score).toBe(100 + FIRST_TIME_YOGI_BOOST);
     expect(resNew.breakdown.participation.items).toEqual(
       expect.arrayContaining([
@@ -302,5 +303,101 @@ describe("YogiList Sorting Helpers", () => {
 
     expect(resNone.breakdown.status.score).toBe(0);
     expect(resNone.breakdown.status.label).not.toContain("Intends Ordination");
+  });
+
+  test("getYogiSortScore adds a boost of 100 if yogi has participated in at least one Dhamma Seva retreat within the last 2 years", () => {
+    const today = new Date();
+    const fourYearsAgo = new Date(today.getFullYear() - 4, today.getMonth(), 1);
+    const sixMonthsAgo = new Date(today.getFullYear(), today.getMonth() - 6, 1);
+
+    const dsRetreatOld = {
+      code: "DS1",
+      retreatCode: "DS-OLD",
+      retreatType: "dhamma-seva",
+      date: fourYearsAgo,
+    } as any;
+
+    const dsRetreatRecent = {
+      code: "DS2",
+      retreatCode: "DS-NEW",
+      retreatType: "dhamma-seva",
+      date: sixMonthsAgo,
+    } as any;
+
+    const currentGeneralRetreat = {
+      code: "GEN1",
+      retreatType: "general",
+      date: today,
+    } as any;
+
+    // Yogi attended Dhamma Seva 4 years ago (past the 2-year cutoff) - should expire
+    const yogiWithOldDs = {
+      attributes: {},
+      participation: {
+        p1: { retreat: "DS1", attendance: "attended" },
+      },
+      expressionOfInterests: {},
+    } as any;
+
+    // Yogi attended Dhamma Seva 6 months ago (within 2 years) - receives boost
+    const yogiWithRecentDs = {
+      attributes: {},
+      participation: {
+        p1: { retreat: "DS2", attendance: "attended" },
+      },
+      expressionOfInterests: {},
+    } as any;
+
+    // Yogi attended multiple Dhamma Seva retreats
+    const yogiWithMultipleDs = {
+      attributes: {},
+      participation: {
+        p1: { retreat: "DS1", attendance: "attended" },
+        p2: { retreat: "DS2", attendance: "attended" },
+      },
+      expressionOfInterests: {},
+    } as any;
+
+    // Yogi who only had no-show for Dhamma Seva
+    const yogiWithNoShowDs = {
+      attributes: {},
+      participation: {
+        p1: { retreat: "DS2", attendance: "noshow" },
+      },
+      expressionOfInterests: {},
+    } as any;
+
+    const allRetreatsList = [dsRetreatOld, dsRetreatRecent, currentGeneralRetreat];
+
+    const resOld = getYogiSortScore(yogiWithOldDs, allRetreatsList, [], currentGeneralRetreat);
+    const resRecent = getYogiSortScore(yogiWithRecentDs, allRetreatsList, [], currentGeneralRetreat);
+    const resMulti = getYogiSortScore(yogiWithMultipleDs, allRetreatsList, [], currentGeneralRetreat);
+    const resNoShow = getYogiSortScore(yogiWithNoShowDs, allRetreatsList, [], currentGeneralRetreat);
+
+    // Old Dhamma Seva participation (4 years ago) has expired, no boost
+    expect(resOld.breakdown.participation.score).toBe(100);
+    expect(resOld.breakdown.participation.items).not.toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ label: "Dhamma Seva Boost" }),
+      ]),
+    );
+
+    // Recent Dhamma Seva participation receives +100 boost
+    expect(resRecent.breakdown.participation.score).toBe(100 + DHAMMA_SEVA_BOOST);
+    expect(resRecent.breakdown.participation.items).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ label: "Dhamma Seva Boost", points: DHAMMA_SEVA_BOOST }),
+      ]),
+    );
+
+    // Multiple Dhamma Seva attendances only receive the boost once
+    expect(resMulti.breakdown.participation.score).toBe(100 + DHAMMA_SEVA_BOOST);
+
+    // No-show does not receive boost
+    expect(resNoShow.breakdown.participation.items).not.toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ label: "Dhamma Seva Boost" }),
+      ]),
+    );
   });
 });

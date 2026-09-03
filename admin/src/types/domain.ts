@@ -1,4 +1,4 @@
-export type RetreatType = "silent" | "general";
+export type RetreatType = "silent" | "general" | "dhamma-seva";
 export type RetreatMedium = "sinhala" | "english";
 
 export interface Retreat {
