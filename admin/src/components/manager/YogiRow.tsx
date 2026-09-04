@@ -48,6 +48,8 @@ const getReasonLabel = (reason: string) => {
       return "Possible disciplinary or behavioral concerns";
     case "TOO_MANY_NO_SHOWS":
       return "Too many no shows across past years";
+    case "TOO_MANY_PARTICIPATIONS":
+      return "Too many participations across past retreats";
     case "OUTSIDE_COMMUNICATION":
       return "Already known to be not attending based on outside communication";
     case "READINESS_ANSWERS":

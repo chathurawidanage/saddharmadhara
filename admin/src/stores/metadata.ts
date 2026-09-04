@@ -12,6 +12,7 @@ import {
   DHIS2_DASHBOARD_EOI_SUMMARY_SQL_VIEW,
   DHIS2_SEASON_OPTION_SET_ID,
   DHIS2_RETREAT_SEASON_ATTRIBUTE,
+  DHIS2_RETREAT_DISABLED_ATTRIBUTE,
 } from "../dhis2";
 import {
   transformAttendance,
@@ -272,6 +273,24 @@ class MetadataStore {
       });
     }
     return success;
+  };
+
+  setRetreatDisabled = async (retreat: Retreat, disabled: boolean): Promise<boolean> => {
+    const updated = await this.updateRetreatAttribute(
+      retreat,
+      DHIS2_RETREAT_DISABLED_ATTRIBUTE,
+      disabled ? "true" : "false",
+    );
+    if (updated) {
+      runInAction(() => {
+        retreat.disabled = disabled;
+        const retreatIndex = this.retreats.findIndex((r) => r.id === retreat.id);
+        if (retreatIndex !== -1) {
+          this.retreats[retreatIndex].disabled = disabled;
+        }
+      });
+    }
+    return updated;
   };
 
   updateRetreatAttribute = async (

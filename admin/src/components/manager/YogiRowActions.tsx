@@ -189,6 +189,7 @@ export const StateChangeButton = observer(({ currentState, yogi, retreat, allYog
     { label: "Based on past staff review (eg: inappropriate behavior)", value: "PAST_REVIEW" },
     { label: "Possible disciplinary or behavioral concerns", value: "DISCIPLINARY_CONCERNS" },
     { label: "Too many no shows across past years", value: "TOO_MANY_NO_SHOWS" },
+    { label: "Too many participations across past retreats", value: "TOO_MANY_PARTICIPATIONS" },
     { label: "Already known to be not attending based on outside communication", value: "OUTSIDE_COMMUNICATION" },
     { label: "Based on the answers to the questions Physical & Psychological Readiness.", value: "READINESS_ANSWERS" },
     { label: "Health issues", value: "HEALTH_ISSUES" },

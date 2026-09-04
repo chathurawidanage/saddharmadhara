@@ -182,3 +182,22 @@
 .retreat-details-deadline-wrapper * {
   max-width: none !important;
 }
+
+.retreat-details-right {
+  margin-left: auto;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--spacing-m);
+}
+
+.retreat-details-right * {
+  max-width: none !important;
+}
+
+.retreat-disable-switch-wrapper {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+

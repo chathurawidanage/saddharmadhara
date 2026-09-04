@@ -1,6 +1,18 @@
-import { Tag } from "@dhis2/ui";
+import {
+  Tag,
+  Switch,
+  CircularLoader,
+  Modal,
+  ModalTitle,
+  ModalContent,
+  ModalActions,
+  ButtonStrip,
+  Button,
+  NoticeBox,
+} from "@dhis2/ui";
+import { useAlert } from "@dhis2/app-runtime";
 import { observer } from "mobx-react";
-import React from "react";
+import React, { useState } from "react";
 import {
   FaGlobe,
   FaCalendarAlt,
@@ -24,6 +36,19 @@ interface RetreatDetailsProps {
 
 const RetreatDetails = observer(({ retreat }: RetreatDetailsProps) => {
   const store = useStore();
+  const [updatingDisabled, setUpdatingDisabled] = useState(false);
+  const [pendingTargetState, setPendingTargetState] = useState<boolean | null>(null);
+
+  const { show: showSuccessAlert } = useAlert(
+    ({ message }: { message: string }) => message,
+    { success: true, duration: 3000 }
+  );
+
+  const { show: showErrorAlert } = useAlert(
+    ({ message }: { message: string }) => message,
+    { critical: true, duration: 4000 }
+  );
+
   const discretionaryInfo = store.yogis?.getDiscretionaryQuota(retreat.code);
 
   const isRetreatDatePassed = (() => {
@@ -49,6 +74,37 @@ const RetreatDetails = observer(({ retreat }: RetreatDetailsProps) => {
       year: "numeric",
     });
   })();
+
+  const confirmToggleAcceptApplications = async () => {
+    if (pendingTargetState === null) return;
+    const targetChecked = pendingTargetState;
+    setUpdatingDisabled(true);
+    try {
+      // targetChecked === true means retreat is enabled (disabled = false)
+      // targetChecked === false means retreat is disabled (disabled = true)
+      const disabledValue = !targetChecked;
+      const success = await store.metadata?.setRetreatDisabled(retreat, disabledValue);
+      if (success) {
+        showSuccessAlert({
+          message: targetChecked
+            ? "Retreat enabled. Accepting applications."
+            : "Retreat disabled. Applications closed.",
+        });
+        setPendingTargetState(null);
+      } else {
+        showErrorAlert({
+          message: "Failed to update retreat status. Please try again.",
+        });
+      }
+    } catch (err) {
+      console.error("Failed to toggle retreat status:", err);
+      showErrorAlert({
+        message: "An error occurred while updating retreat status.",
+      });
+    } finally {
+      setUpdatingDisabled(false);
+    }
+  };
 
   return (
     <div className="retreat-details-row">
@@ -90,13 +146,91 @@ const RetreatDetails = observer(({ retreat }: RetreatDetailsProps) => {
           </span>
         </div>
       )}
-      {retreat.confirmationDeadline && !isRetreatDatePassed ? (
-        <div className={`confirmation-deadline-pill retreat-details-deadline-wrapper ${isDeadlineExpired ? "expired" : ""}`}>
-          <FaHourglassHalf className="deadline-pill-icon" />
-          <span className="deadline-pill-label">Confirmation Deadline</span>
-          <span className="deadline-pill-value">{formattedDeadline}</span>
+      {!isRetreatDatePassed && (
+        <div className="retreat-details-right">
+          {retreat.confirmationDeadline ? (
+            <div
+              className={`confirmation-deadline-pill ${
+                isDeadlineExpired ? "expired" : ""
+              }`}
+            >
+              <FaHourglassHalf className="deadline-pill-icon" />
+              <span className="deadline-pill-label">Confirmation Deadline</span>
+              <span className="deadline-pill-value">{formattedDeadline}</span>
+            </div>
+          ) : null}
+          <div className="retreat-disable-switch-wrapper">
+            <Switch
+              dense
+              checked={!retreat.disabled}
+              disabled={updatingDisabled}
+              label={
+                !retreat.disabled
+                  ? "Accepting applications"
+                  : "Applications closed"
+              }
+              onChange={({ checked }: { checked: boolean }) => setPendingTargetState(checked)}
+            />
+            {updatingDisabled && <CircularLoader extrasmall />}
+          </div>
         </div>
-      ) : null}
+      )}
+      {pendingTargetState !== null && (
+        <Modal onClose={updatingDisabled ? undefined : () => setPendingTargetState(null)}>
+          <ModalTitle>
+            {pendingTargetState ? "Open Applications?" : "Stop Accepting Applications?"}
+          </ModalTitle>
+          <ModalContent>
+            {pendingTargetState ? (
+              <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                <p style={{ margin: 0, fontSize: "14px", lineHeight: "20px" }}>
+                  Are you sure you want to open applications for{" "}
+                  <strong>
+                    {retreat.name} ({retreat.retreatCode})
+                  </strong>
+                  ?
+                </p>
+                <NoticeBox title="What is going to happen">
+                  This retreat will be marked as active and will immediately become available on the public application portal. Yogis will be able to submit new applications.
+                </NoticeBox>
+              </div>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                <p style={{ margin: 0, fontSize: "14px", lineHeight: "20px" }}>
+                  Are you sure you want to stop accepting applications for{" "}
+                  <strong>
+                    {retreat.name} ({retreat.retreatCode})
+                  </strong>
+                  ?
+                </p>
+                <NoticeBox warning title="What is going to happen">
+                  This retreat will be marked as disabled and hidden from the public application portal. Yogis will no longer be able to apply. Any applications already received will not be affected.
+                </NoticeBox>
+              </div>
+            )}
+          </ModalContent>
+          <ModalActions>
+            <ButtonStrip>
+              <Button
+                secondary
+                disabled={updatingDisabled}
+                onClick={() => setPendingTargetState(null)}
+              >
+                Cancel
+              </Button>
+              <Button
+                primary={pendingTargetState}
+                destructive={!pendingTargetState}
+                loading={updatingDisabled}
+                disabled={updatingDisabled}
+                onClick={confirmToggleAcceptApplications}
+              >
+                {pendingTargetState ? "Accept Applications" : "Stop Accepting Applications"}
+              </Button>
+            </ButtonStrip>
+          </ModalActions>
+        </Modal>
+      )}
     </div>
   );
 });

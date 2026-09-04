@@ -112,3 +112,60 @@ describe("MetadataStore.generalRetreatStats", () => {
     });
   });
 });
+
+describe("MetadataStore.setRetreatDisabled", () => {
+  let store: MetadataStore;
+  let mockEngine: any;
+
+  beforeEach(() => {
+    mockEngine = {
+      query: jest.fn().mockResolvedValue({
+        retreat: {
+          id: "r1",
+          code: "R1",
+          name: "Retreat 1",
+          attributeValues: [],
+        },
+      }),
+      mutate: jest.fn().mockResolvedValue({
+        httpStatusCode: 200,
+      }),
+    };
+    store = new MetadataStore(mockEngine);
+    store.retreats = [
+      {
+        id: "r1",
+        code: "R1",
+        name: "Retreat 1",
+        disabled: false,
+      } as any,
+    ];
+  });
+
+  test("disables retreat successfully and updates store", async () => {
+    const retreat = store.retreats[0];
+    const success = await store.setRetreatDisabled(retreat, true);
+
+    expect(success).toBe(true);
+    expect(retreat.disabled).toBe(true);
+    expect(store.retreats[0].disabled).toBe(true);
+    expect(mockEngine.mutate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        resource: "options",
+        id: "r1",
+        type: "update",
+      })
+    );
+  });
+
+  test("enables retreat successfully and updates store", async () => {
+    store.retreats[0].disabled = true;
+    const retreat = store.retreats[0];
+    const success = await store.setRetreatDisabled(retreat, false);
+
+    expect(success).toBe(true);
+    expect(retreat.disabled).toBe(false);
+    expect(store.retreats[0].disabled).toBe(false);
+  });
+});
+
