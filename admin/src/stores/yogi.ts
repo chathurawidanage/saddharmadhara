@@ -482,19 +482,32 @@ class YogiStore {
   };
 
   markAttendance = async (yogiId: string, retreat: Retreat, attendance: string, specialComment?: string): Promise<boolean> => {
-    const eventId =
-      this.yogiIdToObjectMap.get(yogiId)?.participation[retreat.code]?.eventId;
+    const existingParticipation =
+      this.yogiIdToObjectMap.get(yogiId)?.participation[retreat.code];
+    const eventId = existingParticipation?.eventId;
     const type = eventId ? ("update" as const) : ("create" as const);
+    const resolvedSpecialComment =
+      specialComment !== undefined
+        ? specialComment
+        : existingParticipation?.specialComment;
+    const resolvedRoomCode = existingParticipation?.room;
+
     const data = eventId
-      ? attendanceEventData({ attendance, specialComment, retreat })
+      ? attendanceEventData({
+          attendance,
+          specialComment: resolvedSpecialComment,
+          roomCode: resolvedRoomCode,
+          retreat,
+        })
       : attendanceEventData({
-        attendance,
-        specialComment,
-        retreat,
-        trackedEntityInstance: yogiId,
-        orgUnit: retreat.location,
-        eventDate: new Date(),
-      });
+          attendance,
+          specialComment: resolvedSpecialComment,
+          roomCode: resolvedRoomCode,
+          retreat,
+          trackedEntityInstance: yogiId,
+          orgUnit: retreat.location,
+          eventDate: new Date(),
+        });
 
     const mutation = {
       resource: "events",
@@ -507,33 +520,48 @@ class YogiStore {
       const yogi = this.yogiIdToObjectMap.get(yogiId);
       if (yogi) {
         yogi.participation[retreat.code] = {
-          attendance,
-          specialComment,
+          ...yogi.participation[retreat.code],
+          attendance: attendance as AttendanceState,
+          specialComment: resolvedSpecialComment,
           eventId:
             eventId ||
             (response.response?.importSummaries
               ? response.response.importSummaries[0].reference
               : response.response?.reference),
           retreat: retreat.code,
-          occurredAt: (data.eventDate as Date).toISOString(),
+          occurredAt:
+            (data.eventDate as Date)?.toISOString?.() ||
+            existingParticipation?.occurredAt ||
+            new Date().toISOString(),
         };
       }
     });
   };
 
   assignRoom = async (yogiId: string, retreat: Retreat, roomCode: string): Promise<boolean> => {
-    const eventId =
-      this.yogiIdToObjectMap.get(yogiId)?.participation[retreat.code]?.eventId;
+    const existingParticipation =
+      this.yogiIdToObjectMap.get(yogiId)?.participation[retreat.code];
+    const eventId = existingParticipation?.eventId;
     const type = eventId ? ("update" as const) : ("create" as const);
+    const resolvedAttendance = existingParticipation?.attendance;
+    const resolvedSpecialComment = existingParticipation?.specialComment;
+
     const data = eventId
-      ? attendanceEventData({ roomCode, retreat })
+      ? attendanceEventData({
+          roomCode,
+          attendance: resolvedAttendance,
+          specialComment: resolvedSpecialComment,
+          retreat,
+        })
       : attendanceEventData({
-        roomCode,
-        retreat,
-        trackedEntityInstance: yogiId,
-        orgUnit: retreat.location,
-        eventDate: new Date(),
-      });
+          roomCode,
+          attendance: resolvedAttendance,
+          specialComment: resolvedSpecialComment,
+          retreat,
+          trackedEntityInstance: yogiId,
+          orgUnit: retreat.location,
+          eventDate: new Date(),
+        });
 
     const mutation = {
       resource: "events",
@@ -554,7 +582,10 @@ class YogiStore {
               ? response.response.importSummaries[0].reference
               : response.response?.reference),
           retreat: retreat.code,
-          occurredAt: (data.eventDate as Date).toISOString(),
+          occurredAt:
+            (data.eventDate as Date)?.toISOString?.() ||
+            existingParticipation?.occurredAt ||
+            new Date().toISOString(),
         };
       }
     });
